@@ -1,0 +1,509 @@
+html {
+    background-color: black;
+}
+
+body {
+    width: 100vw;
+    height: 100vh;
+    font-family: 'Quattrocento Sans', sans-serif;
+    font-weight: normal;
+    font-size: 10pt;
+    color: lightskyblue;
+    text-shadow: 0 0 3px lightskyblue;;
+    background-color: black;
+}
+a:hover {
+    color: inherit;
+    outline: none;
+    text-decoration: none;
+}
+a:focus {
+    outline: none;
+}
+a {
+    color: inherit;
+}
+code {
+    background-color: transparent;
+    color: lightskyblue;
+}
+code:hover {
+    color: #c7254e;
+}
+sup {
+    margin-left: 5px;
+    top: -16px;
+}
+
+ul {
+    padding: 0;
+    list-style-type: none;
+}
+
+.micro {
+    font-size: 10pt;
+}
+.small {
+    font-size: 12pt;
+}
+.medium {
+    font-size: 16pt;
+}
+.large {
+    font-size: 24pt;
+}
+.xlarge {
+    font-size: 30pt;
+}
+.thin {
+    font-weight: 200;
+}
+.light {
+    font-weight: 300;
+}
+.heavy {
+    font-weight: 400;
+}
+.left-bar {
+    padding-left: 10px;
+    border-left: 2px solid #9d1717;
+}
+.white-glow {
+    color: white;
+    text-shadow: 0 0 3px white;
+}
+.orange-glow {
+    color: #ff8c00;
+    text-shadow: 0 0 3px #c7254e;
+}
+.blue-glow {
+    color: lightskyblue;
+    text-shadow: 0 0 3px lightskyblue;
+}
+.purple-glow {
+    color: mediumpurple;
+    text-shadow: 0 0 3px mediumpurple;
+}
+.green-glow {
+    color: lightseagreen;
+    text-shadow: 0 0 3px lightseagreen;
+}
+.success-glow {
+    color: #24d3c9;
+    text-shadow: 0 0 3px lightseagreen;
+}
+.success {
+    color: #24d3c9;
+}
+
+#headerContainer {
+    width: 100%;
+    height: 100px;
+    position: absolute;
+    background-color: #1f2d3c;
+}
+
+#headerTitle {
+    display: table;
+    width: 60%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+#headerTitleMain {
+    height: 12pt;
+}
+
+#headerTitleSub {
+    margin-left: -2px
+}
+
+#navList {
+    position: absolute;
+    bottom: 0;
+    z-index: 2;
+    right: 25%;
+}
+
+#navList ul {
+    list-style: none;
+    padding: 0;
+    overflow: hidden;
+    margin: 0;
+}
+
+#navList ul a {
+    display: inline-block;
+    padding: 10px 20px;
+    border-radius: 5px 5px 0 0;
+    background-color: #2f3b4b;
+    z-index: 2;
+    box-shadow: inset 0 -3px 3px rgba(0,0,0,0.2);
+}
+
+#navList ul a:hover {
+    background: linear-gradient(to bottom, #283547, #2f3b4b);
+    text-shadow: 0 0 3px white;
+}
+
+#navList ul a.active {
+    z-index: 9999;
+    box-shadow: 0 0 5px rgba(0,0,0,0.2);
+}
+
+#navList ul a:first-child.active {
+    filter: drop-shadow(3px 0 3px rgba(0,0,0,0.2));
+}
+
+#navList ul a:not(:first-child) {
+    margin-left: -3px;
+}
+
+#navList ul a li ~ span {
+    position: absolute;
+    padding: 1px 5px;
+    border-radius: 100px;
+    font-size: 8pt;
+    font-weight: 400;
+    background-color: #9d1717;
+    top: -3px;
+    right: -3px;
+    text-align: center;
+}
+
+#bodyContainer {
+    width: 100%;
+    position: absolute;
+    top: 100px;
+    height: calc(100% - 100px);
+    overflow-y: scroll;
+    background-color: #2f3b4b;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+}
+
+.contentContainer {
+    width: 60%;
+    height: 87%;
+    overflow-y: scroll;
+    margin-top: 20px;
+    margin-bottom: 0;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#dataContainer {
+    width: 60%;
+    height: 87%;
+    overflow-y: scroll;
+    margin-top: 20px;
+    margin-bottom: 0;
+    margin-left: auto;
+    margin-right: auto;
+}
+#dataContainer form {
+    margin-top: 25px;
+    width: 92%;
+    display: table;
+}
+#dataContainer form select {
+    font-family: "Consolas", "Monaco", monospace;
+    font-size: 10pt;
+    color: lightskyblue;
+    width: 80%;
+    background-color: rgba(0,0,0,0.2);
+    padding: 11px 25px;
+    border: 1px solid rgba(0,0,0,0.2);
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    float: left;
+    margin-right: 25px;
+}
+#dataContainer form input[type=submit] {
+    background-color: rgba(0,0,0,0.2);
+    padding: 10px 45px;
+    border-radius: 5px;
+    border: 1px solid rgba(0,0,0,0.2);
+    float: left;
+}
+#dataContainer form input[type=submit]:hover {
+    background-color: rgba(0,0,0,0.4);
+}
+#dataList {
+    width: 92%;
+    margin-top: 25px;
+}
+#dataList > ul {
+    list-style: none;
+    padding: 0;
+}
+#dataList > ul > li {
+    border-left: 1px solid rgba(0,0,0,0.2);
+    border-right: 1px solid rgba(0,0,0,0.2);
+    border-bottom: 1px solid rgba(0,0,0,0.2);
+    background-color: rgba(0,0,0,0.2);
+}
+#dataList > ul > li:first-child {
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    border-top: 1px solid rgba(0,0,0,0.2);
+}
+#dataList > ul > li:last-child {
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+#dataList > ul > li > div:first-child {
+    padding: 10px 25px;
+}
+#dataList > ul > li > div:first-child.expanded {
+    border-bottom: 1px dashed rgba(0,0,0,0.2);
+}
+#dataList > ul > li > div:first-child:hover {
+    background-color: rgba(0,0,0,0.3);
+}
+#dataList > ul > li > div:first-child span:first-child {
+    display: inline-table;
+    min-width: 200px;
+    width: 34%;
+}
+#dataList > ul > li > div:first-child span:nth-child(2) {
+    display: inline-table;
+    min-width: 200px;
+    width: 65%;
+    text-align: right;
+}
+#dataList > ul > li > div > div {
+    margin-top: 20px;
+    width: 100%;
+    padding: 0 25px;
+}
+#dataList .list-metadata ul {
+    list-style: none;
+    padding: 0;
+}
+#dataList .list-metadata ul li {
+    min-width: 130px;
+    width: 19%;
+    margin-bottom: 5px;
+    display: inline-block;
+    border: 1px solid rgba(0,0,0,0.2);
+    background-color: rgba(0,0,0,0.2);
+    border-radius: 5px;
+}
+#dataList .list-metadata ul li:not(:last-child) {
+    margin-right: 8px;
+}
+#dataList .list-metadata ul li span {
+    display: block;
+    text-align: center;
+    padding: 5px 0;
+}
+#dataList .list-metadata ul li span:first-child {
+    border-bottom: 1px solid rgba(0,0,0,0.2);
+    line-height: 34pt;
+}
+#dataList .list-img > img {
+    border-radius: 5px;
+    width: 99.7%;
+    height: 450px;
+}
+#dataList .list-img > div {
+    border-radius: 5px;
+    width: 100%;
+    height: 450px;
+    background-color: rgba(0,0,0,0.4);
+}
+#dataList .list-img > div > img {
+    filter: drop-shadow(0 0 3px lightskyblue);
+    height: 450px;
+    width: 120px;
+    margin: 0 auto;
+    display: table;
+}
+#dataList .list-buttons {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+#dataList .list-buttons > div {
+    display: table;
+    margin: 0 auto;
+}
+#dataList .list-buttons span {
+    font-family: "Consolas", "Monaco", monospace;
+    color: lightskyblue;
+    width: 80px;
+    text-align: center;
+    cursor: pointer;
+    display: inline-block;
+    padding: 5px 15px;
+    border-radius: 25px;
+    border: 1px solid rgba(0,0,0,0.2);
+    background-color: rgba(0,0,0,0.2);
+}
+#dataList .list-buttons span:hover {
+    background-color: rgba(0,0,0,0.4);
+    color: #c7254e;
+}
+#dataList .list-buttons span:not(:last-child) {
+    margin-right: 10px;
+}
+
+#statusContainer > h2 {
+    width: 87%;
+    display: inline-block;
+}
+#statusContainer > button {
+    display: inline-block;
+    background-color: rgba(0,0,0,0.2);
+    border: 1px solid rgba(0,0,0,0.2);
+    padding: 8px 15px 5px 15px;
+    border-radius: 5px;
+    vertical-align: super
+}
+#statusContainer > button:hover {
+    background-color: rgba(0,0,0,0.4);
+    color: #24d3c9;
+}
+#statusContainer ul {
+    list-style: none;
+    padding: 0;
+}
+#statusContainer ul li {
+    min-width: 150px;
+    width: 21%;
+    display: inline-block;
+    border-radius: 5px;
+    border: 1px solid rgba(0,0,0,0.2);
+    background-color: rgba(0,0,0,0.2);
+    margin-top: 25px;
+}
+#statusContainer ul li:not(:last-child) {
+    margin-right: 25px;
+}
+#statusContainer ul li span {
+    display: block;
+    text-align: center;
+}
+#statusContainer ul li span:first-child {
+    padding: 25px 0;
+    font-size: 20pt;
+    line-height: 16pt;
+}
+#statusContainer ul li span:not(:first-child) {
+    padding: 5px 0;
+    border-top: 1px solid rgba(0,0,0,0.2);
+}
+
+#oS {
+    margin-top: 25px;
+    width: 92%;
+}
+.oS-item {
+    width: 100%;
+    height: 40px;
+    margin: 0;
+    background-color: rgba(0,0,0,0.2);
+    border-top: 1px solid rgba(0,0,0,0.2);
+    border-left: 1px solid rgba(0,0,0,0.2);
+    border-right: 1px solid rgba(0,0,0,0.2);
+    border-radius: 0;
+    box-shadow: none;
+    -webkit-box-shadow: none;
+    position: relative;
+}
+.oS-item .progress-bar {
+    box-shadow: none;
+    -webkit-box-shadow: none;
+    background-color: rgba(0,0,0,0.3);
+}
+.oS-item:first-child {
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+}
+.oS-item:last-child {
+    border-bottom: 1px solid rgba(0,0,0,0.2);
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+.oS-item .oS-content {
+    position: absolute;
+    left: 0;
+    width: 100%;
+}
+.oS-item .oS-content > span {
+    display: inline-block;
+    text-align: center;
+    padding: 10px 0px;
+}
+.oS-item .oS-content > span:not(:last-child) {
+    border-right: 1px solid rgba(0,0,0,0.2);
+}
+.oS-item .oS-content > span.oS-header {
+    min-width: 16%;
+}
+.oS-item .oS-content > span.oS-progress {
+    width: 16%;
+}
+.oS-item .oS-content > span.oS-abort {
+    width: 8%;
+    cursor: pointer;
+    color: lightskyblue;
+    height: 39px;
+}
+.oS-item:first-child .oS-content > span.oS-abort {
+    border-top-right-radius: 5px;
+}
+.oS-item:last-child .oS-content > span.oS-abort {
+    border-bottom-right-radius: 5px;
+}
+.oS-item .oS-content > span.oS-abort:hover {
+    color: #c7254e;
+    background-color: rgba(0,0,0,0.3);
+}
+.oS-item .oS-content > span.oS-abort > span.fa {
+    transition: transform 0.3s ease;
+    vertical-align: -2px;
+    -webkit-text-stroke: 1px #2a313e;
+}
+.oS-item .oS-content > span.oS-abort:hover > span.fa {
+    transform: rotateZ(135deg);
+    transition: transform 0.3s ease;
+    -webkit-text-stroke: 1px #1d222c;
+}
+
+#noObservation {
+    width: 92%;
+    display: table;
+    margin-top: 25px;
+    padding: 20px;
+    background-color: rgba(0,0,0,0.2);
+    border-radius: 5px;
+    border: 1px solid rgba(0,0,0,0.2);
+}
+#noObservation img {
+    width: 30%;
+    display: block;
+    margin: 0 auto;
+    opacity: 0.75;
+    filter: hue-rotate(180deg);
+}
+#noObservation span {
+    margin-top: 25px;
+    display: block;
+    width: 100%;
+    text-align: center;
+}
+
+#footerContainer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    padding-bottom: 20px;
+    padding-top: 50px;
+    background: linear-gradient(to top, #2f3b4b, rgba(0,0,0,0));
+}
+#footerContainer span {
+    opacity: 0.75;
+}
