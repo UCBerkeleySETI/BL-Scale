@@ -26,13 +26,18 @@ def create_app(test_config=None):
 
     # a simple page that says hello
     @app.route('/index')
+    @app.route('/')
     def index():
-        return render_template("index.html")
+        return render_template("index.html", title="Main Page")
+
 
     from . import db
     db.init_app(app)
 
     from . import auth
     app.register_blueprint(auth.bp)
+
+    from . import monitor
+    app.register_blueprint(monitor.bp)
 
     return app

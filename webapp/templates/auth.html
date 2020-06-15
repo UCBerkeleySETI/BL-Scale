@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block title %}Auth{% endblock %}
+
+{% block header %}
+{% endblock %}
+
+{% block content %}
+    <div class="container row center">
+        <div class="container col-6">
+            <div class="container row">
+                <h3>Log In</h3>
+            </div>
+            <form action="{{ url_for('auth.login') }}" method="post">
+                <div class="container row margin-5">
+                    <label for="username">Username</label>
+                    &emsp;
+                    <input name="username" id="username" required>
+                </div>
+                <div class="container row margin-5">
+                    <label for="password">Password</label>
+                    &emsp;
+                    <input type="password" name="password" id="password" required>
+                </div>
+                <div class="container row margin-5">
+                    <input type="submit" value="Log In">
+                </div>
+            </form>
+        </div>
+        <div class="container col-6">
+            <div class="container row">
+                <h3>Register</h3>
+            </div>
+            <form action="{{ url_for('auth.register') }}" method="post">
+                <div class="container row margin-5">
+                    <label for="username">Username</label>
+                    &emsp;
+                    <input name="username" id="username" required>
+                </div>
+                <div class="container row margin-5">
+                    <label for="password">Password</label>
+                    &emsp;
+                    <input type="password" name="password" id="password" required>
+                </div>
+                <div class="container row margin-5">
+                    <input type="submit" value="Register">
+                </div>
+            </form>
+        </div>
+    </div>
+
+{% endblock %}

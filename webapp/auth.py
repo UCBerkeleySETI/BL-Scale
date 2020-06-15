@@ -10,6 +10,11 @@ from webapp.db import get_db
 bp = Blueprint('auth', __name__, url_prefix='/auth')
 
 
+@bp.route('/')
+def base():
+    return render_template("auth.html", title="Auth")
+
+
 @bp.route('/register', methods=('GET', 'POST'))
 def register():
     if request.method == 'POST':
@@ -33,11 +38,11 @@ def register():
                 (username, generate_password_hash(password))
             )
             db.commit()
-            return redirect(url_for('auth.login'))
+            return redirect(url_for('auth'))
 
         flash(error)
 
-    return render_template('auth/register.html')
+    return render_template("auth.html", title="Auth")
 
 
 @bp.route('/login', methods=('GET', 'POST'))
@@ -63,7 +68,7 @@ def login():
 
         flash(error)
 
-    return render_template('auth/login.html')
+    return render_template("auth.html", title="Auth")
 
 
 @bp.before_app_request
