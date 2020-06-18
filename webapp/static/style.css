@@ -3,6 +3,7 @@ html {
 }
 
 body {
+    width: 100vw;
     font-family: 'Quattrocento Sans', sans-serif;
     font-weight: normal;
     font-size: 10pt;

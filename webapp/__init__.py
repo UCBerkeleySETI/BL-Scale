@@ -89,6 +89,32 @@ def create_app(test_config=None):
  'https://storage.cloud.google.com/bl-scale/GBT_58014_69579_HIP77629_fine/filtered/2/80794652.png',
  'https://storage.cloud.google.com/bl-scale/GBT_58014_69579_HIP77629_fine/filtered/2/80809452.png',
  'https://storage.cloud.google.com/bl-scale/GBT_58014_69579_HIP77629_fine/filtered/2/80812152.png']
+
+        sample_urls_3 = ['https://storage.cloud.google.com/bl-scale/GBT_58110_60123_HIP91926_fine/filtered/0/96300.png',
+ 'https://storage.cloud.google.com/bl-scale/GBT_58110_60123_HIP91926_fine/filtered/0/96400.png',
+ 'https://storage.cloud.google.com/bl-scale/GBT_58110_60123_HIP91926_fine/filtered/0/375500.png',
+ 'https://storage.cloud.google.com/bl-scale/GBT_58110_60123_HIP91926_fine/filtered/0/375600.png',
+ 'https://storage.cloud.google.com/bl-scale/GBT_58110_60123_HIP91926_fine/filtered/0/381900.png',
+ 'https://storage.cloud.google.com/bl-scale/GBT_58110_60123_HIP91926_fine/filtered/0/382000.png',
+ 'https://storage.cloud.google.com/bl-scale/GBT_58110_60123_HIP91926_fine/filtered/0/7164056.png',
+ 'https://storage.cloud.google.com/bl-scale/GBT_58110_60123_HIP91926_fine/filtered/0/7164156.png',
+ 'https://storage.cloud.google.com/bl-scale/GBT_58110_60123_HIP91926_fine/filtered/0/18317192.png',
+ 'https://storage.cloud.google.com/bl-scale/GBT_58110_60123_HIP91926_fine/filtered/0/18317292.png',
+ 'https://storage.cloud.google.com/bl-scale/GBT_58110_60123_HIP91926_fine/filtered/0/18382692.png',
+ 'https://storage.cloud.google.com/bl-scale/GBT_58110_60123_HIP91926_fine/filtered/0/18382792.png',
+ 'https://storage.cloud.google.com/bl-scale/GBT_58110_60123_HIP91926_fine/filtered/0/27049100.png',
+ 'https://storage.cloud.google.com/bl-scale/GBT_58110_60123_HIP91926_fine/filtered/0/27049200.png',
+ 'https://storage.cloud.google.com/bl-scale/GBT_58110_60123_HIP91926_fine/filtered/2/60084332.png',
+ 'https://storage.cloud.google.com/bl-scale/GBT_58110_60123_HIP91926_fine/filtered/2/60084432.png',
+ 'https://storage.cloud.google.com/bl-scale/GBT_58110_60123_HIP91926_fine/filtered/2/71958968.png',
+ 'https://storage.cloud.google.com/bl-scale/GBT_58110_60123_HIP91926_fine/filtered/2/71959068.png',
+ 'https://storage.cloud.google.com/bl-scale/GBT_58110_60123_HIP91926_fine/filtered/2/75018296.png',
+ 'https://storage.cloud.google.com/bl-scale/GBT_58110_60123_HIP91926_fine/filtered/2/75018396.png',
+ 'https://storage.cloud.google.com/bl-scale/GBT_58110_60123_HIP91926_fine/filtered/2/78474724.png',
+ 'https://storage.cloud.google.com/bl-scale/GBT_58110_60123_HIP91926_fine/filtered/2/80984852.png',
+ 'https://storage.cloud.google.com/bl-scale/GBT_58110_60123_HIP91926_fine/filtered/2/80984952.png',
+ 'https://storage.cloud.google.com/bl-scale/GBT_58110_60123_HIP91926_fine/filtered/1/45193468.png',
+ 'https://storage.cloud.google.com/bl-scale/GBT_58110_60123_HIP91926_fine/filtered/1/45193568.png']
         # obs_dict = {'GBT_58010_50176_HIP61317_fine': ['10','296909208','296909308','299668860','299668960','299669360'],'GBT_58010_50176_HIP61317_fine':
         # ['223233912','223254312','223274712','223295112']}
         # #obs_names = ['GBT_58010_50176_HIP61317_fine','GBT_58014_69579_HIP77629_fine','GBT_58110_60123_HIP91926_fine','GBT_58202_60970_B0329+54_fine','GBT_58210_37805_HIP103730_fine'
@@ -96,7 +122,7 @@ def create_app(test_config=None):
         # block_nums = ['0','1','2','3','4','5','6','7','8','9','10']
         # sample_urls_1 = get_img_url(obs_dict, 'GBT_58010_50176_HIP61317_fine')
         #sample_urls_2 = get_img_url(obs_dict, )
-        return render_template("index.html", title="Main Page", samples_1=sample_urls_1, samples_2=sample_urls_2)
+        return render_template("index.html", title="Main Page", samples_1=sample_urls_1, samples_2=sample_urls_2, samples_3=sample_urls_3)
 
 
     # def get_img_url(obs_dict, dict_key):

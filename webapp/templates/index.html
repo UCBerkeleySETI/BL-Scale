@@ -12,7 +12,7 @@
   </div>
   <div class="row">
     {%for sample_1 in samples_1%}
-      <div class="col-sm-3"><img class="img-responsive" src='{{ sample_1 }}' height="25" width="200"></div>
+      <div class="col-sm-3"><img class='img-responsive' src='{{ sample_1 }}' height="40" width="200" style="margin:15px"></div>
     {%endfor%}
   </div>
   <div class="row">
@@ -20,17 +20,16 @@
   </div>
   <div class="row">
     {%for sample_2 in samples_2%}
-      <div class="col-sm-3"><img class="img-responsive" src='{{ sample_2 }}'></div>
+      <div class="col-sm-3"><img class="img-responsive" src='{{ sample_2 }}' height="40" width="200" style="margin:15px"></div>
     {%endfor%}
   </div>
   <div class="row">
     <div class="col-sm-12">GBT_58110_60123_HIP91926_fine/ Unusual Filtered Samples</div>
   </div>
   <div class="row">
-    <div class="col-sm-3"><img class="img-responsive" src="https://storage.cloud.google.com/bl-scale/GBT_58014_69579_HIP77629_fine/filtered/0/10450684.png"></div>
-    <div class="col-sm-3"><img class="img-responsive" src="https://storage.cloud.google.com/bl-scale/GBT_58014_69579_HIP77629_fine/filtered/0/10450784.png"></div>
-    <div class="col-sm-3"><img class="img-responsive" src='https://storage.cloud.google.com/bl-scale/GBT_58010_50176_HIP61317_fine/filtered/0/1048676.png'></div>
-    <div class="col-sm-3"><img class="img-responsive" src='https://storage.cloud.google.com/bl-scale/GBT_58010_50176_HIP61317_fine/filtered/0/1048776.png'></div>
+    {%for sample_3 in samples_3%}
+      <div class="col-sm-3"><img class="img-responsive" src='{{ sample_3 }}' height="40" width="200" style="margin:15px"></div>
+    {%endfor%}
   </div>
   <div class="row">
     <div class="col-sm-12">GBT_58202_60970_B0329+54_fine/ Unusual Filtered Samples</div>
