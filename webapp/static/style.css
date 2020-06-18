@@ -1,16 +1,14 @@
 html {
-    background-color: black;
+    background-color: white;
 }
 
 body {
-    width: 100vw;
-    height: 100vh;
     font-family: 'Quattrocento Sans', sans-serif;
     font-weight: normal;
     font-size: 10pt;
     color: lightskyblue;
     text-shadow: 0 0 3px lightskyblue;;
-    background-color: black;
+    background-color: white;
 }
 a:hover {
     color: inherit;
@@ -145,7 +143,7 @@ ul {
 #navList ul {
     list-style: none;
     padding: 0;
-    overflow: hidden;
+    overflow: auto;
     margin: 0;
 }
 
