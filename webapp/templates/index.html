@@ -1,24 +1,24 @@
 {% extends 'base.html' %}
 
 {% block header %}
-  <h1>{% block title %}BL-Scale Images{% endblock %}</h1>
+  <h1>Welcome to BL@Scale</h1>
 {% endblock %}
 
 {% block content %}
-<h4>Images from each observation</h4>
+<h4>Unusual or extreme images from each observation</h4>
 <div class="container-fluid">
   {%for i in range(0, len)%}
-        <div class="row">
-	         <div class="col-sm-12">{{ sample_keys[i] }} Unusual Filtered Samples</div>
-  	      </div>
-		    <div class="row">
-    		    <div class="col-sm-12"><img src='{{ plot_bytes[i] }}'></div>
-  		  </div>
-  		  <div class="row">
-            {% for sample in sample_urls[sample_keys[i]] %}
-                <div class="col-sm-3"><img class='img-responsive' src='{{ sample }}' height="40" width="200" style="margin:15px"></div>
-            {%endfor%}
-        </div>
+      <div class="row">
+	        <div class="col-sm-12">{{ sample_keys[i] }} Unusual Filtered Samples</div>
+  	  </div>
+		  <div class="row">
+    		  <div class="col-sm-12"><img src='{{ plot_bytes[i] }}'></div>
+  		</div>
+  		<div class="row">
+          {% for sample in sample_urls[sample_keys[i]] %}
+              <div class="col-sm-3"><img class='img-responsive' src='{{ sample }}' height="40" width="200" style="margin:15px"></div>
+          {%endfor%}
+      </div>
 	{%endfor%}
 </div>
 {% endblock %}
