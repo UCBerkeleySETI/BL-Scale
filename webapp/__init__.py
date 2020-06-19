@@ -1,4 +1,9 @@
 import os
+import base64
+import io
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 from flask import Flask, render_template
 
@@ -491,11 +496,34 @@ def create_app(test_config=None):
         sample_urls_keys = list(sample_urls.keys())
         len_sample_keys = len(sample_urls_keys)
         plot_bytes = [base64_img_1] + [base64_img_2] + [base64_img_3] + [base64_img_4] + [base64_img_5] + [base64_img_6] + [base64_img_7] + [base64_img_8] + [base64_img_9] + [base64_img_10]
+
+        # def get_df():
+        #
+
+        def get_img_url(df, observation):
+            indexes = []
+            samples_url = []
+            blockn = []
+            for row in df.itertuples():
+                indexes += [row[1]]
+                blockn += [row[4]]
+                for i in range(0, len(indexes)):
+                    samples_url += ["https://storage.cloud.google.com/bl-scale/"+observation+"/filtered/"+str(blockn[i])+"/"+str(indexes[i])+".png"]
+            return samples_url
+
+        def get_base64_hist(df):
+            plt.figure(figsize=(8,6))
+            plt.hist(df["freqs"], bins = np.arange(min(df["freqs"]),max(df["freqs"]), 0.8116025973))
+            plt.title("Histogram of Hits")
+            plt.xlabel("Frequency [MHz]")
+            plt.ylabel("Count")
+            pic_IObytes = io.BytesIO()
+            plt.savefig(pic_IObytes,  format='png')
+            pic_IObytes.seek(0)
+            pic_hash = base64.b64encode(pic_IObytes.read())
+            return pic_hash
+
         return render_template("index.html", title="Main Page", sample_urls=sample_urls, plot_bytes=plot_bytes, sample_keys=sample_urls_keys, len=len_sample_keys)
-        # return render_template("index.html", title="Main Page", samples_1=sample_urls_1, samples_2=sample_urls_2, samples_3=sample_urls_3, samples_4=sample_urls_4,
-        #                         samples_5=sample_urls_5, samples_6=sample_urls_6, samples_7=sample_urls_7, samples_8=sample_urls_8, samples_9=sample_urls_9, samples_10=sample_urls_10,
-        #                         plot_bytes_1=base64_img_1, plot_bytes_2=base64_img_2, plot_bytes_3=base64_img_3, plot_bytes_4=base64_img_4, plot_bytes_5=base64_img_5,
-        #                         plot_bytes_6=base64_img_6, plot_bytes_7=base64_img_7, plot_bytes_8=base64_img_8, plot_bytes_9=base64_img_9, plot_bytes_10=base64_img_10)
 
 
     from . import db
