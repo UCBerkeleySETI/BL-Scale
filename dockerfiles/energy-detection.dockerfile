@@ -11,6 +11,7 @@ RUN docker-apt-install \
      python3-pandas \
      python3-tqdm \
      python3-matplotlib \
+     python3-bitshuffle \
      python3-h5py \
      python3-pip \
      git \
