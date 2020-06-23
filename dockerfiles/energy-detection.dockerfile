@@ -1,4 +1,4 @@
-FROM ubuntu:18.04
+FROM kernsuite/base:dev
 
 USER root
 
