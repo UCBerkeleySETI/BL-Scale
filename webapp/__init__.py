@@ -1,6 +1,7 @@
 import os
 import base64
 import io
+import re
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -510,10 +511,12 @@ def create_app(test_config=None):
         bucket=storage_client.get_bucket(bucket_name)
         # List blobs iterate in folder
         blobs=bucket.list_blobs(prefix=file, delimiter=delimiter) # Excluding folder inside bucket
+        testing = []
         for blob in blobs:
-           print(blob.name)
-           destination_uri = '{}/{}'.format(folder, blob.name)
-           blob.download_to_filename(destination_uri)
+           #print(blob.name)
+           testing += [blob.name]
+           # destination_uri = '{}/{}'.format(folder, blob.name)
+           # blob.download_to_filename(destination_uri)
 
         #reads in and downloads dataframes and outputs dictionary of
         #sample urls
