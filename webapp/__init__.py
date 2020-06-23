@@ -3,6 +3,7 @@ import base64
 import io
 import re
 import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 
@@ -501,29 +502,14 @@ def create_app(test_config=None):
         len_sample_keys = len(sample_urls_keys)
         plot_bytes = [base64_img_1] + [base64_img_2] + [base64_img_3] + [base64_img_4] + [base64_img_5] + [base64_img_6] + [base64_img_7] + [base64_img_8] + [base64_img_9] + [base64_img_10]
 
-        bucket_name = 'bl-scale'
-        folder='/GBT_58010_50176_HIP61317_fine/info_df.pkl'
-        delimiter='/'
-        file = 'bl-scale'
 
-        storage_client = storage.Client("BL-Scale")
-        # Retrieve all blobs with a prefix matching the file.
-        bucket=storage_client.get_bucket(bucket_name)
-        # List blobs iterate in folder
-        blobs=bucket.list_blobs(prefix=file, delimiter=delimiter) # Excluding folder inside bucket
-        testing = []
-        for blob in blobs:
-           #print(blob.name)
-           testing += [blob.name]
-           # destination_uri = '{}/{}'.format(folder, blob.name)
-           # blob.download_to_filename(destination_uri)
+        uris = ['gs://bl-scale/GBT_58010_50176_HIP61317_fine/info_df.pkl', 'gs://bl-scale/GBT_58014_69579_HIP77629_fine/info_df.pkl', 'gs://bl-scale/GBT_58110_60123_HIP91926_fine/info_df.pkl', 'gs://bl-scale/GBT_58202_60970_B0329+54_fine/info_df.pkl', 'gs://bl-scale/GBT_58210_37805_HIP103730_fine/info_df.pkl', 'gs://bl-scale/GBT_58210_39862_HIP105504_fine/info_df.pkl', 'gs://bl-scale/GBT_58210_40853_HIP106147_fine/info_df.pkl', 'gs://bl-scale/GBT_58210_41185_HIP105761_fine/info_df.pkl', 'gs://bl-scale/GBT_58307_26947_J1935+1616_fine/info_df.pkl', 'gs://bl-scale/GBT_58452_79191_HIP115687_fine/info_df.pkl']
 
-        #reads in and downloads dataframes and outputs dictionary of
-        #sample urls
-        # def get_df():
-        #
+        def get_observation(uri_str):
+            obs = re.search(r"([A-Z])\w+", uri_str)
+            return obs.group(0)
 
-        #returns list of image url given the observation dataframe and name
+        #returns string list of urls
         def get_img_url(df, observation):
             indexes = []
             samples_url = []
@@ -531,11 +517,11 @@ def create_app(test_config=None):
             for row in df.itertuples():
                 indexes += [row[1]]
                 blockn += [row[4]]
-                for i in range(0, len(indexes)):
+            for i in range(0, len(indexes)):
                     samples_url += ["https://storage.cloud.google.com/bl-scale/"+observation+"/filtered/"+str(blockn[i])+"/"+str(indexes[i])+".png"]
             return samples_url
 
-        #returns base64 string for histogram image
+        #return base64 string of histogram
         def get_base64_hist(df):
             plt.figure(figsize=(8,6))
             plt.hist(df["freqs"], bins = np.arange(min(df["freqs"]),max(df["freqs"]), 0.8116025973))
@@ -546,9 +532,40 @@ def create_app(test_config=None):
             plt.savefig(pic_IObytes,  format='png')
             pic_IObytes.seek(0)
             pic_hash = base64.b64encode(pic_IObytes.read())
-            return pic_hash
+            base64_img = "data:image/jpeg;base64, " + str(pic_hash.decode("utf8"))
+            return base64_img
 
-        return render_template("index.html", title="Main Page", sample_urls=sample_urls, plot_bytes=plot_bytes, sample_keys=sample_urls_keys, len=len_sample_keys)
+        #returns dataframe of filtered images
+        def filter_images(df):
+            #filter 1000 to 1400 freqs
+            freq_1000_1400 = df[(df["freqs"] >= 1000) & (df["freqs"] <= 1400)]
+            std_stat_1000_1400 = np.std(freq_1000_1400["statistic"])
+            extr_1000_1400 = freq_1000_1400[freq_1000_1400["statistic"] >= 8*std_stat_1000_1400]
+
+            #filter 1400 to 1700 freqs
+            freq_1400_1700 = df[(df["freqs"] > 1400) & (df["freqs"] <= 1700)]
+            std_stat_1400_1700 = np.std(freq_1400_1700["statistic"])
+            extr_1400_1700 = freq_1400_1700[freq_1400_1700["statistic"] >= 7*std_stat_1400_1700]
+
+            #filter 1700 plus freqs
+            freq_1700 = df[df["freqs"] > 1700]
+            std_stat_1700 = np.std(freq_1700["statistic"])
+            extr_1700 = freq_1700[freq_1700["statistic"] >= 8*std_stat_1700]
+            extr_all = pd.concat([extr_1000_1400, extr_1400_1700, extr_1700])
+            return extr_all
+
+        obs_filtered_url = {}
+        base64_obs = {}
+        for uri in uris[:2]:
+            data = pd.read_pickle(uri)
+            observ = get_observation(uri)
+            base64_obs[observ] = get_base64_hist(data)
+            processed_data = filter_images(data)
+            obs_filtered_url[observ] = get_img_url(processed_data, observ)
+        obs_filtered_url_keys = list(obs_filtered_url.keys())
+
+        return render_template("index.html", title="Main Page", sample_urls=obs_filtered_url, plot_bytes=base64_obs, dict_keys = obs_filtered_url_keys)
+        #return render_template("index.html", title="Main Page", sample_urls=sample_urls, plot_bytes=plot_bytes, sample_keys=sample_urls_keys, len=len_sample_keys)
 
 
     from . import db
