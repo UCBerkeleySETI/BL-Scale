@@ -5,6 +5,9 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
+import logging
+from google.cloud import storage
+
 from flask import Flask, render_template
 
 
@@ -497,9 +500,27 @@ def create_app(test_config=None):
         len_sample_keys = len(sample_urls_keys)
         plot_bytes = [base64_img_1] + [base64_img_2] + [base64_img_3] + [base64_img_4] + [base64_img_5] + [base64_img_6] + [base64_img_7] + [base64_img_8] + [base64_img_9] + [base64_img_10]
 
+        bucket_name = 'bl-scale'
+        folder='/GBT_58010_50176_HIP61317_fine/info_df.pkl'
+        delimiter='/'
+        file = 'bl-scale'
+
+        storage_client = storage.Client("BL-Scale")
+        # Retrieve all blobs with a prefix matching the file.
+        bucket=storage_client.get_bucket(bucket_name)
+        # List blobs iterate in folder
+        blobs=bucket.list_blobs(prefix=file, delimiter=delimiter) # Excluding folder inside bucket
+        for blob in blobs:
+           print(blob.name)
+           destination_uri = '{}/{}'.format(folder, blob.name)
+           blob.download_to_filename(destination_uri)
+
+        #reads in and downloads dataframes and outputs dictionary of
+        #sample urls
         # def get_df():
         #
 
+        #returns list of image url given the observation dataframe and name
         def get_img_url(df, observation):
             indexes = []
             samples_url = []
@@ -511,6 +532,7 @@ def create_app(test_config=None):
                     samples_url += ["https://storage.cloud.google.com/bl-scale/"+observation+"/filtered/"+str(blockn[i])+"/"+str(indexes[i])+".png"]
             return samples_url
 
+        #returns base64 string for histogram image
         def get_base64_hist(df):
             plt.figure(figsize=(8,6))
             plt.hist(df["freqs"], bins = np.arange(min(df["freqs"]),max(df["freqs"]), 0.8116025973))
