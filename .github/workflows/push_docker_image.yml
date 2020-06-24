@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: CI
+name: Build Docker
 
 # Controls when the action will run. Triggers the workflow on push or pull request
 # events but only for the master branch
@@ -30,4 +30,14 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
           repository: fx196/bl-scale
           dockerfile: dockerfiles/energy-detection.dockerfile
-          tags: energy-detection
+          tags: latest
+
+    - name: Build and push Google Container Registry
+      uses: docker/build-push-action@v1
+      with:
+          username: _json_key
+          password: ${{ secrets.GCP_JSON_KEY }}
+          registry: gcr.io
+          repository: breakthrough-listen-sandbox/bl-scale
+          dockerfile: dockerfiles/energy-detection.dockerfile
+          tags: latest
