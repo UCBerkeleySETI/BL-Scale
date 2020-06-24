@@ -30,4 +30,4 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
           repository: fx196/bl-scale
           dockerfile: dockerfiles/energy-detection.dockerfile
-          tags: energy-detection
+          tags: latest
