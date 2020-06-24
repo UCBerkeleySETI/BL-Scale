@@ -21,3 +21,4 @@ RUN mkdir /code
 WORKDIR /code
 
 RUN git clone https://github.com/FX196/SETI-Energy-Detection.git
+RUN git clone https://github.com/FX196/BL-Scale.git
