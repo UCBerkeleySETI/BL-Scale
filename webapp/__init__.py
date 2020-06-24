@@ -502,11 +502,28 @@ def create_app(test_config=None):
         len_sample_keys = len(sample_urls_keys)
         plot_bytes = [base64_img_1] + [base64_img_2] + [base64_img_3] + [base64_img_4] + [base64_img_5] + [base64_img_6] + [base64_img_7] + [base64_img_8] + [base64_img_9] + [base64_img_10]
 
+        def get_uri(bucket_name):
+            #bucket_name = 'bl-scale'
+            delimiter='/'
+
+            storage_client = storage.Client("BL-Scale")
+            # Retrieve all blobs with a prefix matching the file.
+            bucket=storage_client.get_bucket(bucket_name)
+            print(bucket)
+            # List blobs iterate in folder
+            blobs=bucket.list_blobs()
+
+            uris = []
+            for blob in blobs:
+               if "info_df.pkl" in blob.name:
+                   uris += ["gs://"+bucket_name+"/"+blob.name]
+            return uris
 
         uris = ['gs://bl-scale/GBT_58010_50176_HIP61317_fine/info_df.pkl', 'gs://bl-scale/GBT_58014_69579_HIP77629_fine/info_df.pkl', 'gs://bl-scale/GBT_58110_60123_HIP91926_fine/info_df.pkl', 'gs://bl-scale/GBT_58202_60970_B0329+54_fine/info_df.pkl', 'gs://bl-scale/GBT_58210_37805_HIP103730_fine/info_df.pkl', 'gs://bl-scale/GBT_58210_39862_HIP105504_fine/info_df.pkl', 'gs://bl-scale/GBT_58210_40853_HIP106147_fine/info_df.pkl', 'gs://bl-scale/GBT_58210_41185_HIP105761_fine/info_df.pkl', 'gs://bl-scale/GBT_58307_26947_J1935+1616_fine/info_df.pkl', 'gs://bl-scale/GBT_58452_79191_HIP115687_fine/info_df.pkl']
 
+        #returns string observation
         def get_observation(uri_str):
-            obs = re.search(r"([A-Z])\w+", uri_str)
+            obs = re.search(r"([A-Z])\w+(\+\w+)*", uri_str)
             return obs.group(0)
 
         #returns string list of urls
@@ -556,7 +573,7 @@ def create_app(test_config=None):
 
         obs_filtered_url = {}
         base64_obs = {}
-        for uri in uris[:2]:
+        for uri in uris:
             data = pd.read_pickle(uri)
             observ = get_observation(uri)
             base64_obs[observ] = get_base64_hist(data)
