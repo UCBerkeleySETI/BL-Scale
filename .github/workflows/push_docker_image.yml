@@ -39,4 +39,5 @@ jobs:
           password: ${{ secrets.GCP_JSON_KEY }}
           registry: gcr.io
           repository: breakthrough-listen-sandbox/bl-scale
+          dockerfile: dockerfiles/energy-detection.dockerfile
           tags: latest
