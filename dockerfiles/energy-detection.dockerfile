@@ -23,4 +23,6 @@ RUN git clone https://github.com/FX196/SETI-Energy-Detection.git
 RUN git clone https://github.com/FX196/BL-Scale.git
 RUN git clone https://github.com/FX196/alien-hunting-algs.git
 
-CMD python3 alien-hunting-algs/$ALG_DIR/$ALG_NAME
+WORKDIR /code/alien-hunting-algs
+
+CMD python3 $ALG_DIR/$ALG_NAME
