@@ -15,8 +15,8 @@ from google.cloud import storage
 
 from flask import Flask, render_template
 
-global counter
-counter = 0
+global cache
+cache = {}
 
 # create and configure the app
 test_config=None
@@ -124,21 +124,25 @@ def index():
     #iterate through every observation dataframe in uri list
     #fills in the obs_filtered_url and base64_obs dictionary to be passed into render_template
 
-    for uri in uris:
-        data = pd.read_pickle(uri)
-        observ = get_observation(uri)
-        base64_obs[observ] = get_base64_hist(data)
-        processed_data = filter_images(data, 4)
-        obs_filtered_url[observ] = get_img_url(processed_data, observ)
+    global cache
 
-    global counter
-    counter = counter + 1
+    if not cache:
+        print("cache empty")
+        print(cache)
+        for uri in uris:
+            data = pd.read_pickle(uri)
+            observ = get_observation(uri)
+            base64_obs[observ] = get_base64_hist(data)
+            processed_data = filter_images(data, 4)
+            obs_filtered_url[observ] = get_img_url(processed_data, observ)
+            cache[observ] = [base64_obs[observ], obs_filtered_url[observ]]
+    else:
+        print("cache not empty")
+        for key in cache.keys():
+            obs_filtered_url[key] = cache[key][1]
+            base64_obs[key] = cache[key][0]
 
-    return render_template("index.html", title="Main Page", sample_urls=obs_filtered_url, plot_bytes=base64_obs, count=counter)
-
-# @app.route('/count')
-# def increment_counter():
-#     counter+=1
+    return render_template("index.html", title="Main Page", sample_urls=obs_filtered_url, plot_bytes=base64_obs)
 
 import db
 db.init_app(app)
