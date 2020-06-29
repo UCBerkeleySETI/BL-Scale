@@ -2,10 +2,13 @@ import os
 import base64
 import io
 import re
+
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+
+import zmq
 
 import logging
 from google.cloud import storage
@@ -120,11 +123,8 @@ def create_app(test_config=None):
             base64_obs[observ] = get_base64_hist(data)
             processed_data = filter_images(data)
             obs_filtered_url[observ] = get_img_url(processed_data, observ)
-        obs_filtered_url_keys = list(obs_filtered_url.keys())
 
-        return render_template("index.html", title="Main Page", sample_urls=obs_filtered_url, plot_bytes=base64_obs, dict_keys = obs_filtered_url_keys)
-        #return render_template("index.html", title="Main Page", sample_urls=sample_urls, plot_bytes=plot_bytes, sample_keys=sample_urls_keys, len=len_sample_keys)
-
+        return render_template("index.html", title="Main Page", sample_urls=obs_filtered_url, plot_bytes=base64_obs)
 
     from . import db
     db.init_app(app)
