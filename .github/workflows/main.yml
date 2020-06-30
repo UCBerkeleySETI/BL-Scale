@@ -21,6 +21,7 @@ jobs:
           project_id: ${{ secrets.GCP_PROJECT_ID }}
           service_account_key:  ${{ secrets.GCP_JSON_KEY }}
           export_default_credentials: true
+      - run: gcloud info
       - name: Set up Python 3.7
         uses: actions/setup-python@v2
         with:
@@ -32,9 +33,9 @@ jobs:
           pip install -r requirements.txt
       - name: Run deployment
         if: success()
-        uses: actions-hub/gcloud@master
+        uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
         env:
           CLOUDSDK_CORE_PROJECT: aef-default-20200629t160002-8f97
         with:
           entrypoint: gcloud
-          args: app deploy ./app.yaml --quiet
+          args: app deploy app.yaml --quiet
