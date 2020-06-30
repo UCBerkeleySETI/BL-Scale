@@ -19,7 +19,7 @@ jobs:
         env:
           version: '290.0.1'
           project_id: ${{ secrets.GCP_PROJECT_ID }}
-          service_account_key:  ${{ secrets.GCP_JSON_KEY }}
+          APPLICATION_CREDENTIALS:  ${{ secrets.GCP_JSON_KEY }}
           export_default_credentials: true
       - run: gcloud info
       - name: Set up Python 3.7
