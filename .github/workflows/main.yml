@@ -14,14 +14,14 @@ jobs:
       - name: Retrieving the repo
         uses: actions/checkout@v2
         
-      - name: Setting up GCloud Auth
-        uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
-        env:
-          version: '290.0.1'
-          project_id: ${{ secrets.GCP_PROJECT_ID }}
-          APPLICATION_CREDENTIALS:  ${{ secrets.GCP_JSON_KEY }}
-          export_default_credentials: true
-      - run: gcloud info
+#       - name: Setting up GCloud Auth
+#         uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+#         env:
+#           version: '290.0.1'
+#           project_id: ${{ secrets.GCP_PROJECT_ID }}
+#           APPLICATION_CREDENTIALS:  ${{ secrets.GCP_JSON_KEY }}
+#           export_default_credentials: true
+#       - run: gcloud info
       - name: Set up Python 3.7
         uses: actions/setup-python@v2
         with:
@@ -32,10 +32,9 @@ jobs:
           cd webapp
           pip install -r requirements.txt
       - name: Run deployment
-        if: success()
-        uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+      - uses: actions-hub/gcloud@master
         env:
-          CLOUDSDK_CORE_PROJECT: aef-default-20200629t160002-8f97
+          PROJECT_ID: ${{secrets.GCP_PROJECT_ID}}
+          APPLICATION_CREDENTIALS: ${{secrets.GCP_JSON_KEY}}
         with:
-          entrypoint: gcloud
-          args: app deploy app.yaml --quiet
+          args: app deploy app.yaml
