@@ -19,7 +19,7 @@ jobs:
         with:
           python-version: 3.7
       - name: Install dependencies
-        run: |
+        run: 
           python -m pip install --upgrade pip
           cd webapp
           pip install -r requirements.txt
@@ -28,6 +28,6 @@ jobs:
         uses: actions-hub/gcloud@master
         env:
           PROJECT_ID: ${{secrets.GCP_PROJECT_ID }}
-          APPLICATION_CREDENTIALS: ${{secrets.GCP_JSON_KEY }}
+          APPLICATION_CREDENTIALS: ${{secrets.B64_GCP_JSON_KEY }}
         with:
           args: app deploy app.yaml
