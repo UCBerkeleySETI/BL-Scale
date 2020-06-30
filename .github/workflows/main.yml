@@ -12,13 +12,8 @@ jobs:
 
     steps:
       - name: Retrieving the repo
-      - uses: actions/checkout@v2
-      - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
-        with:
-          version: '290.0.1'
-          project_id: ${{ secrets.GCP_PROJECT_ID }}
-          service_account_key: ${{ secrets.GCP_JSON_KEY }}
-      - run: gcloud info
+        uses: actions/checkout@v2
+        
       - name: Set up Python 3.7
         uses: actions/setup-python@v2
         with:
@@ -28,8 +23,11 @@ jobs:
           python -m pip install --upgrade pip
           cd webapp
           pip install -r requirements.txt
-      - name: Publish app to Google App Engine
-        run: |
-          gcloud auth activate-service-account ${{ secrets.GCP_SA_EMAIL }} --key-file=client-secret.json
-          gcloud config set project ${{ secrets.GCP_PROJECT_ID }}
-          gcloud -q app deploy app.yaml --promote
+
+      - name: "deploy to project A"  
+        uses: actions-hub/gcloud@master
+        env:
+          PROJECT_ID: ${{secrets.GCP_PROJECT_ID }}
+          APPLICATION_CREDENTIALS: ${{secrets.GCP_JSON_KEY }}
+        with:
+          args: app deploy app.yaml
