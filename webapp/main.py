@@ -63,7 +63,6 @@ def index():
             password = request.form['password']
             try:
                 auth.sign_in_with_email_and_password(email, password)
-
                 template_returned = home()
                 return template_returned
             except:
