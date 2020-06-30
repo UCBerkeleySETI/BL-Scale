@@ -33,4 +33,4 @@ jobs:
           PROJECT_ID: ${{secrets.GCP_PROJECT_ID }}
           APPLICATION_CREDENTIALS: ${{secrets.B64_GCP_JSON_KEY }}
         with:
-          args: app deploy --appyaml=webapp/app.yaml --version=${{ steps.extract_branch.outputs.branch }}
+          args: app deploy --version=${{ steps.extract_branch.outputs.branch }} webapp/app.yaml
