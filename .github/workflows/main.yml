@@ -14,6 +14,7 @@ jobs:
         uses: actions-hub/gcloud@master
         env:
           APPLICATION_CREDENTIALS: ${{ secrets.GCP_JSON_KEY }} # You must run base64 ./gcp_creds.json, then paste the output into the secrets area in your repo settings.
+          PROJECT_ID: breakthrough-listen-sandbox
       - name: Set up Python 3.7
         uses: actions/setup-python@v2
         with:
