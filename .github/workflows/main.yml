@@ -11,7 +11,7 @@ jobs:
         uses: actions/checkout@v2
         
       - name: Setting up GCloud Auth
-        uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+        uses: actions-hub/gcloud@master
         env:
           GCLOUD_AUTH: ${{ secrets.GCP_JSON_KEY }} # You must run base64 ./gcp_creds.json, then paste the output into the secrets area in your repo settings.
       - name: Set up Python 3.7
@@ -25,7 +25,7 @@ jobs:
           pip install -r requirements.txt
       - name: Run deployment
         if: success()
-        uses: actions/gcloud/cli@master
+        uses: actions-hub/gcloud@master
         env:
           CLOUDSDK_CORE_PROJECT: aef-default-20200629t160002-8f97
         with:
