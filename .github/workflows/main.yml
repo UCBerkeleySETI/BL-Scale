@@ -28,4 +28,4 @@ jobs:
           PROJECT_ID: ${{secrets.GCP_PROJECT_ID }}
           APPLICATION_CREDENTIALS: ${{secrets.B64_GCP_JSON_KEY }}
         with:
-          args: app deploy app.yaml
+          args: ls
