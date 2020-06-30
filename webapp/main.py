@@ -43,6 +43,9 @@ except OSError:
 @app.route('/index')
 @app.route('/')
 def index():
+
+    def get_cache():
+        return cache
     #NOT SURE IF WE NEED THIS YET
     def get_uri(bucket_name):
         #bucket_name = 'bl-scale'
@@ -128,7 +131,6 @@ def index():
 
     if not cache:
         print("cache empty")
-        print(cache)
         for uri in uris:
             data = pd.read_pickle(uri)
             observ = get_observation(uri)
@@ -141,6 +143,7 @@ def index():
         for key in cache.keys():
             obs_filtered_url[key] = cache[key][1]
             base64_obs[key] = cache[key][0]
+
 
     return render_template("index.html", title="Main Page", sample_urls=obs_filtered_url, plot_bytes=base64_obs)
 
