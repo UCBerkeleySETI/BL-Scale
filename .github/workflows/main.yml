@@ -8,13 +8,14 @@ jobs:
 
     steps:
       - name: Retrieving the repo
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
+        
       - name: Setting up GCloud Auth
         uses: actions/gcloud/auth@master
         env:
-          GCLOUD_AUTH: ${{ secrets.GCLOUD_AUTH }} # You must run base64 ./gcp_creds.json, then paste the output into the secrets area in your repo settings.
+          GCLOUD_AUTH: ${{ secrets.GCP_JSON_KEY }} # You must run base64 ./gcp_creds.json, then paste the output into the secrets area in your repo settings.
       - name: Set up Python 3.7
-        uses: actions/setup-python@v1
+        uses: actions/setup-python@v2
         with:
           python-version: 3.7
       - name: Install dependencies
@@ -22,13 +23,6 @@ jobs:
           python -m pip install --upgrade pip
           cd webapp
           pip install -r requirements.txt
-      - name: Test with pytest
-        env:
-          APPLICATION_CREDENTIALS: ${{ secrets.GCP_JSON_KEY }}
-        run: |
-          echo $APPLICATION_CREDENTIALS > ~/service_account_credentials.json
-          pip install pytest
-          python -m pytest tests/
       - name: Run deployment
         if: success()
         uses: actions/gcloud/cli@master
