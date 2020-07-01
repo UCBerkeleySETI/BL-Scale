@@ -7,14 +7,9 @@ Cloud-based platform for scaling algorithms to process petabytes of Breakthrough
 `cd` into the repo and run
 
 ```
-export FLASK_APP=webapp
-flask init-db
+python -m main
 ```
 
-This will set up and initialize the app. After that, running 
+This will deploy the app on localhost port 5000. You will be prompted to enter credentials.
 
-```
-flask run
-```
 
-will deploy the app on your localhost
