@@ -2,9 +2,8 @@ name: Google App Engine Deployment
 # For this to work, you must verify the App Engine Admin API is enabled.
 on:
   push:
-    branches: [ master, stable ]
   pull_request:
-    branches: [ master ]
+    branches-ignore: [ stable ]
 
 jobs:
   deploy:
