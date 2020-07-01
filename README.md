@@ -4,7 +4,7 @@ Cloud-based platform for scaling algorithms to process petabytes of Breakthrough
 
 ## Deployment
 
-`cd` into the repo and run
+`cd` into the `webapp` directory and run
 
 ```
 python -m main
