@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>Welcome to BL@Scale</h1>
+{% endblock %}
+
+{% block content %}
+<h4>ZMQ TEST Received request STUFF</h4>
+<!-- <a href="/logout">Log out</a> -->
+<div class="container-fluid">
+  {%for key in sample_urls%}
+      <div class="row">
+	        <div class="col-sm-12">{{ key }} Unusual Filtered Samples</div>
+  	  </div>
+		  
+  		<div class="row">
+          {% for sample in sample_urls[key] %}
+              <p>{{ sample }}</p>
+          {%endfor%}
+      </div>
+	{%endfor%}
+</div>
+{% endblock %}
