@@ -38,6 +38,8 @@ spec:
               - name: "cred-key"
                 secret:
                   secretName: "bl-scale-cred-key"
+            nodeSelector:
+                cloud.google.com/gke-nodepool: energy-detection-pool
             dnsPolicy: ClusterFirst
             restartPolicy: Always
             schedulerName: default-scheduler
