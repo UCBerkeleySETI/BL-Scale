@@ -2,7 +2,7 @@ import zmq
 
 context = zmq.Context()
 socket = context.socket(zmq.SUB)
-socket.bind("tcp://35.192.178.168:5000")
+socket.connect("tcp://35.192.178.168:5000")
 socket.setsockopt(zmq.SUBSCRIBE, b'')
 
 while True:
