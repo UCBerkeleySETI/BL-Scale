@@ -22,20 +22,7 @@
             Menu
             <i class="fas fa-bars"></i>
         </button>
-        <div class="collapse navbar-collapse" id="navbarResponsive">
-            <ul class="navbar-nav ml-auto">
-                <li class="nav-item">
-                    {% if g.user %}
-                        {{ g.user['username'] }} &emsp; <a href="{{ url_for('auth.logout') }}">Log Out</a>
-                    {% else %}
-                        <a href="{{ url_for('auth.base') }}">Auth</a>
-                    {% endif %}
-                </li>
-                <li class="nav-item">
-                    <a href="{{ url_for('monitor.base') }}">Monitor</a>
-                </li>
-            </ul>
-        </div>
+        
     </div>
 </nav>
 

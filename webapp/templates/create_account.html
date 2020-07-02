@@ -5,8 +5,8 @@
 
     <br/>
       <div class="jumbotron">
-        <h1 class="display-4">BL@Scale</h1>
-        <p class="lead">Login to access Cloud-based platform for scaling algorithms to process petabytes of Breakthrough Listen data.</p>
+        <h1 class="display-4">Hey</h1>
+        <p class="lead">Create an account, then you can log in with it!</p>
         <hr class="my-4">
         {% if smessage %}
           <div class="alert alert-success">
@@ -18,7 +18,7 @@
             {{ umessage }}
           </div>
         {% endif %}
-        <form action="/index" method="post">
+        <form action="/create_account" method="post">
             <div class="form-group">
             <label for="exampleInputEmail1">Email address</label>
             <input type="email" class="form-control" name="name"  placeholder="Enter email">
@@ -27,17 +27,8 @@
             <label for="exampleInputPassword1">Password</label>
             <input type="password" class="form-control" name="password" placeholder="Password">
             </div>
-            <button type="submit" name="submit" class="btn btn-primary">Submit</button>
+            <button type="submit" name="submit" class="btn btn-primary">Create</button>
         </form>
-
-        <div class="row">
-          <div class="col-sm">
-            <a href="/forgot_password" class="text-decoration-none">Forgot Password</a>
-          </div>
-          <div class="col-sm">
-            <a href="/create_account" class="text-decoration-none">Create Account</a>
-          </div>
-        </div>
      </div>
 
 {% endblock %}
