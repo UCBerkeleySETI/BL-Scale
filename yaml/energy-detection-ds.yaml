@@ -29,7 +29,7 @@ spec:
                   volumeMounts:
                   - name: "cred-key"
                     mountPath: "/var/run/secret/cloud.google.com"
-                  image: gcr.io/breakthrough-listen-sandbox/bl-scale:latest
+                  image: gcr.io/breakthrough-listen-sandbox/bl-scale:energy-detection-latest
                   imagePullPolicy: Always
                   name: bl-scale-energy-detection
                   terminationMessagePath: /dev/termination-log
