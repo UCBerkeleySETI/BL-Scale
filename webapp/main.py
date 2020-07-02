@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 import zmq
+import time
 
 import logging
 from google.cloud import storage
@@ -58,10 +59,6 @@ except OSError:
 @app.route('/')
 @app.route('/index', methods=['GET', 'POST'])
 def index():
-
-    def get_cache():
-        return cache
-
     if (request.method == 'POST'):
             email = request.form['name']
             password = request.form['password']
@@ -109,6 +106,44 @@ def forgot_password():
 
 @app.route('/home', methods=['GET', 'POST'])
 def home():
+
+    def get_cache():
+        return cache
+
+    #client, request data
+    def get_data():
+        message_list = []
+        context = zmq.Context()
+        # Socket to talk to server
+        print("Connecting to server...")
+        socket = context.socket(zmq.REQ)
+        socket.connect("tcp://*:5555")
+
+        for request in range(1):
+            print("Sending request %s..." % request)
+            socket.send(b"Please send over data")
+
+            # Get the reply
+            message = pickle.loads(socket.recv())
+            message_list += [message]
+        return message_list
+
+    #server, send data
+    def send_data(info):
+        context = zmq.Context()
+        socket = context.socket(zmq.REP)
+        socket.bind("tcp://*:5555")
+
+        while True:
+            # Wait for next request from client
+            message = socket.recv()
+            print("Request received: %s" % message)
+
+            #D o some 'work'
+            time.sleep(1)
+
+            # Send reply back to client
+            socket.send(pickle.dumps(info))
 
     #NOT SURE IF WE NEED THIS YET
     def get_uri(bucket_name):
@@ -218,12 +253,6 @@ def home():
             base64_obs[key] = cache[key][0]
     print("returning home")
     return render_template("home.html", title="Main Page", sample_urls=obs_filtered_url, plot_bytes=base64_obs)
-
-import db
-db.init_app(app)
-
-import auth
-app.register_blueprint(auth.bp)
 
 import monitor
 app.register_blueprint(monitor.bp)
