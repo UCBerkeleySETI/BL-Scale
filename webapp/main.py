@@ -99,27 +99,20 @@ def forgot_password():
 # ___________________________________END OF USER AUTHENTICATIONS___________________________________#
 ####################################################################################################
 @app.route('/zmq', methods=['GET', 'POST'])
-def zmq_test():
-    print("IN ZMQ FUNCTION")
-    context = zmq.Context()
-    socket = context.socket(zmq.REP)
-    socket.bind("tcp://*:5555")
-    print("ZMQ SOCKET BINDED TO 5555")
-    stuff=[]
-    while True:
-        print("Waiting for message")
-        #  Wait for next request from client
-        message = socket.recv()
-        print("Received request: %s" % message)
-        stuff.append(message)
-        print("GOT message!")
-        #  Do some 'work'
-        time.sleep(1)
-
-        #  Send reply back to client
-        socket.send(b"World")
-        return render_template("zmq_test.html", title="Main Page", sample_urls=stuff)
-    return render_template("zmq_test.html", title="Main Page", sample_urls=stuff)
+def zmq_sub():
+    def get_sub():
+        context = zmq.Context()
+        socket = context.socket(zmq.SUB)
+        socket.connect("tcp://35.192.178.168:5000")
+        socket.setsockopt(zmq.SUBSCRIBE, b'')
+        
+    
+        print("Trying to get msg...")
+        message = socket.recv_pyobj()
+        print(message)
+        return str(message)
+    message_sub = get_sub()
+    return render_template("zmq_test.html", title="Main Page", message_sub=message_sub)
 
 
 @app.route('/home', methods=['GET', 'POST'])

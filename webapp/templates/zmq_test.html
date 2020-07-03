@@ -8,9 +8,21 @@
 <h4>ZMQ TEST Received request STUFF</h4>
 <!-- <a href="/logout">Log out</a> -->
 <div class="container-fluid">
-  {%for key in sample_urls%}
+
       <div class="row">
-	        <div class="col-sm-12">{{ key }} Unusual Filtered Samples</div>
+	        <div class="col-sm-12">
+            <h1>
+               Reading Python Object Casted To String From tcp://35.192.178.168:5000 
+            </h1>
+            <h1>
+              {{ message_sub }}
+              <script language="javascript">
+                setInterval(function(){
+                   window.location.reload(1);
+                }, 10000);
+                </script>
+            </h1>
+          </div>
   	  </div>
 		  
   		<div class="row">
@@ -18,6 +30,7 @@
               <p>{{ sample }}</p>
           {%endfor%}
       </div>
-	{%endfor%}
+
 </div>
+
 {% endblock %}
