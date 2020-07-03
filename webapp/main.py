@@ -113,7 +113,7 @@ def zmq_sub():
     message_sub = get_sub()
     if message_sub == None:
         message_sub ="No Data From Publisher Node"
-    return render_template("zmq_test.html", title="Main Page", message_sub=message_sub)
+    return render_template("zmq_sub.html", title="Main Page", message_sub=message_sub)
 
 @app.route('/zmq_push')
 def my_form():
