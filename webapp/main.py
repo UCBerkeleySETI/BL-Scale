@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 import zmq
+import time
 
 import logging
 from google.cloud import storage
@@ -80,8 +81,8 @@ def create_account():
                 return render_template('index.html')
             except:
                 unsuccessful = 'Issues with credentials - Cannot sign you up :('
-                return render_template('create_account.html', umessage=unsuccessful)    
-    return render_template('create_account.html')   
+                return render_template('create_account.html', umessage=unsuccessful)
+    return render_template('create_account.html')
 
 @app.route('/forgot_password', methods=['GET', 'POST'])
 def forgot_password():
@@ -105,10 +106,48 @@ def forgot_password():
 
 @app.route('/home', methods=['GET', 'POST'])
 def home():
-  
+
+    def get_cache():
+        return cache
+
+    #client, request data
+    def get_data():
+        message_list = []
+        context = zmq.Context()
+        # Socket to talk to server
+        print("Connecting to server...")
+        socket = context.socket(zmq.REQ)
+        socket.connect("tcp://*:5555")
+
+        for request in range(1):
+            print("Sending request %s..." % request)
+            socket.send(b"Please send over data")
+
+            # Get the reply
+            message = pickle.loads(socket.recv())
+            message_list += [message]
+        return message_list
+
+    #server, send data
+    def send_data(info):
+        context = zmq.Context()
+        socket = context.socket(zmq.REP)
+        socket.bind("tcp://*:5555")
+
+        while True:
+            # Wait for next request from client
+            message = socket.recv()
+            print("Request received: %s" % message)
+
+            #D o some 'work'
+            time.sleep(1)
+
+            # Send reply back to client
+            socket.send(pickle.dumps(info))
+
     #NOT SURE IF WE NEED THIS YET
     def get_uri(bucket_name):
-       
+
         #bucket_name = 'bl-scale'
 
         storage_client = storage.Client("BL-Scale")
@@ -123,19 +162,19 @@ def home():
             if "info_df.pkl" in blob.name:
                 uris += ["gs://"+bucket_name+"/"+blob.name]
         return uris
- 
+
     #string list of pickles
     uris = ['gs://bl-scale/GBT_58010_50176_HIP61317_fine/info_df.pkl', 'gs://bl-scale/GBT_58014_69579_HIP77629_fine/info_df.pkl', 'gs://bl-scale/GBT_58110_60123_HIP91926_fine/info_df.pkl', 'gs://bl-scale/GBT_58202_60970_B0329+54_fine/info_df.pkl', 'gs://bl-scale/GBT_58210_37805_HIP103730_fine/info_df.pkl', 'gs://bl-scale/GBT_58210_39862_HIP105504_fine/info_df.pkl', 'gs://bl-scale/GBT_58210_40853_HIP106147_fine/info_df.pkl', 'gs://bl-scale/GBT_58210_41185_HIP105761_fine/info_df.pkl', 'gs://bl-scale/GBT_58307_26947_J1935+1616_fine/info_df.pkl', 'gs://bl-scale/GBT_58452_79191_HIP115687_fine/info_df.pkl']
 
     #returns string observation
     def get_observation(uri_str):
-       
+
         obs = re.search(r"([A-Z])\w+(\+\w+)*", uri_str)
         return obs.group(0)
 
     #returns string list of urls
     def get_img_url(df, observation):
-      
+
         indexes = []
         samples_url = []
         blockn = []
@@ -148,7 +187,7 @@ def home():
 
     #return base64 string of histogram
     def get_base64_hist(df):
-      
+
         plt.figure(figsize=(8,6))
         plt.hist(df["freqs"], bins = np.arange(min(df["freqs"]),max(df["freqs"]), 0.8116025973))
         plt.title("Histogram of Hits")
@@ -163,7 +202,7 @@ def home():
 
     #returns dataframe of 3*n filtered images
     def filter_images(df, n):
-    
+
         #filter 1000 to 1400 freqs
         freq_1000_1400 = df[(df["freqs"] >= 1000) & (df["freqs"] <= 1400)]
         freq_1000_1400 = freq_1000_1400.sort_values("statistic", ascending=False).head(n)
@@ -196,15 +235,15 @@ def home():
     if not cache:
         print("cache empty")
         for uri in uris:
-      
+
             data = pd.read_pickle(uri)
-          
+
             observ = get_observation(uri)
-         
+
             base64_obs[observ] = get_base64_hist(data)
-         
+
             processed_data = filter_images(data, 4)
-          
+
             obs_filtered_url[observ] = get_img_url(processed_data, observ)
             cache[observ] = [base64_obs[observ], obs_filtered_url[observ]]
     else:
@@ -215,6 +254,8 @@ def home():
     print("returning home")
     return render_template("home.html", title="Main Page", sample_urls=obs_filtered_url, plot_bytes=base64_obs)
 
+import monitor
+app.register_blueprint(monitor.bp)
 
 if __name__ == '__main__':
     app.run()
