@@ -5,10 +5,8 @@
 {% endblock %}
 
 {% block content %}
-<h4>ZMQ TEST Received request STUFF</h4>
-<!-- <a href="/logout">Log out</a> -->
+<h4>ZMQ SUB Received request From Instance</h4>
 <div class="container-fluid">
-
       <div class="row">
 	        <div class="col-sm-12">
             <h1>
@@ -16,21 +14,16 @@
             </h1>
             <h1>
               {{ message_sub }}
-              <script language="javascript">
-                setInterval(function(){
-                   window.location.reload(1);
-                }, 10000);
-                </script>
             </h1>
           </div>
+          <script language="javascript">
+            setInterval(function(){
+               window.location.reload(1);
+            }, 10000);
+            </script>
   	  </div>
-		  
   		<div class="row">
-          {% for sample in sample_urls[key] %}
-              <p>{{ sample }}</p>
-          {%endfor%}
       </div>
-
 </div>
 
 {% endblock %}

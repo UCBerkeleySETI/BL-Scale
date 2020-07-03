@@ -97,23 +97,47 @@ def forgot_password():
 
 ####################################################################################################
 # ___________________________________END OF USER AUTHENTICATIONS___________________________________#
+# ________________________________________START OF ZMQ NETWORKING__________________________________#
 ####################################################################################################
-@app.route('/zmq', methods=['GET', 'POST'])
+@app.route('/zmq_sub', methods=['GET', 'POST'])
 def zmq_sub():
     def get_sub():
         context = zmq.Context()
         socket = context.socket(zmq.SUB)
         socket.connect("tcp://35.192.178.168:5000")
-        socket.setsockopt(zmq.SUBSCRIBE, b'')
-        
-    
+        socket.setsockopt(zmq.SUBSCRIBE, b'')    
         print("Trying to get msg...")
         message = socket.recv_pyobj()
         print(message)
         return str(message)
     message_sub = get_sub()
+    if message_sub == None:
+        message_sub ="No Data From Publisher Node"
     return render_template("zmq_test.html", title="Main Page", message_sub=message_sub)
 
+@app.route('/zmq_push')
+def my_form():
+    return render_template('zmq_push.html')
+
+@app.route('/zmq_push', methods=['GET', 'POST'])
+def zmq_push():
+    text = request.form['text']
+    processed_text = text.upper()
+    print(processed_text)
+
+    context = zmq.Context()
+    socket = context.socket(zmq.PUSH)
+    socket.bind("tcp://127.0.0.1:5555")
+    
+    socket.send(str.encode(str(processed_text)))
+ 
+    return render_template('zmq_push.html')
+
+
+####################################################################################################
+# _______________________________________END OF ZMQ PIPELINE_______________________________________#
+# ________________________________________START OF HOME PAGE____________________________________#
+####################################################################################################
 
 @app.route('/home', methods=['GET', 'POST'])
 def home():
