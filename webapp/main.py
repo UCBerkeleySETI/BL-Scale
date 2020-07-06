@@ -94,11 +94,11 @@ def forgot_password():
     return render_template('forgot_password.html')
 
 
-# @app.route('/logout', methods=['GET', 'POST'])
-# @app.route('/')
-# def logout():
-#     auth.signOut()
-#     return render_template('index.html')
+@app.route('/logout', methods=['GET', 'POST'])
+@app.route('/')
+def logout():
+    auth.current_user = None
+    return render_template('index.html')
 
 ####################################################################################################
 # ___________________________________END OF USER AUTHENTICATIONS___________________________________#
