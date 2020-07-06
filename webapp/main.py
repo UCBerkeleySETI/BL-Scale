@@ -9,21 +9,23 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-
 import zmq
 import time
 import pickle
 
 import logging
 from google.cloud import storage
-
 from flask import render_template, request, redirect, session, Flask
-
+import time
 import os
-
+import threading
 global cache
+from time import sleep
 cache = {}
+import multiprocessing
 
+global message_sub
+message_sub = ""
 
 config = {
     "apiKey": "AIzaSyAWVDszEVzJ_GSopx-23slhwKM2Ha5qkbw",
@@ -35,6 +37,7 @@ config = {
     "appId": "1:848306815127:web:52de0d53e030cac44029d2",
     "measurementId": "G-STR7QLT26Q"
 }
+
 
 firebase = pyrebase.initialize_app(config)
 auth = firebase.auth()
@@ -88,9 +91,9 @@ def create_account():
 @app.route('/forgot_password', methods=['GET', 'POST'])
 def forgot_password():
     if (request.method == 'POST'):
-            email = request.form['name']
-            auth.send_password_reset_email(email)
-            return render_template('index.html')
+        email = request.form['name']
+        auth.send_password_reset_email(email)
+        return render_template('index.html')
     return render_template('forgot_password.html')
 
 
@@ -102,8 +105,50 @@ def logout():
 
 ####################################################################################################
 # ___________________________________END OF USER AUTHENTICATIONS___________________________________#
+# ________________________________________START OF ZMQ NETWORKING__________________________________#
 ####################################################################################################
 
+def get_sub():
+    global message_sub
+    context = zmq.Context()
+    socket = context.socket(zmq.SUB)
+    socket.connect("tcp://10.0.3.141:5560")
+    socket.setsockopt(zmq.SUBSCRIBE, b'')
+    while True:
+        print("Trying to get msg...")
+        message_sub = str(socket.recv_pyobj())
+        print(message_sub)
+        sleep(5)
+
+@app.route('/zmq_sub', methods=['GET', 'POST'])
+def zmq_sub():
+    global message_sub
+    print(" ---"+ message_sub + "--- getting from webpage")
+    if message_sub == None:
+        message_sub ="No Data From Publisher Node"
+    return render_template("zmq_sub.html", title="Main Page", message_sub=message_sub)
+
+@app.route('/zmq_push')
+def my_form():
+    return render_template('zmq_push.html')
+
+@app.route('/zmq_push', methods=['GET', 'POST'])
+def zmq_push():
+    input_ip = request.form['input_ip']
+    output_ip = request.form['output_ip']
+    processed_text = output_ip.upper()
+    print(str(input_ip))
+    print(processed_text)
+    context = zmq.Context()
+    socket = context.socket(zmq.PUSH)
+    socket.connect(str(input_ip))
+    socket.send(str.encode(str(processed_text)))
+    return render_template('zmq_push.html')
+
+####################################################################################################
+# _______________________________________END OF ZMQ PIPELINE_______________________________________#
+# ________________________________________START OF HOME PAGE____________________________________#
+####################################################################################################
 
 @app.route('/home', methods=['GET', 'POST'])
 def home():
@@ -259,4 +304,6 @@ import monitor
 app.register_blueprint(monitor.bp)
 
 if __name__ == '__main__':
+    p1 = threading.Thread(target=get_sub, args=())
+    p1.start()
     app.run()
