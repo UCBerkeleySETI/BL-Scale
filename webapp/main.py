@@ -124,12 +124,13 @@ def my_form():
 
 @app.route('/zmq_push', methods=['GET', 'POST'])
 def zmq_push():
-    text = request.form['text']
-    processed_text = text.upper()
+    input_ip = request.form['input_ip']
+    output_ip = request.form['output_ip']
+    processed_text = output_ip.upper()
     print(processed_text)
     context = zmq.Context()
     socket = context.socket(zmq.PUSH)
-    socket.bind("tcp://127.0.0.1:5555")
+    socket.connect(str(input_ip))
     socket.send(str.encode(str(processed_text)))
     return render_template('zmq_push.html')
 
