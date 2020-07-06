@@ -6,18 +6,18 @@ def main():
     context = zmq.Context()
 
     # Socket facing producers
-    frontend = context.socket(zmq.XPUB)
-    frontend.bind("tcp://*:5559")
+    upstream = context.socket(zmq.XSUB)
+    upstream.bind("tcp://*:5559")
 
     # Socket facing consumers
-    backend = context.socket(zmq.XSUB)
-    backend.bind("tcp://*:5560")
+    downstream = context.socket(zmq.XPUB)
+    downstream.bind("tcp://*:5560")
 
-    zmq.proxy(frontend, backend)
+    zmq.proxy(upstream, downstream)
 
     # We never get here…
-    frontend.close()
-    backend.close()
+    upstream.close()
+    downstream.close()
     context.term()
 
 if __name__ == "__main__":
