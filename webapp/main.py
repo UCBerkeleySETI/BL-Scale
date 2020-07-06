@@ -12,10 +12,7 @@ import seaborn as sns
 
 import zmq
 import time
-<<<<<<< HEAD
 import pickle
-=======
->>>>>>> e5803fcd47c5700c70add6688e558c6a3755d704
 
 import logging
 from google.cloud import storage
