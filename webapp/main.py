@@ -12,6 +12,10 @@ import seaborn as sns
 
 import zmq
 import time
+<<<<<<< HEAD
+import pickle
+=======
+>>>>>>> e5803fcd47c5700c70add6688e558c6a3755d704
 
 import logging
 from google.cloud import storage
@@ -93,11 +97,11 @@ def forgot_password():
     return render_template('forgot_password.html')
 
 
-# @app.route('/logout', methods=['GET', 'POST'])
-# @app.route('/')
-# def logout():
-#     auth.signOut()
-#     return render_template('index.html')
+@app.route('/logout', methods=['GET', 'POST'])
+@app.route('/')
+def logout():
+    auth.current_user = None
+    return render_template('index.html')
 
 ####################################################################################################
 # ___________________________________END OF USER AUTHENTICATIONS___________________________________#
