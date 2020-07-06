@@ -15,10 +15,14 @@ from google.cloud import storage
 from flask import render_template, request, redirect, session, Flask
 import time
 import os
-
+import threading
 global cache
+from time import sleep
 cache = {}
+import multiprocessing
 
+global message_sub
+message_sub = ""
 
 config = {
     "apiKey": "AIzaSyAWVDszEVzJ_GSopx-23slhwKM2Ha5qkbw",
@@ -30,6 +34,7 @@ config = {
     "appId": "1:848306815127:web:52de0d53e030cac44029d2",
     "measurementId": "G-STR7QLT26Q"
 }
+
 
 firebase = pyrebase.initialize_app(config)
 auth = firebase.auth()
@@ -70,47 +75,45 @@ def index():
 @app.route('/create_account', methods=['GET', 'POST'])
 def create_account():
     if (request.method == 'POST'):
-            email = request.form['name']
-            password = request.form['password']
-            try:
-                auth.create_user_with_email_and_password(email, password)
-                return render_template('index.html')
-            except:
-                unsuccessful = 'Issues with credentials - Cannot sign you up :('
-                return render_template('create_account.html', umessage=unsuccessful)    
+        email = request.form['name']
+        password = request.form['password']
+        try:
+            auth.create_user_with_email_and_password(email, password)
+            return render_template('index.html')
+        except:
+            unsuccessful = 'Issues with credentials - Cannot sign you up :('
+            return render_template('create_account.html', umessage=unsuccessful)    
     return render_template('create_account.html')   
 
 @app.route('/forgot_password', methods=['GET', 'POST'])
 def forgot_password():
     if (request.method == 'POST'):
-            email = request.form['name']
-            auth.send_password_reset_email(email)
-            return render_template('index.html')
+        email = request.form['name']
+        auth.send_password_reset_email(email)
+        return render_template('index.html')
     return render_template('forgot_password.html')
-
-
-# @app.route('/logout', methods=['GET', 'POST'])
-# @app.route('/')
-# def logout():
-#     auth.signOut()
-#     return render_template('index.html')
 
 ####################################################################################################
 # ___________________________________END OF USER AUTHENTICATIONS___________________________________#
 # ________________________________________START OF ZMQ NETWORKING__________________________________#
 ####################################################################################################
+
+def get_sub():
+    global message_sub
+    context = zmq.Context()
+    socket = context.socket(zmq.SUB)
+    socket.connect("tcp://10.0.3.141:5560")
+    socket.setsockopt(zmq.SUBSCRIBE, b'')
+    while True:
+        print("Trying to get msg...")
+        message_sub = str(socket.recv_pyobj())
+        print(message_sub)
+        sleep(5)
+
 @app.route('/zmq_sub', methods=['GET', 'POST'])
 def zmq_sub():
-    def get_sub():
-        context = zmq.Context()
-        socket = context.socket(zmq.SUB)
-        socket.connect("tcp://35.192.178.168:5000")
-        socket.setsockopt(zmq.SUBSCRIBE, b'')    
-        print("Trying to get msg...")
-        message = socket.recv_pyobj()
-        print(message)
-        return str(message)
-    message_sub = get_sub()
+    global message_sub
+    print(" ---"+ message_sub + "--- getting from webpage")
     if message_sub == None:
         message_sub ="No Data From Publisher Node"
     return render_template("zmq_sub.html", title="Main Page", message_sub=message_sub)
@@ -124,15 +127,11 @@ def zmq_push():
     text = request.form['text']
     processed_text = text.upper()
     print(processed_text)
-
     context = zmq.Context()
     socket = context.socket(zmq.PUSH)
     socket.bind("tcp://127.0.0.1:5555")
-    
     socket.send(str.encode(str(processed_text)))
- 
     return render_template('zmq_push.html')
-
 
 ####################################################################################################
 # _______________________________________END OF ZMQ PIPELINE_______________________________________#
@@ -144,9 +143,6 @@ def home():
   
     #NOT SURE IF WE NEED THIS YET
     def get_uri(bucket_name):
-       
-        #bucket_name = 'bl-scale'
-
         storage_client = storage.Client("BL-Scale")
         # Retrieve all blobs with a prefix matching the file.
         bucket=storage_client.get_bucket(bucket_name)
@@ -253,4 +249,12 @@ def home():
 
 
 if __name__ == '__main__':
+    p1 = threading.Thread(target=get_sub, args=())
+    # p2 = threading.Thread(target=get_sub, args=())
+    p1.start()
     app.run()
+
+
+
+
+
