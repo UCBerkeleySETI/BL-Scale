@@ -137,6 +137,7 @@ def zmq_push():
     input_ip = request.form['input_ip']
     output_ip = request.form['output_ip']
     processed_text = output_ip.upper()
+    print(str(input_ip))
     print(processed_text)
     context = zmq.Context()
     socket = context.socket(zmq.PUSH)
@@ -304,11 +305,5 @@ app.register_blueprint(monitor.bp)
 
 if __name__ == '__main__':
     p1 = threading.Thread(target=get_sub, args=())
-    # p2 = threading.Thread(target=get_sub, args=())
     p1.start()
     app.run()
-
-
-
-
-
