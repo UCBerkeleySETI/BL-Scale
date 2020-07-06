@@ -7,7 +7,7 @@ def main():
 
     # Socket facing producers
     upstream = context.socket(zmq.XSUB)
-    upstream.bind("tcp://*:5559")
+    upstream.connect("tcp://*:5559")
 
     # Socket facing consumers
     downstream = context.socket(zmq.XPUB)
