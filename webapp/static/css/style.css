@@ -20,11 +20,27 @@ Exclusively available here: https://themeforest.net/user/fourtabsthemes
 }
 
 
-.wolf-logo{
-    padding-top: 150px;
-    padding-bottom: 150px;
-  
-    width:auto;
+
+.linear-wipe {
+	font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+	font-size: 6rem;
+	font-weight:  100;
+	letter-spacing: 2px;
+	text-align: center;
+	color: #f35626;
+	background-image: -webkit-linear-gradient(92deg, #f35626, #feab3a);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	-webkit-animation: hue 10s infinite linear;
+}
+
+@-webkit-keyframes hue {
+  from {
+    -webkit-filter: hue-rotate(0deg);
+  }
+  to {
+    -webkit-filter: hue-rotate(-360deg);
+  }
 }
 .center{
     align-content: center;
@@ -4065,7 +4081,13 @@ blockquote p{
     color: #232323 !important
 
 }
+.btn-green{
 
+    background: #000 !important;
+    border-color: #2bf707 !important;
+    color: #2bf707 !important
+
+}
 .btn-white:hover,
 .btn-white:focus{
 
