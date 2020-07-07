@@ -125,7 +125,7 @@ def zmq_sub():
     global message_dict
     print(f" ---{message_dict}--- getting from webpage")
     if message_dict["message"] == "":
-        message_dict ="No Data From Publisher Node"
+        message_dict["message"] = "No Data From Publisher Node"
     return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict["message"])
 
 @app.route('/zmq_push')
