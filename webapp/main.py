@@ -37,8 +37,6 @@ config = {
     "appId": "1:848306815127:web:52de0d53e030cac44029d2",
     "measurementId": "G-STR7QLT26Q"
 }
-
-
 firebase = pyrebase.initialize_app(config)
 auth = firebase.auth()
 app = Flask(__name__, instance_relative_config=True)
@@ -63,6 +61,10 @@ except OSError:
 @app.route('/')
 @app.route('/index', methods=['GET', 'POST'])
 def index():
+    return render_template('index.html')
+
+@app.route('/login', methods=['GET', 'POST'])
+def index():
     if (request.method == 'POST'):
             email = request.form['name']
             password = request.form['password']
@@ -73,7 +75,7 @@ def index():
             except:
                 unsuccessful = 'Please check your credentials'
                 return render_template('index.html', umessage=unsuccessful)
-    return render_template('index.html')
+    return render_template('login.html')
 
 @app.route('/create_account', methods=['GET', 'POST'])
 def create_account():
@@ -151,10 +153,8 @@ def zmq_push():
 
 @app.route('/home', methods=['GET', 'POST'])
 def home():
-
     def get_cache():
         return cache
-
     #client, request data
     def get_data():
         message_list = []
