@@ -24,8 +24,8 @@ from time import sleep
 cache = {}
 import multiprocessing
 
-global message_sub
-message_sub = ""
+global message_dict
+message_dict = {"message": ""}
 
 config = {
     "apiKey": "AIzaSyAWVDszEVzJ_GSopx-23slhwKM2Ha5qkbw",
@@ -109,24 +109,24 @@ def logout():
 ####################################################################################################
 
 def get_sub():
-    global message_sub
+    global message_dict
     context = zmq.Context()
     socket = context.socket(zmq.SUB)
     socket.connect("tcp://10.0.3.141:5560")
     socket.setsockopt(zmq.SUBSCRIBE, b'')
     while True:
         print("Trying to get msg...")
-        message_sub = str(socket.recv_pyobj())
-        print(message_sub)
-        sleep(5)
+        message_dict = socket.recv_pyobj()
+        print(message_dict)
+        sleep(1)
 
 @app.route('/zmq_sub', methods=['GET', 'POST'])
 def zmq_sub():
-    global message_sub
-    print(" ---"+ message_sub + "--- getting from webpage")
-    if message_sub == None:
-        message_sub ="No Data From Publisher Node"
-    return render_template("zmq_sub.html", title="Main Page", message_sub=message_sub)
+    global message_dict
+    print(f" ---{message_dict}--- getting from webpage")
+    if message_dict["message"] == "":
+        message_dict ="No Data From Publisher Node"
+    return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict["message"])
 
 @app.route('/zmq_push')
 def my_form():
@@ -134,15 +134,14 @@ def my_form():
 
 @app.route('/zmq_push', methods=['GET', 'POST'])
 def zmq_push():
-    input_ip = request.form['input_ip']
-    output_ip = request.form['output_ip']
-    processed_text = output_ip.upper()
-    print(str(input_ip))
-    print(processed_text)
+    target_ip = request.form['target_ip']
+    message = request.form['message']
+    print(str(target_ip))
+    print(message)
     context = zmq.Context()
     socket = context.socket(zmq.PUSH)
-    socket.connect(str(input_ip))
-    socket.send(str.encode(str(processed_text)))
+    socket.connect(str(target_ip))
+    socket.send_pyobj({"message": message})
     return render_template('zmq_push.html')
 
 ####################################################################################################
