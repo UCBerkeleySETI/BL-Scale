@@ -60,3 +60,13 @@ jobs:
           repository: breakthrough-listen-sandbox/bl-scale
           dockerfile: dockerfiles/webapp.dockerfile
           tags: webapp-latest
+          
+    - name: Build and push Proxy Image to Google Container Registry
+      uses: docker/build-push-action@v1
+      with:
+          username: _json_key
+          password: ${{ secrets.GCP_JSON_KEY }}
+          registry: gcr.io
+          repository: breakthrough-listen-sandbox/bl-scale
+          dockerfile: dockerfiles/zproxy.dockerfile
+          tags: zproxy-latest

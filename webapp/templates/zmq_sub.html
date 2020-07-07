@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>Welcome to BL@Scale</h1>
+{% endblock %}
+
+{% block content %}
+<h4>ZMQ SUB Received request From Instance</h4>
+<div class="container-fluid">
+      <div class="row">
+	        <div class="col-sm-12">
+            <h1>
+               Reading Python Object Casted To String From tcp://10.0.3.141:5560
+            </h1>
+            <h1>
+              {{ message_sub }}
+            </h1>
+          </div>
+          <!-- <script language="javascript">
+            setInterval(function(){
+               window.location.reload(1);
+            }, 3000);
+            </script> -->
+  	  </div>
+  		<div class="row">
+      </div>
+</div>
+
+{% endblock %}
