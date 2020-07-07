@@ -1,5 +1,7 @@
 # BL@Scale
 
+![Build Docker](https://github.com/UCBerkeleySETI/BL-Scale/workflows/Build%20Docker/badge.svg)
+
 Cloud-based platform for scaling algorithms to process petabytes of Breakthrough Listen data.
 
 ## Deployment
