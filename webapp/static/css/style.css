@@ -31,7 +31,7 @@ Exclusively available here: https://themeforest.net/user/fourtabsthemes
 	background-image: -webkit-linear-gradient(92deg, #f35626, #feab3a);
 	-webkit-background-clip: text;
 	-webkit-text-fill-color: transparent;
-	-webkit-animation: hue 10s infinite linear;
+	-webkit-animation: hue 5s infinite linear;
 }
 
 @-webkit-keyframes hue {
@@ -68,7 +68,7 @@ Exclusively available here: https://themeforest.net/user/fourtabsthemes
 
 
 .backimg{
-    background: url('../images/radio-telescope-background1.png') no-repeat;
+    background: url('../images/radio-telescope-background2.png') no-repeat;
     background-size: 100%;
    
     
@@ -4081,11 +4081,11 @@ blockquote p{
     color: #232323 !important
 
 }
-.btn-green{
+.btn-orange{
 
-    background: #000 !important;
-    border-color: #2bf707 !important;
-    color: #2bf707 !important
+    
+    border-color: #fc5603 !important;
+    color: #fc5603 !important
 
 }
 .btn-white:hover,
