@@ -108,9 +108,6 @@ def logout():
 @app.route('/home', methods=['GET', 'POST'])
 def home():
 
-    def get_cache():
-        return cache
-
     #client, request data
     def get_data():
         message_list = []
@@ -246,6 +243,7 @@ def home():
             processed_data = filter_images(data, 4)
 
             obs_filtered_url[observ] = get_img_url(processed_data, observ)
+
             cache[observ] = [base64_obs[observ], obs_filtered_url[observ]]
     else:
         print("cache not empty")
