@@ -200,6 +200,7 @@
             <h2 class="text-weight-800 Raleway text-white">Login  <img style="width: 10%;"src="../static/images/BL_Scale_icon.png"  ></h2>
           <p class="text-white text-weight-400 no-margin-bottom">Login to access Cloud-based platform for scaling algorithms to process petabytes of Breakthrough Listen data.</p>
           <p class="text-white text-weight-400 no-margin-bottom"><b>NOTE</b>: If this is your first time loging in in the past few days, this may require 30 sec - 1 min to fully update your account with the data in our storage</p>
+		  <div class="loader"></div>
 
           {% if smessage %}
             <div class="alert alert-success">
@@ -220,7 +221,7 @@
               <label for="exampleInputPassword1">Password</label>
               <input type="password" class="form-control" name="password" placeholder="Password">
               </div>
-              <button type="submit" name="submit" class="btn btn-primary">Submit</button>
+			  <button type="submit" name="submit" class="btn btn-primary">Submit</button>
           </form>
 
           <div class="row">
