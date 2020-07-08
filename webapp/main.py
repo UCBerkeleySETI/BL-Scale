@@ -59,12 +59,12 @@ except OSError:
 
 
 @app.route('/')
-@app.route('/index', methods=['GET', 'POST'])
+@app.route('/index')
 def index():
     return render_template('index.html')
 
 @app.route('/login', methods=['GET', 'POST'])
-def index():
+def login():
     if (request.method == 'POST'):
             email = request.form['name']
             password = request.form['password']
@@ -74,7 +74,7 @@ def index():
                 return template_returned
             except:
                 unsuccessful = 'Please check your credentials'
-                return render_template('index.html', umessage=unsuccessful)
+                return render_template('login.html', umessage=unsuccessful)
     return render_template('login.html')
 
 @app.route('/create_account', methods=['GET', 'POST'])
@@ -84,7 +84,7 @@ def create_account():
             password = request.form['password']
             try:
                 auth.create_user_with_email_and_password(email, password)
-                return render_template('index.html')
+                return render_template('login.html')
             except:
                 unsuccessful = 'Issues with credentials - Cannot sign you up :('
                 return render_template('create_account.html', umessage=unsuccessful)
@@ -95,7 +95,7 @@ def forgot_password():
     if (request.method == 'POST'):
         email = request.form['name']
         auth.send_password_reset_email(email)
-        return render_template('index.html')
+        return render_template('login.html')
     return render_template('forgot_password.html')
 
 
@@ -103,7 +103,7 @@ def forgot_password():
 @app.route('/')
 def logout():
     auth.current_user = None
-    return render_template('index.html')
+    return render_template('login.html')
 
 ####################################################################################################
 # ___________________________________END OF USER AUTHENTICATIONS___________________________________#
