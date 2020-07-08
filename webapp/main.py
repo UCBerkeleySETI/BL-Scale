@@ -37,8 +37,6 @@ config = {
     "appId": "1:848306815127:web:52de0d53e030cac44029d2",
     "measurementId": "G-STR7QLT26Q"
 }
-
-
 firebase = pyrebase.initialize_app(config)
 auth = firebase.auth()
 app = Flask(__name__, instance_relative_config=True)
@@ -61,8 +59,12 @@ except OSError:
 
 
 @app.route('/')
-@app.route('/index', methods=['GET', 'POST'])
+@app.route('/index')
 def index():
+    return render_template('index.html')
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
     if (request.method == 'POST'):
             email = request.form['name']
             password = request.form['password']
@@ -72,8 +74,8 @@ def index():
                 return template_returned
             except:
                 unsuccessful = 'Please check your credentials'
-                return render_template('index.html', umessage=unsuccessful)
-    return render_template('index.html')
+                return render_template('login.html', umessage=unsuccessful)
+    return render_template('login.html')
 
 @app.route('/create_account', methods=['GET', 'POST'])
 def create_account():
@@ -82,7 +84,7 @@ def create_account():
             password = request.form['password']
             try:
                 auth.create_user_with_email_and_password(email, password)
-                return render_template('index.html')
+                return render_template('login.html')
             except:
                 unsuccessful = 'Issues with credentials - Cannot sign you up :('
                 return render_template('create_account.html', umessage=unsuccessful)
@@ -93,7 +95,7 @@ def forgot_password():
     if (request.method == 'POST'):
         email = request.form['name']
         auth.send_password_reset_email(email)
-        return render_template('index.html')
+        return render_template('login.html')
     return render_template('forgot_password.html')
 
 
@@ -101,7 +103,7 @@ def forgot_password():
 @app.route('/')
 def logout():
     auth.current_user = None
-    return render_template('index.html')
+    return render_template('login.html')
 
 ####################################################################################################
 # ___________________________________END OF USER AUTHENTICATIONS___________________________________#
@@ -151,10 +153,8 @@ def zmq_push():
 
 @app.route('/home', methods=['GET', 'POST'])
 def home():
-
     def get_cache():
         return cache
-
     #client, request data
     def get_data():
         message_list = []
@@ -232,7 +232,7 @@ def home():
 
     #return base64 string of histogram
     def get_base64_hist(df):
-
+        plt.style.use("dark_background")
         plt.figure(figsize=(8,6))
         plt.hist(df["freqs"], bins = np.arange(min(df["freqs"]),max(df["freqs"]), 0.8116025973))
         plt.title("Histogram of Hits")
