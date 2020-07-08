@@ -232,7 +232,7 @@ def home():
 
     #return base64 string of histogram
     def get_base64_hist(df):
-
+        plt.style.use("dark_background")
         plt.figure(figsize=(8,6))
         plt.hist(df["freqs"], bins = np.arange(min(df["freqs"]),max(df["freqs"]), 0.8116025973))
         plt.title("Histogram of Hits")
