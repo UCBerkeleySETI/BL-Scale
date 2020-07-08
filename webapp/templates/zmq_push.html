@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>Welcome to BL@Scale</h1>
+{% endblock %}
+
+{% block content %}
+<h4>ZMQ PUSH AND PULL Request</h4>
+
+
+
+
+<div class="container-fluid">
+      <div class="row">
+	        <div class="col-sm-12">
+            <h1>
+              Input IP
+            </h1>
+            <form method="POST">
+                <input name="input_ip">
+            <h1>
+              Output IP
+            </h1>
+
+              <input name="output_ip">
+              <input type="submit">
+          </form>
+  	  </div>
+  		<div class="row">
+      </div>
+</div>
+
+{% endblock %}
