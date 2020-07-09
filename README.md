@@ -1,4 +1,4 @@
-# BL@Scale
+![alt text](https://github.com/UCBerkeleySETI/BL-Scale/blob/peter-dev/webapp/static/images/BL-scale-logo_dark.png?raw=true)
 
 ![Build Docker](https://github.com/UCBerkeleySETI/BL-Scale/workflows/Build%20Docker/badge.svg)
 
