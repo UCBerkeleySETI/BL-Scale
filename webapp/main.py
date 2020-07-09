@@ -140,8 +140,8 @@ def my_form():
 def zmq_push():
     target_ip = request.form['target_ip']
     message = request.form['message']
-    print(str(target_ip))
-    print(message)
+    # print(str(target_ip))
+    # print(message)
     context = zmq.Context()
     socket = context.socket(zmq.PUSH)
     socket.connect(str(target_ip))
@@ -300,9 +300,6 @@ def home():
             base64_obs[key] = cache[key][0]
     print("returning home")
     return render_template("home.html", title="Main Page", sample_urls=obs_filtered_url, plot_bytes=base64_obs)
-
-import monitor
-app.register_blueprint(monitor.bp)
 
 if __name__ == '__main__':
     p1 = threading.Thread(target=get_sub, args=())
