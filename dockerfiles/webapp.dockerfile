@@ -9,8 +9,8 @@ RUN apt install -y git curl python3-pip gunicorn3
 
 RUN mkdir /code
 WORKDIR /code
-RUN git clone https://github.com/UCBerkeleySETI/BL-Scale.git
+COPY . /code/BL-Scale
 WORKDIR /code/BL-Scale/webapp
 RUN pip3 install -r requirements.txt
 
-CMD gunicorn3 -b :5000 main:app
+CMD gunicorn3 -k=gevent -b :5000 --log-level=debug "main:config_app()"

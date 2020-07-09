@@ -105,14 +105,16 @@ Exclusively available here: https://themeforest.net/user/fourtabsthemes
     background-position: 20%;
     
 }
-.backimg-wave{
-    background: url('../images/wave-animation.gif') no-repeat;
-    background-size: 50%;
-    background-position: 20%;
-    
-}
+
 .backimg-PAPER{
     background: url('../images/jupiter.png') no-repeat;
+    background-size: 100%;
+    /* background-position: 20%; */
+    
+}
+.backimg-wave{
+    background: url('../images/world.gif') no-repeat;
+    background-position: center;
     background-size: 100%;
     /* background-position: 20%; */
     
