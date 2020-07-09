@@ -41,6 +41,11 @@ auth = firebase.auth()
 db = firebase.database()
 app = Flask(__name__, instance_relative_config=True)
 
+if __name__ != '__main__':
+    gunicorn_logger = logging.getLogger('gunicorn.error')
+    app.logger.handlers = gunicorn_logger.handlers
+    app.logger.setLevel(gunicorn_logger.level)
+
 test_config=None
 
 
@@ -127,27 +132,26 @@ def get_sub():
     poller = zmq.Poller()
     poller.register(sub, zmq.POLLIN)
     while True:
-        print("Polling for message")
+        app.logger.debug("Polling for message")
         socks = dict(poller.poll(2))
         if sub in socks and socks[sub] == zmq.POLLIN:
             serialized_message_dict = socket.recv()
             print(serialized_message_dict)
             # Update the string variable
-            db.child("breakthrough-listen-sandbox").child("flask_vars").child("sub_message").set(serialized_message_dict)
-            print('Updated database')
+            message_dict = pickle.loads(serialized_message_dict)
+            db.child("breakthrough-listen-sandbox").child("flask_vars").child("sub_message").set(message_dict)
+            app.logger.debug('Updated database')
         else:
-            print("No message has been received, waiting...")
+            app.logger.debug("No message has been received, waiting...")
         time.sleep(1)
 
 @app.route('/zmq_sub', methods=['GET', 'POST'])
 def zmq_sub():
-    result = db.child("breakthrough-listen-sandbox").child("flask_vars").child("sub_message").get().val()
-    if result:
-        message_dict = pickle.loads(result)
-    else:
+    message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("sub_message").get().val()
+    if not message_dict:
         message = "No Data From Publisher Node"
         return render_template("zmq_sub.html", title="Main Page", message_sub=message)
-    print(f" ---{message_dict}--- getting from webpage")
+    app.logger.debug(f" ---{message_dict}--- getting from webpage")
     if message_dict["message"] == "":
         message = "No Data From Publisher Node"
     else:
