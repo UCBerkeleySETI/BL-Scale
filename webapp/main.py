@@ -13,7 +13,6 @@ import seaborn as sns
 import zmq
 import time
 import pickle
-
 import logging
 from google.cloud import storage
 from flask import render_template, request, redirect, session, Flask
@@ -22,8 +21,9 @@ import os
 import threading
 global cache
 import time
-cache = {}
 import multiprocessing
+cache = {}
+
 
 
 config = {
@@ -89,18 +89,18 @@ def login():
                 return render_template('login.html', umessage=unsuccessful)
     return render_template('login.html')
 
-@app.route('/create_account', methods=['GET', 'POST'])
-def create_account():
-    if (request.method == 'POST'):
-            email = request.form['name']
-            password = request.form['password']
-            try:
-                auth.create_user_with_email_and_password(email, password)
-                return render_template('login.html')
-            except:
-                unsuccessful = 'Issues with credentials - Cannot sign you up :('
-                return render_template('create_account.html', umessage=unsuccessful)
-    return render_template('create_account.html')
+# @app.route('/create_account', methods=['GET', 'POST'])
+# def create_account():
+#     if (request.method == 'POST'):
+#             email = request.form['name']
+#             password = request.form['password']
+#             try:
+#                 auth.create_user_with_email_and_password(email, password)
+#                 return render_template('login.html')
+#             except:
+#                 unsuccessful = 'Issues with credentials - Cannot sign you up :('
+#                 return render_template('create_account.html', umessage=unsuccessful)
+#     return render_template('create_account.html')
 
 @app.route('/forgot_password', methods=['GET', 'POST'])
 def forgot_password():
@@ -325,6 +325,9 @@ def home():
             base64_obs[key] = cache[key][0]
     print("returning home")
     return render_template("home.html", title="Main Page", sample_urls=obs_filtered_url, plot_bytes=base64_obs)
+
+import monitor
+app.register_blueprint(monitor.bp)
 
 if __name__ == '__main__':
     p1 = threading.Thread(target=get_sub, args=())
