@@ -23,9 +23,8 @@ global cache
 from time import sleep
 cache = {}
 import multiprocessing
+from firebase import firebase as firebase_database_module
 
-global message_dict
-message_dict = {"message": ""}
 
 config = {
     "apiKey": "AIzaSyAWVDszEVzJ_GSopx-23slhwKM2Ha5qkbw",
@@ -39,6 +38,7 @@ config = {
 }
 firebase = pyrebase.initialize_app(config)
 auth = firebase.auth()
+fire_database = firebase_database_module.FirebaseApplication('https://breakthrough-listen-sandbox.firebaseio.com/', None)
 app = Flask(__name__, instance_relative_config=True)
 
 test_config=None
@@ -111,7 +111,6 @@ def logout():
 ####################################################################################################
 
 def get_sub():
-    global message_dict
     context = zmq.Context()
     socket = context.socket(zmq.SUB)
     socket.connect("tcp://10.0.3.141:5560")
@@ -119,16 +118,19 @@ def get_sub():
     while True:
         print("Trying to get msg...")
         message_dict = socket.recv_pyobj()
-        print(message_dict)
+        # Update the string variable
+        fire_database.put('/breakthrough-listen-sandbox/flask_vars/-MBkt_yIVsUfiHB4WF7c', 'Message', str(message_dict))
+        print('Updated database')
         sleep(1)
 
 @app.route('/zmq_sub', methods=['GET', 'POST'])
 def zmq_sub():
-    global message_dict
+    message_dict =  fire_database.get('/breakthrough-listen-sandbox/flask_vars', '')
+    message_dict = str(message_dict)
     print(f" ---{message_dict}--- getting from webpage")
-    if message_dict["message"] == "":
-        message_dict["message"] = "No Data From Publisher Node"
-    return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict["message"])
+    if message_dict == "":
+        message_dict= "No Data From Publisher Node"
+    return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict)
 
 @app.route('/zmq_push')
 def my_form():
