@@ -21,7 +21,7 @@ import time
 import os
 import threading
 global cache
-from time import sleep
+import time
 cache = {}
 import multiprocessing
 
@@ -40,7 +40,7 @@ firebase = pyrebase.initialize_app(config)
 auth = firebase.auth()
 db = firebase.database()
 app = Flask(__name__, instance_relative_config=True)
-loop = asyncio.new_event_loop()
+listener = threading.Thread(target=get_sub, args=())
 
 test_config=None
 
@@ -59,10 +59,9 @@ except OSError:
     pass
 
 def config_app():
-    asyncio.set_event_loop(loop)
-
-    asyncio.ensure_future(get_sub())
-    loop.run_forever()
+    if not listener.is_alive():
+        listener.start()
+        print("Started Listener")
 
     return app
 
@@ -119,7 +118,7 @@ def logout():
 # ________________________________________START OF ZMQ NETWORKING__________________________________#
 ####################################################################################################
 
-async def get_sub():
+def get_sub():
     context = zmq.Context()
     sub = context.socket(zmq.SUB)
     sub.connect("tcp://10.0.3.141:5560")
@@ -139,7 +138,7 @@ async def get_sub():
             print('Updated database')
         else:
             print("No message has been received, waiting...")
-        await asyncio.sleep(1)
+        time.sleep(1)
 
 @app.route('/zmq_sub', methods=['GET', 'POST'])
 def zmq_sub():
@@ -326,11 +325,6 @@ def home():
     return render_template("home.html", title="Main Page", sample_urls=obs_filtered_url, plot_bytes=base64_obs)
 
 if __name__ == '__main__':
-    # p1 = threading.Thread(target=get_sub, args=())
-    # p1.start()
-
-    asyncio.set_event_loop(loop)
-
-    asyncio.ensure_future(get_sub())
-    loop.run_forever()
+    p1 = threading.Thread(target=get_sub, args=())
+    p1.start()
     app.run()
