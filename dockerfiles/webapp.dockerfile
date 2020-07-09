@@ -13,4 +13,4 @@ COPY . /code/BL-Scale
 WORKDIR /code/BL-Scale/webapp
 RUN pip3 install -r requirements.txt
 
-CMD gunicorn3 -k=gevent -b :5000 main:app
+CMD gunicorn -k=gevent -b :5000 --log-level=debug "main:config_app()"
