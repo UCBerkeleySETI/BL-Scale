@@ -23,7 +23,6 @@ global cache
 from time import sleep
 cache = {}
 import multiprocessing
-from firebase import firebase as firebase_database_module
 
 
 config = {
@@ -38,7 +37,7 @@ config = {
 }
 firebase = pyrebase.initialize_app(config)
 auth = firebase.auth()
-fire_database = firebase_database_module.FirebaseApplication('https://breakthrough-listen-sandbox.firebaseio.com/', None)
+db = firebase.database()
 app = Flask(__name__, instance_relative_config=True)
 
 test_config=None
@@ -119,14 +118,14 @@ def get_sub():
         print("Trying to get msg...")
         message_dict = socket.recv_pyobj()
         # Update the string variable
-        fire_database.put('/breakthrough-listen-sandbox/flask_vars/-MBkt_yIVsUfiHB4WF7c', 'Message', str(message_dict))
+        db.child("breakthrough-listen-sandbox").child("flask_vars").child("-MBkt_yIVsUfiHB4WF7c").update({"Message": str(message_dict)})
         print('Updated database')
         sleep(1)
 
 @app.route('/zmq_sub', methods=['GET', 'POST'])
 def zmq_sub():
-    message_dict =  fire_database.get('/breakthrough-listen-sandbox/flask_vars', '')
-    message_dict = str(message_dict)
+    result = db.child("breakthrough-listen-sandbox").child("flask_vars").get()
+    message_dict = str(result.val())
     print(f" ---{message_dict}--- getting from webpage")
     if message_dict == "":
         message_dict= "No Data From Publisher Node"
