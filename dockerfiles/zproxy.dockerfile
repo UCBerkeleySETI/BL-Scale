@@ -9,7 +9,7 @@ RUN apt install -y git python3-pip
 
 RUN mkdir /code
 WORKDIR /code
-RUN git clone https://github.com/UCBerkeleySETI/BL-Scale.git
+COPY . /code/BL-Scale
 WORKDIR /code/BL-Scale/webapp
 RUN pip3 install -r requirements.txt
 
