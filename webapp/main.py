@@ -117,16 +117,23 @@ def logout():
 
 def get_sub():
     context = zmq.Context()
-    socket = context.socket(zmq.SUB)
-    socket.connect("tcp://10.0.3.141:5560")
-    socket.setsockopt(zmq.SUBSCRIBE, b'')
+    sub = context.socket(zmq.SUB)
+    sub.connect("tcp://10.0.3.141:5560")
+    sub.setsockopt(zmq.SUBSCRIBE, b'')
+
+    # set up poller
+    poller = zmq.Poller()
+    poller.register(sub, zmq.POLLIN)
     while True:
         print("Trying to get msg...")
-        serialized_message_dict = socket.recv()
-        # Update the string variable
-        db.child("breakthrough-listen-sandbox").child("flask_vars").child("sub_message").set(serialized_message_dict)
-        print('Updated database')
-        sleep(1)
+        socks = dict(poller.poll())
+        if sub in socks and socks[sub] == zmq.POLLIN:
+            serialized_message_dict = socket.recv()
+            print(serialized_message_dict)
+            # Update the string variable
+            db.child("breakthrough-listen-sandbox").child("flask_vars").child("sub_message").set(serialized_message_dict)
+            print('Updated database')
+        sleep(5)
 
 @app.route('/zmq_sub', methods=['GET', 'POST'])
 def zmq_sub():
