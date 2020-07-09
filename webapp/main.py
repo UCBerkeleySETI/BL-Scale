@@ -130,8 +130,12 @@ def get_sub():
 
 @app.route('/zmq_sub', methods=['GET', 'POST'])
 def zmq_sub():
-    result = db.child("breakthrough-listen-sandbox").child("flask_vars").child("sub_message").get()
-    message_dict = pickle.loads(result.val())
+    result = db.child("breakthrough-listen-sandbox").child("flask_vars").child("sub_message").get().val()
+    if result:
+        message_dict = pickle.loads(result)
+    else:
+        message = "No Data From Publisher Node"
+        return render_template("zmq_sub.html", title="Main Page", message_sub=message)
     print(f" ---{message_dict}--- getting from webpage")
     if message_dict["message"] == "":
         message = "No Data From Publisher Node"
