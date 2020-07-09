@@ -132,7 +132,6 @@ def get_sub():
     poller = zmq.Poller()
     poller.register(sub, zmq.POLLIN)
     while True:
-        app.logger.debug("Polling for message")
         socks = dict(poller.poll(2))
         if sub in socks and socks[sub] == zmq.POLLIN:
             serialized_message_dict = sub.recv()
@@ -140,9 +139,7 @@ def get_sub():
             # Update the string variable
             message_dict = pickle.loads(serialized_message_dict)
             db.child("breakthrough-listen-sandbox").child("flask_vars").child("sub_message").set(message_dict)
-            app.logger.debug('Updated database')
-        else:
-            app.logger.debug("No message has been received, waiting...")
+            app.logger.debug(f'Updated database with {message_dict}')
         time.sleep(1)
 
 @app.route('/zmq_sub', methods=['GET', 'POST'])
@@ -166,8 +163,8 @@ def my_form():
 def zmq_push():
     target_ip = request.form['target_ip']
     message = request.form['message']
-    # print(str(target_ip))
-    # print(message)
+    app.logger.debug(str(target_ip))
+    app.logger.debug(message)
     context = zmq.Context()
     socket = context.socket(zmq.PUSH)
     socket.connect(str(target_ip))
