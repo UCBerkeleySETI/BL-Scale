@@ -326,6 +326,11 @@ def home():
     return render_template("home.html", title="Main Page", sample_urls=obs_filtered_url, plot_bytes=base64_obs)
 
 if __name__ == '__main__':
-    p1 = threading.Thread(target=get_sub, args=())
-    p1.start()
+    # p1 = threading.Thread(target=get_sub, args=())
+    # p1.start()
+
+    asyncio.set_event_loop(loop)
+
+    asyncio.ensure_future(get_sub())
+    loop.run_forever()
     app.run()
