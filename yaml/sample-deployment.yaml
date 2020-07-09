@@ -1,0 +1,83 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "1"
+  creationTimestamp: "2020-06-28T19:33:09Z"
+  generation: 6
+  labels:
+    app: bl-scale
+  name: bl-scale
+  namespace: default
+  resourceVersion: "47865"
+  selfLink: /apis/apps/v1/namespaces/default/deployments/bl-scale
+  uid: 32881445-b976-11ea-bd59-42010a80015f
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: bl-scale
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: bl-scale
+    spec:
+      containers:
+      - env:
+        - name: ALG_SUB_PACKAGE
+          valueFrom:
+            configMapKeyRef:
+              key: ALG_SUB_PACKAGE
+              name: bl-scale-config-38mx
+        - name: ALG_NAME
+          valueFrom:
+            configMapKeyRef:
+              key: ALG_NAME
+              name: bl-scale-config-38mx
+        - name: GOOGLE_APPLICATION_CREDENTIALS
+          value: "/var/run/secret/cloud.google.com/bl-scale_key.json"
+        volumeMounts:
+        - name: "cred-key"
+          mountPath: "/var/run/secret/cloud.google.com"
+        image: gcr.io/breakthrough-listen-sandbox/bl-scale:latest
+        imagePullPolicy: Always
+        name: bl-scale-1
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      volumes:
+        - name: "cred-key"
+          secret:
+            secretName: "bl-scale-cred-key"
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+status:
+  availableReplicas: 1
+  conditions:
+  - lastTransitionTime: "2020-06-28T19:33:09Z"
+    lastUpdateTime: "2020-06-28T19:33:29Z"
+    message: ReplicaSet "bl-scale-5686fc7f75" has successfully progressed.
+    reason: NewReplicaSetAvailable
+    status: "True"
+    type: Progressing
+  - lastTransitionTime: "2020-06-28T23:11:14Z"
+    lastUpdateTime: "2020-06-28T23:11:14Z"
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  observedGeneration: 6
+  readyReplicas: 1
+  replicas: 1
+  updatedReplicas: 1

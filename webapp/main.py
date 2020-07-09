@@ -9,19 +9,23 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-
 import zmq
+import time
+import pickle
 
 import logging
 from google.cloud import storage
-
 from flask import render_template, request, redirect, session, Flask
-
+import time
 import os
-
+import threading
 global cache
+from time import sleep
 cache = {}
+import multiprocessing
 
+global message_dict
+message_dict = {"message": ""}
 
 config = {
     "apiKey": "AIzaSyAWVDszEVzJ_GSopx-23slhwKM2Ha5qkbw",
@@ -33,7 +37,6 @@ config = {
     "appId": "1:848306815127:web:52de0d53e030cac44029d2",
     "measurementId": "G-STR7QLT26Q"
 }
-
 firebase = pyrebase.initialize_app(config)
 auth = firebase.auth()
 app = Flask(__name__, instance_relative_config=True)
@@ -56,8 +59,12 @@ except OSError:
 
 
 @app.route('/')
-@app.route('/index', methods=['GET', 'POST'])
+@app.route('/index')
 def index():
+    return render_template('index.html')
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
     if (request.method == 'POST'):
             email = request.form['name']
             password = request.form['password']
@@ -67,8 +74,8 @@ def index():
                 return template_returned
             except:
                 unsuccessful = 'Please check your credentials'
-                return render_template('index.html', umessage=unsuccessful)
-    return render_template('index.html')
+                return render_template('login.html', umessage=unsuccessful)
+    return render_template('login.html')
 
 @app.route('/create_account', methods=['GET', 'POST'])
 def create_account():
@@ -77,38 +84,115 @@ def create_account():
             password = request.form['password']
             try:
                 auth.create_user_with_email_and_password(email, password)
-                return render_template('index.html')
+                return render_template('login.html')
             except:
                 unsuccessful = 'Issues with credentials - Cannot sign you up :('
-                return render_template('create_account.html', umessage=unsuccessful)    
-    return render_template('create_account.html')   
+                return render_template('create_account.html', umessage=unsuccessful)
+    return render_template('create_account.html')
 
 @app.route('/forgot_password', methods=['GET', 'POST'])
 def forgot_password():
     if (request.method == 'POST'):
-            email = request.form['name']
-            auth.send_password_reset_email(email)
-            return render_template('index.html')
+        email = request.form['name']
+        auth.send_password_reset_email(email)
+        return render_template('login.html')
     return render_template('forgot_password.html')
 
 
-# @app.route('/logout', methods=['GET', 'POST'])
-# @app.route('/')
-# def logout():
-#     auth.signOut()
-#     return render_template('index.html')
+@app.route('/logout', methods=['GET', 'POST'])
+@app.route('/')
+def logout():
+    auth.current_user = None
+    return render_template('login.html')
 
 ####################################################################################################
 # ___________________________________END OF USER AUTHENTICATIONS___________________________________#
+# ________________________________________START OF ZMQ NETWORKING__________________________________#
 ####################################################################################################
 
+def get_sub():
+    global message_dict
+    context = zmq.Context()
+    socket = context.socket(zmq.SUB)
+    socket.connect("tcp://10.0.3.141:5560")
+    socket.setsockopt(zmq.SUBSCRIBE, b'')
+    while True:
+        print("Trying to get msg...")
+        message_dict = socket.recv_pyobj()
+        print(message_dict)
+        sleep(1)
+
+@app.route('/zmq_sub', methods=['GET', 'POST'])
+def zmq_sub():
+    global message_dict
+    print(f" ---{message_dict}--- getting from webpage")
+    if message_dict["message"] == "":
+        message_dict["message"] = "No Data From Publisher Node"
+    return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict["message"])
+
+@app.route('/zmq_push')
+def my_form():
+    return render_template('zmq_push.html')
+
+@app.route('/zmq_push', methods=['GET', 'POST'])
+def zmq_push():
+    target_ip = request.form['target_ip']
+    message = request.form['message']
+    print(str(target_ip))
+    print(message)
+    context = zmq.Context()
+    socket = context.socket(zmq.PUSH)
+    socket.connect(str(target_ip))
+    socket.send_pyobj({"message": message})
+    return render_template('zmq_push.html')
+
+####################################################################################################
+# _______________________________________END OF ZMQ PIPELINE_______________________________________#
+# ________________________________________START OF HOME PAGE____________________________________#
+####################################################################################################
 
 @app.route('/home', methods=['GET', 'POST'])
 def home():
-  
+    def get_cache():
+        return cache
+    #client, request data
+    def get_data():
+        message_list = []
+        context = zmq.Context()
+        # Socket to talk to server
+        print("Connecting to server...")
+        socket = context.socket(zmq.REQ)
+        socket.connect("tcp://*:5555")
+
+        for request in range(1):
+            print("Sending request %s..." % request)
+            socket.send(b"Please send over data")
+
+            # Get the reply
+            message = pickle.loads(socket.recv())
+            message_list += [message]
+        return message_list
+
+    #server, send data
+    def send_data(info):
+        context = zmq.Context()
+        socket = context.socket(zmq.REP)
+        socket.bind("tcp://*:5555")
+
+        while True:
+            # Wait for next request from client
+            message = socket.recv()
+            print("Request received: %s" % message)
+
+            #D o some 'work'
+            time.sleep(1)
+
+            # Send reply back to client
+            socket.send(pickle.dumps(info))
+
     #NOT SURE IF WE NEED THIS YET
     def get_uri(bucket_name):
-       
+
         #bucket_name = 'bl-scale'
 
         storage_client = storage.Client("BL-Scale")
@@ -123,19 +207,19 @@ def home():
             if "info_df.pkl" in blob.name:
                 uris += ["gs://"+bucket_name+"/"+blob.name]
         return uris
- 
+
     #string list of pickles
     uris = ['gs://bl-scale/GBT_58010_50176_HIP61317_fine/info_df.pkl', 'gs://bl-scale/GBT_58014_69579_HIP77629_fine/info_df.pkl', 'gs://bl-scale/GBT_58110_60123_HIP91926_fine/info_df.pkl', 'gs://bl-scale/GBT_58202_60970_B0329+54_fine/info_df.pkl', 'gs://bl-scale/GBT_58210_37805_HIP103730_fine/info_df.pkl', 'gs://bl-scale/GBT_58210_39862_HIP105504_fine/info_df.pkl', 'gs://bl-scale/GBT_58210_40853_HIP106147_fine/info_df.pkl', 'gs://bl-scale/GBT_58210_41185_HIP105761_fine/info_df.pkl', 'gs://bl-scale/GBT_58307_26947_J1935+1616_fine/info_df.pkl', 'gs://bl-scale/GBT_58452_79191_HIP115687_fine/info_df.pkl']
 
     #returns string observation
     def get_observation(uri_str):
-       
+
         obs = re.search(r"([A-Z])\w+(\+\w+)*", uri_str)
         return obs.group(0)
 
     #returns string list of urls
     def get_img_url(df, observation):
-      
+
         indexes = []
         samples_url = []
         blockn = []
@@ -148,7 +232,7 @@ def home():
 
     #return base64 string of histogram
     def get_base64_hist(df):
-      
+        plt.style.use("dark_background")
         plt.figure(figsize=(8,6))
         plt.hist(df["freqs"], bins = np.arange(min(df["freqs"]),max(df["freqs"]), 0.8116025973))
         plt.title("Histogram of Hits")
@@ -163,7 +247,7 @@ def home():
 
     #returns dataframe of 3*n filtered images
     def filter_images(df, n):
-    
+
         #filter 1000 to 1400 freqs
         freq_1000_1400 = df[(df["freqs"] >= 1000) & (df["freqs"] <= 1400)]
         freq_1000_1400 = freq_1000_1400.sort_values("statistic", ascending=False).head(n)
@@ -196,15 +280,15 @@ def home():
     if not cache:
         print("cache empty")
         for uri in uris:
-      
+
             data = pd.read_pickle(uri)
-          
+
             observ = get_observation(uri)
-         
+
             base64_obs[observ] = get_base64_hist(data)
-         
+
             processed_data = filter_images(data, 4)
-          
+
             obs_filtered_url[observ] = get_img_url(processed_data, observ)
             cache[observ] = [base64_obs[observ], obs_filtered_url[observ]]
     else:
@@ -215,6 +299,10 @@ def home():
     print("returning home")
     return render_template("home.html", title="Main Page", sample_urls=obs_filtered_url, plot_bytes=base64_obs)
 
+import monitor
+app.register_blueprint(monitor.bp)
 
 if __name__ == '__main__':
+    p1 = threading.Thread(target=get_sub, args=())
+    p1.start()
     app.run()
