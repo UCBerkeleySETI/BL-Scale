@@ -40,6 +40,7 @@ firebase = pyrebase.initialize_app(config)
 auth = firebase.auth()
 db = firebase.database()
 app = Flask(__name__, instance_relative_config=True)
+loop = asyncio.new_event_loop()
 
 test_config=None
 
@@ -58,7 +59,7 @@ except OSError:
     pass
 
 def config_app():
-    loop = asyncio.new_event_loop()
+
     asyncio.set_event_loop(loop)
 
     loop.run_until_complete(
