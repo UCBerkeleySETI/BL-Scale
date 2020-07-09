@@ -56,6 +56,12 @@ try:
 except OSError:
     pass
 
+def config_app():
+    sub_listener = threading.Thread(target=get_sub, args=())
+    sub_listener.start()
+
+    return app
+
 
 @app.route('/')
 @app.route('/index')
@@ -116,20 +122,22 @@ def get_sub():
     socket.setsockopt(zmq.SUBSCRIBE, b'')
     while True:
         print("Trying to get msg...")
-        message_dict = socket.recv_pyobj()
+        serialized_message_dict = socket.recv()
         # Update the string variable
-        db.child("breakthrough-listen-sandbox").child("flask_vars").child("-MBkt_yIVsUfiHB4WF7c").update({"Message": str(message_dict)})
+        db.child("breakthrough-listen-sandbox").child("flask_vars").child("sub_message").set(serialized_message_dict)
         print('Updated database')
         sleep(1)
 
 @app.route('/zmq_sub', methods=['GET', 'POST'])
 def zmq_sub():
-    result = db.child("breakthrough-listen-sandbox").child("flask_vars").get()
-    message_dict = str(result.val())
+    result = db.child("breakthrough-listen-sandbox").child("flask_vars").child("sub_message").get()
+    message_dict = pickle.loads(result.val())
     print(f" ---{message_dict}--- getting from webpage")
-    if message_dict == "":
-        message_dict= "No Data From Publisher Node"
-    return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict)
+    if message_dict["message"] == "":
+        message = "No Data From Publisher Node"
+    else:
+        message = message_dict["message"]
+    return render_template("zmq_sub.html", title="Main Page", message_sub=message)
 
 @app.route('/zmq_push')
 def my_form():
@@ -209,8 +217,8 @@ def home():
                 uris += ["gs://"+bucket_name+"/"+blob.name]
         return uris
 
-    #string list of pickles
-    uris = ['gs://bl-scale/GBT_58010_50176_HIP61317_fine/info_df.pkl', 'gs://bl-scale/GBT_58014_69579_HIP77629_fine/info_df.pkl', 'gs://bl-scale/GBT_58110_60123_HIP91926_fine/info_df.pkl', 'gs://bl-scale/GBT_58202_60970_B0329+54_fine/info_df.pkl', 'gs://bl-scale/GBT_58210_37805_HIP103730_fine/info_df.pkl', 'gs://bl-scale/GBT_58210_39862_HIP105504_fine/info_df.pkl', 'gs://bl-scale/GBT_58210_40853_HIP106147_fine/info_df.pkl', 'gs://bl-scale/GBT_58210_41185_HIP105761_fine/info_df.pkl', 'gs://bl-scale/GBT_58307_26947_J1935+1616_fine/info_df.pkl', 'gs://bl-scale/GBT_58452_79191_HIP115687_fine/info_df.pkl']
+    #string list of pickles 'gs://bl-scale/GBT_58010_50176_HIP61317_fine/info_df.pkl' excluded
+    uris = ['gs://bl-scale/GBT_58014_69579_HIP77629_fine/info_df.pkl', 'gs://bl-scale/GBT_58110_60123_HIP91926_fine/info_df.pkl', 'gs://bl-scale/GBT_58202_60970_B0329+54_fine/info_df.pkl', 'gs://bl-scale/GBT_58210_37805_HIP103730_fine/info_df.pkl', 'gs://bl-scale/GBT_58210_39862_HIP105504_fine/info_df.pkl', 'gs://bl-scale/GBT_58210_40853_HIP106147_fine/info_df.pkl', 'gs://bl-scale/GBT_58210_41185_HIP105761_fine/info_df.pkl', 'gs://bl-scale/GBT_58307_26947_J1935+1616_fine/info_df.pkl', 'gs://bl-scale/GBT_58452_79191_HIP115687_fine/info_df.pkl']
 
     #returns string observation
     def get_observation(uri_str):
