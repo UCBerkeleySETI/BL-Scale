@@ -3,6 +3,7 @@ from flask import render_template, request, redirect, session
 import os
 import base64
 import io
+import asyncio
 import re
 import pyrebase
 import pandas as pd
@@ -20,7 +21,7 @@ import time
 import os
 import threading
 global cache
-from time import sleep
+import time
 cache = {}
 import multiprocessing
 
@@ -40,6 +41,11 @@ auth = firebase.auth()
 db = firebase.database()
 app = Flask(__name__, instance_relative_config=True)
 
+if __name__ != '__main__':
+    gunicorn_logger = logging.getLogger('gunicorn.error')
+    app.logger.handlers = gunicorn_logger.handlers
+    app.logger.setLevel(gunicorn_logger.level)
+
 test_config=None
 
 
@@ -55,6 +61,13 @@ try:
     os.makedirs(app.instance_path)
 except OSError:
     pass
+
+def config_app():
+    if not listener.is_alive():
+        listener.start()
+        print("Started Listener")
+
+    return app
 
 
 @app.route('/')
@@ -111,25 +124,36 @@ def logout():
 
 def get_sub():
     context = zmq.Context()
-    socket = context.socket(zmq.SUB)
-    socket.connect("tcp://10.0.3.141:5560")
-    socket.setsockopt(zmq.SUBSCRIBE, b'')
+    sub = context.socket(zmq.SUB)
+    sub.connect("tcp://10.0.3.141:5560")
+    sub.setsockopt(zmq.SUBSCRIBE, b'')
+
+    # set up poller
+    poller = zmq.Poller()
+    poller.register(sub, zmq.POLLIN)
     while True:
-        print("Trying to get msg...")
-        message_dict = socket.recv_pyobj()
-        # Update the string variable
-        db.child("breakthrough-listen-sandbox").child("flask_vars").child("-MBkt_yIVsUfiHB4WF7c").update({"Message": str(message_dict)})
-        print('Updated database')
-        sleep(1)
+        socks = dict(poller.poll(2))
+        if sub in socks and socks[sub] == zmq.POLLIN:
+            serialized_message_dict = sub.recv()
+            print(serialized_message_dict)
+            # Update the string variable
+            message_dict = pickle.loads(serialized_message_dict)
+            db.child("breakthrough-listen-sandbox").child("flask_vars").child("sub_message").set(message_dict)
+            app.logger.debug(f'Updated database with {message_dict}')
+        time.sleep(1)
 
 @app.route('/zmq_sub', methods=['GET', 'POST'])
 def zmq_sub():
-    result = db.child("breakthrough-listen-sandbox").child("flask_vars").get()
-    message_dict = str(result.val())
-    print(f" ---{message_dict}--- getting from webpage")
-    if message_dict == "":
-        message_dict= "No Data From Publisher Node"
-    return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict)
+    message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("sub_message").get().val()
+    if not message_dict:
+        message = "No Data From Publisher Node"
+        return render_template("zmq_sub.html", title="Main Page", message_sub=message)
+    app.logger.debug(f" ---{message_dict}--- getting from webpage")
+    if message_dict["message"] == "":
+        message = "No Data From Publisher Node"
+    else:
+        message = message_dict["message"]
+    return render_template("zmq_sub.html", title="Main Page", message_sub=message)
 
 @app.route('/zmq_push')
 def my_form():
@@ -139,13 +163,15 @@ def my_form():
 def zmq_push():
     target_ip = request.form['target_ip']
     message = request.form['message']
-    # print(str(target_ip))
-    # print(message)
+    app.logger.debug(str(target_ip))
+    app.logger.debug(message)
     context = zmq.Context()
     socket = context.socket(zmq.PUSH)
     socket.connect(str(target_ip))
     socket.send_pyobj({"message": message})
     return render_template('zmq_push.html')
+
+listener = threading.Thread(target=get_sub, args=())
 
 ####################################################################################################
 # _______________________________________END OF ZMQ PIPELINE_______________________________________#
@@ -209,8 +235,8 @@ def home():
                 uris += ["gs://"+bucket_name+"/"+blob.name]
         return uris
 
-    #string list of pickles
-    uris = ['gs://bl-scale/GBT_58010_50176_HIP61317_fine/info_df.pkl', 'gs://bl-scale/GBT_58014_69579_HIP77629_fine/info_df.pkl', 'gs://bl-scale/GBT_58110_60123_HIP91926_fine/info_df.pkl', 'gs://bl-scale/GBT_58202_60970_B0329+54_fine/info_df.pkl', 'gs://bl-scale/GBT_58210_37805_HIP103730_fine/info_df.pkl', 'gs://bl-scale/GBT_58210_39862_HIP105504_fine/info_df.pkl', 'gs://bl-scale/GBT_58210_40853_HIP106147_fine/info_df.pkl', 'gs://bl-scale/GBT_58210_41185_HIP105761_fine/info_df.pkl', 'gs://bl-scale/GBT_58307_26947_J1935+1616_fine/info_df.pkl', 'gs://bl-scale/GBT_58452_79191_HIP115687_fine/info_df.pkl']
+    #string list of pickles 'gs://bl-scale/GBT_58010_50176_HIP61317_fine/info_df.pkl' excluded
+    uris = ['gs://bl-scale/GBT_58014_69579_HIP77629_fine/info_df.pkl', 'gs://bl-scale/GBT_58110_60123_HIP91926_fine/info_df.pkl', 'gs://bl-scale/GBT_58202_60970_B0329+54_fine/info_df.pkl', 'gs://bl-scale/GBT_58210_37805_HIP103730_fine/info_df.pkl', 'gs://bl-scale/GBT_58210_39862_HIP105504_fine/info_df.pkl', 'gs://bl-scale/GBT_58210_40853_HIP106147_fine/info_df.pkl', 'gs://bl-scale/GBT_58210_41185_HIP105761_fine/info_df.pkl', 'gs://bl-scale/GBT_58307_26947_J1935+1616_fine/info_df.pkl', 'gs://bl-scale/GBT_58452_79191_HIP115687_fine/info_df.pkl']
 
     #returns string observation
     def get_observation(uri_str):
