@@ -1,5 +1,6 @@
 Click==7.0
 Flask==1.1.1
+firebase == 3.0.1
 gcloud==0.17.0
 googleapis-common-protos==1.6.0
 httplib2==0.13.1
