@@ -1,4 +1,7 @@
-![alt text](https://github.com/UCBerkeleySETI/BL-Scale/blob/peter-dev/webapp/static/images/BL-scale-logo_dark.png?raw=true)
+
+<img scr="https://github.com/UCBerkeleySETI/BL-Scale/blob/peter-dev/webapp/static/images/BL-scale-logo_dark.png?raw=true" width="100px">
+
+
 
 ![Build Docker](https://github.com/UCBerkeleySETI/BL-Scale/workflows/Build%20Docker/badge.svg)
 
