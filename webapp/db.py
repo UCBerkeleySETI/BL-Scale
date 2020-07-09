@@ -4,7 +4,7 @@ import json
 import requests
 from requests import Session
 from requests.exceptions import HTTPError
-
+import urllib.request, json 
 # First bit is pyrebase
 
 config = {
@@ -27,7 +27,7 @@ def query_by_order(db, order_by, limit_to, token):
     request_edit = db.build_request_url(token)
     request_edit = request_edit.replace("%2522", "%22")
 
-    import urllib.request, json 
+
     with urllib.request.urlopen(request_edit) as url:
         data = json.loads(url.read().decode())
         return data
