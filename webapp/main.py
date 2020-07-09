@@ -3,6 +3,7 @@ from flask import render_template, request, redirect, session
 import os
 import base64
 import io
+import asyncio
 import re
 import pyrebase
 import pandas as pd
@@ -57,8 +58,12 @@ except OSError:
     pass
 
 def config_app():
-    sub_listener = threading.Thread(target=get_sub, args=())
-    sub_listener.start()
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+
+    loop.run_until_complete(
+        loop.create_task(get_sub())
+    )
 
     return app
 
@@ -115,7 +120,7 @@ def logout():
 # ________________________________________START OF ZMQ NETWORKING__________________________________#
 ####################################################################################################
 
-def get_sub():
+async def get_sub():
     context = zmq.Context()
     sub = context.socket(zmq.SUB)
     sub.connect("tcp://10.0.3.141:5560")
