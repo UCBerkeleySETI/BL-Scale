@@ -130,7 +130,7 @@ async def get_sub():
     poller.register(sub, zmq.POLLIN)
     while True:
         print("Polling for message")
-        socks = dict(poller.poll())
+        socks = dict(poller.poll(2))
         if sub in socks and socks[sub] == zmq.POLLIN:
             serialized_message_dict = socket.recv()
             print(serialized_message_dict)
