@@ -1,5 +1,9 @@
 from firebase import firebase
 import pyrebase 
+import json
+import requests
+from requests import Session
+from requests.exceptions import HTTPError
 
 # First bit is pyrebase
 
@@ -16,15 +20,33 @@ config = {
 
 firebase = pyrebase.initialize_app(config)
 db = firebase.database()
-users = db.child("breakthrough-listen-sandbox").child("flask_vars").get()
-print(users.val())
+
+
+def query_by_order(db, order_by, limit_to, token):
+    users = db.child("breakthrough-listen-sandbox").child("flask_vars").child("obs").order_by_child(order_by).limit_to_last(limit_to)
+    request_edit = db.build_request_url(token)
+    request_edit = request_edit.replace("%2522", "%22")
+
+    import urllib.request, json 
+    with urllib.request.urlopen(request_edit) as url:
+        data = json.loads(url.read().decode())
+        return data
+
+data = query_by_order(db,order_by = "time",limit_to=3,token=False )
+print(data)
+
+
+
+
+
+# print(users.val())
 
 
 #updating a specific record 
-db.child("breakthrough-listen-sandbox").child("flask_vars").child("-MBkt_yIVsUfiHB4WF7c").update({"Message": "Mortiest Morty"})
+# db.child("breakthrough-listen-sandbox").child("flask_vars").child("-MBkt_yIVsUfiHB4WF7c").update({"Message": "Mortiest Morty"})
 # Writing data
-data = {"Message": "karen"}
-db.child("breakthrough-listen-sandbox").child("flask_vars").push(data)
+# data = {"time": 3}
+# db.child("breakthrough-listen-sandbox").child("flask_vars").child('obs').push(data)
 
 # # Posting data
 # firebase = firebase.FirebaseApplication('https://breakthrough-listen-sandbox.firebaseio.com/', None)
