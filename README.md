@@ -1,7 +1,7 @@
 
 
 
-<img src="https://github.com/UCBerkeleySETI/BL-Scale/blob/peter-dev/webapp/static/images/BL-scale-logo_dark.png"  width="120" height="120">
+<img src="https://github.com/UCBerkeleySETI/BL-Scale/blob/peter-dev/webapp/static/images/BL-scale-logo_dark.png"  width="250" >
 
 ![Build Docker](https://github.com/UCBerkeleySETI/BL-Scale/workflows/Build%20Docker/badge.svg)
 
