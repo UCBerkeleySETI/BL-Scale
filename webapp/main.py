@@ -59,12 +59,10 @@ except OSError:
     pass
 
 def config_app():
-
     asyncio.set_event_loop(loop)
 
-    loop.run_until_complete(
-        loop.create_task(get_sub())
-    )
+    asyncio.ensure_future(get_sub())
+    loop.run_forever()
 
     return app
 
@@ -131,7 +129,7 @@ async def get_sub():
     poller = zmq.Poller()
     poller.register(sub, zmq.POLLIN)
     while True:
-        print("Trying to get msg...")
+        print("Polling for message")
         socks = dict(poller.poll())
         if sub in socks and socks[sub] == zmq.POLLIN:
             serialized_message_dict = socket.recv()
@@ -139,7 +137,9 @@ async def get_sub():
             # Update the string variable
             db.child("breakthrough-listen-sandbox").child("flask_vars").child("sub_message").set(serialized_message_dict)
             print('Updated database')
-        sleep(5)
+        else:
+            print("No message has been received, waiting...")
+        await asyncio.sleep(1)
 
 @app.route('/zmq_sub', methods=['GET', 'POST'])
 def zmq_sub():
