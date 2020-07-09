@@ -40,7 +40,6 @@ firebase = pyrebase.initialize_app(config)
 auth = firebase.auth()
 db = firebase.database()
 app = Flask(__name__, instance_relative_config=True)
-listener = threading.Thread(target=get_sub, args=())
 
 test_config=None
 
@@ -170,6 +169,8 @@ def zmq_push():
     socket.connect(str(target_ip))
     socket.send_pyobj({"message": message})
     return render_template('zmq_push.html')
+
+listener = threading.Thread(target=get_sub, args=())
 
 ####################################################################################################
 # _______________________________________END OF ZMQ PIPELINE_______________________________________#
