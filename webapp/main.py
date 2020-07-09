@@ -135,7 +135,7 @@ def get_sub():
         app.logger.debug("Polling for message")
         socks = dict(poller.poll(2))
         if sub in socks and socks[sub] == zmq.POLLIN:
-            serialized_message_dict = socket.recv()
+            serialized_message_dict = sub.recv()
             print(serialized_message_dict)
             # Update the string variable
             message_dict = pickle.loads(serialized_message_dict)
