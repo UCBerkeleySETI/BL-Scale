@@ -5,7 +5,6 @@ import base64
 import io
 import asyncio
 import re
-import pyrebase
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -19,6 +18,12 @@ from flask import render_template, request, redirect, session, Flask
 import time
 import os
 import threading
+# from firebase import firebase
+import json
+import requests
+from requests import Session
+from requests.exceptions import HTTPError
+import urllib.request, json
 global cache
 import time
 import multiprocessing
@@ -303,6 +308,9 @@ def home():
     #iterate through every observation dataframe in uri list
     #fills in the obs_filtered_url and base64_obs dictionary to be passed into render_template
     global cache
+
+    retrieved_cache = firebase.get("/breakthrough-listen-sandbox/flask_vars/cache")
+    print(retrieved_cache)
 
     if not cache:
         print("cache empty")
