@@ -286,19 +286,19 @@ def home():
 
             observ = get_observation(uri)
 
-            base64_obs[observ] = get_base64_hist(data)
+            #base64_obs[observ] = get_base64_hist(data)
 
             processed_data = filter_images(data, 4)
 
-            obs_filtered_url[observ] = get_img_url(processed_data, observ)
-            cache[observ] = [base64_obs[observ], obs_filtered_url[observ]]
+            #obs_filtered_url[observ] = get_img_url(processed_data, observ)
+            cache[observ] = [get_base64_hist(data), get_img_url(processed_data, observ)]
             db.child("breakthrough-listen-sandbox").child("flask_vars").child("cache").child(observ).set(cache[observ])
     else:
         if all(db_k in cache.keys() for db_k in db_cache_keys):
-            print("cache not empty")
-            for key in cache.keys():
-                obs_filtered_url[key] = cache[key][1]
-                base64_obs[key] = cache[key][0]
+            print("cache all updated")
+            # for key in cache.keys():
+            #     obs_filtered_url[key] = cache[key][1]
+            #     base64_obs[key] = cache[key][0]
         else:
             print("adding additional to cache")
             for db_k in db_cache_keys:
@@ -306,10 +306,10 @@ def home():
                     for uri in uris:
                         if get_observation(uri) == db_k:
                             data = pd.read_pickle(uri)
-                            base64_obs[db_k] = get_base64_hist(data)
+                            #base64_obs[db_k] = get_base64_hist(data)
                             processed_data = filter_images(data, 4)
-                            obs_filtered_url[db_k] = get_img_url(processed_data, db_k)
-                            cache[db_k] = [base64_obs[db_k], obs_filtered_url[db_k]]
+                            #obs_filtered_url[db_k] = get_img_url(processed_data, db_k)
+                            cache[db_k] = [get_base64_hist(data), get_img_url(processed_data, db_k)]
                             db.child("breakthrough-listen-sandbox").child("flask_vars").child("cache").child(db_k).set(cache[db_k])
     # else:
     #     print("cache not empty")
