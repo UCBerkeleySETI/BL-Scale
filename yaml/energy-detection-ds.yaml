@@ -21,9 +21,15 @@ spec:
             containers:
                 - env:
                     - name: ALG_SUB_PACKAGE
-                      value: energy_detection
+                      valueFrom:
+                        configMapKeyRef:
+                          key: ALG_SUB_PACKAGE
+                          name: bl-scale-config-38mx
                     - name: ALG_NAME
-                      value: energy_detection
+                      valueFrom:
+                        configMapKeyRef:
+                          key: ALG_NAME
+                          name: bl-scale-config-38mx
                     - name: GOOGLE_APPLICATION_CREDENTIALS
                       value: "/var/run/secret/cloud.google.com/bl-scale_key.json"
                   volumeMounts:

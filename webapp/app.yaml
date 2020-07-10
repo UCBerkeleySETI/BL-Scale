@@ -12,6 +12,9 @@ runtime_config:
 manual_scaling:
   instances: 1
 resources:
-  cpu: 8
-  memory_gb: 24
+  cpu: 4
+  memory_gb: 12
   disk_size_gb: 20
+network:
+  forwarded_ports:
+    - 5555/tcp

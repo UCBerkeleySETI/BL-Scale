@@ -3,26 +3,27 @@ from flask import render_template, request, redirect, session
 import os
 import base64
 import io
+import asyncio
 import re
 import pyrebase
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-
 import zmq
 import time
 import pickle
-
 import logging
 from google.cloud import storage
-
 from flask import render_template, request, redirect, session, Flask
-
+import time
 import os
-
+import threading
 global cache
+import time
+import multiprocessing
 cache = {}
+
 
 
 config = {
@@ -35,10 +36,15 @@ config = {
     "appId": "1:848306815127:web:52de0d53e030cac44029d2",
     "measurementId": "G-STR7QLT26Q"
 }
-
 firebase = pyrebase.initialize_app(config)
 auth = firebase.auth()
+db = firebase.database()
 app = Flask(__name__, instance_relative_config=True)
+
+if __name__ != '__main__':
+    gunicorn_logger = logging.getLogger('gunicorn.error')
+    app.logger.handlers = gunicorn_logger.handlers
+    app.logger.setLevel(gunicorn_logger.level)
 
 test_config=None
 
@@ -56,10 +62,21 @@ try:
 except OSError:
     pass
 
+def config_app():
+    if not listener.is_alive():
+        listener.start()
+        print("Started Listener")
+
+    return app
+
 
 @app.route('/')
-@app.route('/index', methods=['GET', 'POST'])
+@app.route('/index')
 def index():
+    return render_template('index.html')
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
     if (request.method == 'POST'):
             email = request.form['name']
             password = request.form['password']
@@ -69,28 +86,28 @@ def index():
                 return template_returned
             except:
                 unsuccessful = 'Please check your credentials'
-                return render_template('index.html', umessage=unsuccessful)
-    return render_template('index.html')
+                return render_template('login.html', umessage=unsuccessful)
+    return render_template('login.html')
 
-@app.route('/create_account', methods=['GET', 'POST'])
-def create_account():
-    if (request.method == 'POST'):
-            email = request.form['name']
-            password = request.form['password']
-            try:
-                auth.create_user_with_email_and_password(email, password)
-                return render_template('index.html')
-            except:
-                unsuccessful = 'Issues with credentials - Cannot sign you up :('
-                return render_template('create_account.html', umessage=unsuccessful)
-    return render_template('create_account.html')
+# @app.route('/create_account', methods=['GET', 'POST'])
+# def create_account():
+#     if (request.method == 'POST'):
+#             email = request.form['name']
+#             password = request.form['password']
+#             try:
+#                 auth.create_user_with_email_and_password(email, password)
+#                 return render_template('login.html')
+#             except:
+#                 unsuccessful = 'Issues with credentials - Cannot sign you up :('
+#                 return render_template('create_account.html', umessage=unsuccessful)
+#     return render_template('create_account.html')
 
 @app.route('/forgot_password', methods=['GET', 'POST'])
 def forgot_password():
     if (request.method == 'POST'):
-            email = request.form['name']
-            auth.send_password_reset_email(email)
-            return render_template('index.html')
+        email = request.form['name']
+        auth.send_password_reset_email(email)
+        return render_template('login.html')
     return render_template('forgot_password.html')
 
 
@@ -98,16 +115,73 @@ def forgot_password():
 @app.route('/')
 def logout():
     auth.current_user = None
-    return render_template('index.html')
+    return render_template('login.html')
 
 ####################################################################################################
 # ___________________________________END OF USER AUTHENTICATIONS___________________________________#
+# ________________________________________START OF ZMQ NETWORKING__________________________________#
 ####################################################################################################
 
+def get_sub():
+    context = zmq.Context()
+    sub = context.socket(zmq.SUB)
+    sub.connect("tcp://10.0.3.141:5560")
+    sub.setsockopt(zmq.SUBSCRIBE, b'')
+
+    # set up poller
+    poller = zmq.Poller()
+    poller.register(sub, zmq.POLLIN)
+    while True:
+        socks = dict(poller.poll(2))
+        if sub in socks and socks[sub] == zmq.POLLIN:
+            serialized_message_dict = sub.recv()
+            print(serialized_message_dict)
+            # Update the string variable
+            message_dict = pickle.loads(serialized_message_dict)
+            db.child("breakthrough-listen-sandbox").child("flask_vars").child("sub_message").set(message_dict)
+            app.logger.debug(f'Updated database with {message_dict}')
+        time.sleep(1)
+
+@app.route('/zmq_sub', methods=['GET', 'POST'])
+def zmq_sub():
+    message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("sub_message").get().val()
+    if not message_dict:
+        message = "No Data From Publisher Node"
+        return render_template("zmq_sub.html", title="Main Page", message_sub=message)
+    app.logger.debug(f" ---{message_dict}--- getting from webpage")
+    if message_dict["message"] == "":
+        message = "No Data From Publisher Node"
+    else:
+        message = message_dict["message"]
+    return render_template("zmq_sub.html", title="Main Page", message_sub=message)
+
+@app.route('/zmq_push')
+def my_form():
+    return render_template('zmq_push.html')
+
+@app.route('/zmq_push', methods=['GET', 'POST'])
+def zmq_push():
+    target_ip = request.form['target_ip']
+    message = request.form['message']
+    app.logger.debug(str(target_ip))
+    app.logger.debug(message)
+    context = zmq.Context()
+    socket = context.socket(zmq.PUSH)
+    socket.connect(str(target_ip))
+    socket.send_pyobj({"message": message})
+    return render_template('zmq_push.html')
+
+listener = threading.Thread(target=get_sub, args=())
+
+####################################################################################################
+# _______________________________________END OF ZMQ PIPELINE_______________________________________#
+# ________________________________________START OF HOME PAGE____________________________________#
+####################################################################################################
 
 @app.route('/home', methods=['GET', 'POST'])
 def home():
-
+    def get_cache():
+        return cache
     #client, request data
     def get_data():
         message_list = []
@@ -161,8 +235,8 @@ def home():
                 uris += ["gs://"+bucket_name+"/"+blob.name]
         return uris
 
-    #string list of pickles
-    uris = ['gs://bl-scale/GBT_58010_50176_HIP61317_fine/info_df.pkl', 'gs://bl-scale/GBT_58014_69579_HIP77629_fine/info_df.pkl', 'gs://bl-scale/GBT_58110_60123_HIP91926_fine/info_df.pkl', 'gs://bl-scale/GBT_58202_60970_B0329+54_fine/info_df.pkl', 'gs://bl-scale/GBT_58210_37805_HIP103730_fine/info_df.pkl', 'gs://bl-scale/GBT_58210_39862_HIP105504_fine/info_df.pkl', 'gs://bl-scale/GBT_58210_40853_HIP106147_fine/info_df.pkl', 'gs://bl-scale/GBT_58210_41185_HIP105761_fine/info_df.pkl', 'gs://bl-scale/GBT_58307_26947_J1935+1616_fine/info_df.pkl', 'gs://bl-scale/GBT_58452_79191_HIP115687_fine/info_df.pkl']
+    #string list of pickles 'gs://bl-scale/GBT_58010_50176_HIP61317_fine/info_df.pkl' excluded
+    uris = ['gs://bl-scale/GBT_58014_69579_HIP77629_fine/info_df.pkl', 'gs://bl-scale/GBT_58110_60123_HIP91926_fine/info_df.pkl', 'gs://bl-scale/GBT_58202_60970_B0329+54_fine/info_df.pkl', 'gs://bl-scale/GBT_58210_37805_HIP103730_fine/info_df.pkl', 'gs://bl-scale/GBT_58210_39862_HIP105504_fine/info_df.pkl', 'gs://bl-scale/GBT_58210_40853_HIP106147_fine/info_df.pkl', 'gs://bl-scale/GBT_58210_41185_HIP105761_fine/info_df.pkl', 'gs://bl-scale/GBT_58307_26947_J1935+1616_fine/info_df.pkl', 'gs://bl-scale/GBT_58452_79191_HIP115687_fine/info_df.pkl']
 
     #returns string observation
     def get_observation(uri_str):
@@ -185,7 +259,7 @@ def home():
 
     #return base64 string of histogram
     def get_base64_hist(df):
-
+        plt.style.use("dark_background")
         plt.figure(figsize=(8,6))
         plt.hist(df["freqs"], bins = np.arange(min(df["freqs"]),max(df["freqs"]), 0.8116025973))
         plt.title("Histogram of Hits")
@@ -257,4 +331,6 @@ import monitor
 app.register_blueprint(monitor.bp)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    p1 = threading.Thread(target=get_sub, args=())
+    p1.start()
+    app.run()
