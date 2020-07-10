@@ -5,6 +5,7 @@ import base64
 import io
 import asyncio
 import re
+import pyrebase
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -18,12 +19,6 @@ from flask import render_template, request, redirect, session, Flask
 import time
 import os
 import threading
-# from firebase import firebase
-import json
-import requests
-from requests import Session
-from requests.exceptions import HTTPError
-import urllib.request, json
 global cache
 import time
 import multiprocessing
@@ -309,12 +304,15 @@ def home():
     #fills in the obs_filtered_url and base64_obs dictionary to be passed into render_template
     global cache
 
-    retrieved_cache = firebase.get("/breakthrough-listen-sandbox/flask_vars/cache")
-    print(retrieved_cache)
+    db_cache_keys = []
+    retrieve_cache = db.child("breakthrough-listen-sandbox").child("flask_vars").child("cache").get()
+    for rc in retrieve_cache.each():
+        db_cache_keys += [str(rc.key())]
+    print(db_cache_keys)
 
     if not cache:
         print("cache empty")
-        for uri in uris:
+        for uri in uris[:2]:
 
             data = pd.read_pickle(uri)
 
@@ -325,13 +323,31 @@ def home():
             processed_data = filter_images(data, 4)
 
             obs_filtered_url[observ] = get_img_url(processed_data, observ)
-
             cache[observ] = [base64_obs[observ], obs_filtered_url[observ]]
+            db.child("breakthrough-listen-sandbox").child("flask_vars").child("cache").child(observ).set(cache[observ])
     else:
-        print("cache not empty")
-        for key in cache.keys():
-            obs_filtered_url[key] = cache[key][1]
-            base64_obs[key] = cache[key][0]
+        if all(db_k in db_cache_keys for k in cache.keys()):
+            print("cache not empty")
+            for key in cache.keys():
+                obs_filtered_url[key] = cache[key][1]
+                base64_obs[key] = cache[key][0]
+        else:
+            print("adding additional to cache")
+            for db_k in db_cache_keys:
+                if db_k not in cache.keys():
+                    for uri in uris:
+                        if get_observation(uri) == db_k:
+                            data = pd.read_pickle(uri)
+                            base64_obs[db_k] = get_base64_hist(data)
+                            processed_data = filter_images(data, 4)
+                            obs_filtered_url[db_k] = get_img_url(processed_data, db_k)
+                            cache[db_k] = [base64_obs[db_k], obs_filtered_url[db_k]]
+                            db.child("breakthrough-listen-sandbox").child("flask_vars").child(db_k).set(cache[db_k])
+    # else:
+    #     print("cache not empty")
+    #     for key in cache.keys():
+    #         obs_filtered_url[key] = cache[key][1]
+    #         base64_obs[key] = cache[key][0]
     print("returning home")
     return render_template("home.html", title="Main Page", sample_urls=obs_filtered_url, plot_bytes=base64_obs)
 
