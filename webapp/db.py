@@ -5,7 +5,6 @@ import requests
 from requests import Session
 from requests.exceptions import HTTPError
 import urllib.request, json 
-# First bit is pyrebase
 
 config = {
     "apiKey": "AIzaSyAWVDszEVzJ_GSopx-23slhwKM2Ha5qkbw",

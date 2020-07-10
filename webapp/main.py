@@ -157,6 +157,7 @@ def get_sub():
             else:
                 algo_type = message_dict["algo_type"]
                 url = message_dict["url"]
+                
                 db.child("breakthrough-listen-sandbox").child("flask_vars").child('observation_status').child(algo_type).child(url).set(message_dict)
             app.logger.debug(f'Updated database with {message_dict}')
         time.sleep(1)
