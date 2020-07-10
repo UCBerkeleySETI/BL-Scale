@@ -312,7 +312,7 @@ def home():
 
     if not cache:
         print("cache empty")
-        for uri in uris[:2]:
+        for uri in uris[:8]:
 
             data = pd.read_pickle(uri)
 
@@ -326,7 +326,7 @@ def home():
             cache[observ] = [base64_obs[observ], obs_filtered_url[observ]]
             db.child("breakthrough-listen-sandbox").child("flask_vars").child("cache").child(observ).set(cache[observ])
     else:
-        if all(db_k in db_cache_keys for k in cache.keys()):
+        if all(db_k in cache.keys() for db_k in db_cache_keys):
             print("cache not empty")
             for key in cache.keys():
                 obs_filtered_url[key] = cache[key][1]
