@@ -148,11 +148,18 @@ def get_sub():
             
             message_dict = pickle.loads(serialized_message_dict)
             db.child("breakthrough-listen-sandbox").child("flask_vars").child("sub_message").set(message_dict)
-            time_stamp = time.time()*1000
-            message_dict["timestamp"]= time_stamp
-            target_name = message_dict["object_uri"]
-            target_name = target_name.replace("gs://bl-scale/","")
-            db.child("breakthrough-listen-sandbox").child("flask_vars").child('sub_saved').child(target_name).set(message_dict)
+            if message_dict["done"] == True:
+                time_stamp = time.time()*1000
+                algo_type = message_dict["algo_type"]
+                message_dict["timestamp"]= time_stamp
+                target_name = message_dict["target"]
+                db.child("breakthrough-listen-sandbox").child("flask_vars").child('processed_observations').child(algo_type).child(target_name).set(message_dict)
+            else:
+                time_stamp = time.time()*1000
+                algo_type = message_dict["algo_type"]
+                message_dict["timestamp"]= time_stamp
+                target_name = message_dict["target"]
+                db.child("breakthrough-listen-sandbox").child("flask_vars").child('observation_status').child(algo_type).child(target_name).set(message_dict)
             app.logger.debug(f'Updated database with {message_dict}')
         time.sleep(1)
 
