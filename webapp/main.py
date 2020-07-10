@@ -342,7 +342,7 @@ def home():
                             processed_data = filter_images(data, 4)
                             obs_filtered_url[db_k] = get_img_url(processed_data, db_k)
                             cache[db_k] = [base64_obs[db_k], obs_filtered_url[db_k]]
-                            db.child("breakthrough-listen-sandbox").child("flask_vars").child(db_k).set(cache[db_k])
+                            db.child("breakthrough-listen-sandbox").child("flask_vars").child("cache").child(db_k).set(cache[db_k])
     # else:
     #     print("cache not empty")
     #     for key in cache.keys():
