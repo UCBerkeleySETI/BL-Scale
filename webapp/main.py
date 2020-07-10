@@ -121,8 +121,8 @@ def logout():
 # ________________________________________START OF ZMQ NETWORKING__________________________________#
 ####################################################################################################
 
-def query_by_order(db, first_child,order_by, limit_to, token):
-    users = db.child("breakthrough-listen-sandbox").child("flask_vars").child(first_child).order_by_child(order_by).limit_to_last(limit_to)
+def query_by_order(db, first_child,second_child,order_by, limit_to, token):
+    users = db.child("breakthrough-listen-sandbox").child("flask_vars").child(first_child).child(second_child).order_by_child(order_by).limit_to_last(limit_to)
     request_edit = db.build_request_url(token)
     request_edit = request_edit.replace("%2522", "%22")
     print(request_edit)
@@ -157,7 +157,7 @@ def get_sub():
             else:
                 algo_type = message_dict["algo_type"]
                 url = message_dict["url"]
-                
+
                 db.child("breakthrough-listen-sandbox").child("flask_vars").child('observation_status').child(algo_type).child(url).set(message_dict)
             app.logger.debug(f'Updated database with {message_dict}')
         time.sleep(1)
@@ -165,7 +165,7 @@ def get_sub():
 @app.route('/zmq_sub', methods=['GET', 'POST'])
 def zmq_sub():
 
-    message_dict = query_by_order(db=db,first_child = "sub_saved", order_by = "timestamp",limit_to=3,token=False )
+    message_dict = query_by_order(db=db,first_child = "processed_observations",second_child="Energy-Detection", order_by = "timestamp",limit_to=2,token=False )
     print(message_dict)
     # message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("sub_message").get().val()
     # if not message_dict:
