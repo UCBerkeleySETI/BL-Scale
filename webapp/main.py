@@ -155,9 +155,7 @@ def get_sub():
                 target_name = message_dict["target"]
                 db.child("breakthrough-listen-sandbox").child("flask_vars").child('processed_observations').child(algo_type).child(target_name).set(message_dict)
             else:
-                time_stamp = time.time()*1000
                 algo_type = message_dict["algo_type"]
-                message_dict["timestamp"]= time_stamp
                 target_name = message_dict["target"]
                 db.child("breakthrough-listen-sandbox").child("flask_vars").child('observation_status').child(algo_type).child(target_name).set(message_dict)
             app.logger.debug(f'Updated database with {message_dict}')
