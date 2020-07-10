@@ -162,10 +162,10 @@
 					<div class="col-sm-12" style="padding-top: 10%;"><h4 class="text-weight-600 Raleway text-white">{{ key }} Unusual Filtered Samples</h4></div>
 				</div>
 				<div class="row">
-					<div class="col-sm-12"><img src='{{ plot_bytes[key] }}'></div>
+					<div class="col-sm-12"><img src='{{ sample_urls[key][0] }}'></div>
 				</div>
 				<div class="row">
-					{% for sample in sample_urls[key] %}
+					{% for sample in sample_urls[key][1] %}
 						<div class="col-sm-3"><img class='img-responsive' src='{{ sample }}' height="40" width="200" style="margin:15px" class="center"></div>
 					{%endfor%}
 				</div>

@@ -19,10 +19,12 @@ from flask import render_template, request, redirect, session, Flask
 import time
 import os
 import threading
-global cache
+
 import time
 import multiprocessing
+global cache
 cache = {}
+
 
 
 
@@ -182,40 +184,6 @@ listener = threading.Thread(target=get_sub, args=())
 def home():
     def get_cache():
         return cache
-    #client, request data
-    def get_data():
-        message_list = []
-        context = zmq.Context()
-        # Socket to talk to server
-        print("Connecting to server...")
-        socket = context.socket(zmq.REQ)
-        socket.connect("tcp://*:5555")
-
-        for request in range(1):
-            print("Sending request %s..." % request)
-            socket.send(b"Please send over data")
-
-            # Get the reply
-            message = pickle.loads(socket.recv())
-            message_list += [message]
-        return message_list
-
-    #server, send data
-    def send_data(info):
-        context = zmq.Context()
-        socket = context.socket(zmq.REP)
-        socket.bind("tcp://*:5555")
-
-        while True:
-            # Wait for next request from client
-            message = socket.recv()
-            print("Request received: %s" % message)
-
-            #D o some 'work'
-            time.sleep(1)
-
-            # Send reply back to client
-            socket.send(pickle.dumps(info))
 
     #NOT SURE IF WE NEED THIS YET
     def get_uri(bucket_name):
@@ -349,7 +317,7 @@ def home():
     #         obs_filtered_url[key] = cache[key][1]
     #         base64_obs[key] = cache[key][0]
     print("returning home")
-    return render_template("home.html", title="Main Page", sample_urls=obs_filtered_url, plot_bytes=base64_obs)
+    return render_template("home.html", title="Main Page", sample_urls=cache)#sample_urls=obs_filtered_url, plot_bytes=base64_obs)
 
 import monitor
 app.register_blueprint(monitor.bp)
