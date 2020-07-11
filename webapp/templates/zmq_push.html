@@ -159,7 +159,7 @@
     <p>&nbsp;</p>
 
         <div  data-uk-scrollspy="cls:uk-animation-fade" class="row">
-          <div class="col-md-6" style="padding-left: 5%;padding-right: 5%;">
+          <div class="col-md-6" style="padding-left: 5% ">
 			<h2 class="text-weight-800 Raleway text-white">Target IP  </h2>
            
             <form method="POST">
@@ -176,11 +176,14 @@
 			<h2 class="text-weight-800 Raleway text-white">Most Recent Triggers</h2>
            
 			{%for key in message_sub%}
-			<div class="row" style="border-radius:0%;">
+			<div class="row" style=" padding-left: 5%;">
 				<p>&nbsp;</p>
+				<div class="row">
 					<h4 class="text-weight-500 Raleway text-white">
 					{{ message_sub[key]["url"].replace("sslberkeleyedudl","").replace("blpd","")}}
 					</h4>
+				</div>
+				<div class="row">
 					<div class="col-4">
 						<p class="text-white text-weight-400 no-margin-bottom"><b>Algorithm:</b> {{ message_sub[key]["algo_type"] }}</p>
 		
@@ -193,7 +196,7 @@
 						<p class="text-white text-weight-400 no-margin-bottom"><b>Message:</b> {{ message_sub[key]["message"]}}</p>
 					</div>
 					
-				
+				</div>
 			</div>
 			<p>&nbsp;</p>
 			<p>&nbsp;</p>
