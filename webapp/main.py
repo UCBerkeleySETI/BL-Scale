@@ -169,6 +169,7 @@ def hits_form():
 @app.route('/zmq_sub', methods=['GET', 'POST'])
 def zmq_sub():
     alert = ""
+    message_dict = {} 
     try:
         hits = int(request.form['hits'])
         message_dict = query_by_order(db=db,first_child = "processed_observations",second_child="Energy-Detection", order_by = "timestamp",limit_to=hits,token=False )
