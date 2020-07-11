@@ -150,20 +150,20 @@ def get_sub():
                 algo_type = message_dict["algo_type"]
                 message_dict["timestamp"]= time_stamp
                 target_name = message_dict["target"]
-                db.child("breakthrough-listen-sandbox").child("flask_vars").child('processed_observations').child(algo_type).child(target_name).set(message_dict, session['usr'])
+                db.child("breakthrough-listen-sandbox").child("flask_vars").child('processed_observations').child(algo_type).child(target_name).set(message_dict)
             else:
                 algo_type = message_dict["algo_type"]
                 url = message_dict["url"]
                 
-                db.child("breakthrough-listen-sandbox").child("flask_vars").child('observation_status').child(algo_type).child(url).set(message_dict, session['usr'])
+                db.child("breakthrough-listen-sandbox").child("flask_vars").child('observation_status').child(algo_type).child(url).set(message_dict)
             app.logger.debug(f'Updated database with {message_dict}')
         time.sleep(1)
 
-@app.route('/zmq_sub')
+@app.route('/result')
 def hits_form():
     return render_template('zmq_sub.html')
 
-@app.route('/zmq_sub', methods=['GET', 'POST'])
+@app.route('/result', methods=['GET', 'POST'])
 def zmq_sub():
     alert = ""
     message_dict = {} 
@@ -220,7 +220,7 @@ listener = threading.Thread(target=get_sub, args=())
 def home():
     try:
         print(session['usr'])
-        #client, request data
+      
         def get_data():
             message_list = []
             context = zmq.Context()
