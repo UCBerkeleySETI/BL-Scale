@@ -162,11 +162,19 @@ def get_sub():
             app.logger.debug(f'Updated database with {message_dict}')
         time.sleep(1)
 
+@app.route('/zmq_sub')
+def hits_form():
+    return render_template('zmq_sub.html')
+
 @app.route('/zmq_sub', methods=['GET', 'POST'])
 def zmq_sub():
-
-    message_dict = query_by_order(db=db,first_child = "processed_observations",second_child="Energy-Detection", order_by = "timestamp",limit_to=2,token=False )
-    print(message_dict)
+    alert = ""
+    try:
+        hits = int(request.form['hits'])
+        message_dict = query_by_order(db=db,first_child = "processed_observations",second_child="Energy-Detection", order_by = "timestamp",limit_to=hits,token=False )
+    except:
+        alert="invalid number"
+    
     # message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("sub_message").get().val()
     # if not message_dict:
     #     message = "No Data From Publisher Node"
@@ -176,7 +184,7 @@ def zmq_sub():
     #     message = "No Data From Publisher Node"
     # else:
     #     message = str(message_dict["time"])
-    return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict)
+    return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict, alert = alert)
 
 @app.route('/zmq_push')
 def my_form():
