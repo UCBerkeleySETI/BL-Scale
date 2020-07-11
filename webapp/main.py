@@ -184,16 +184,17 @@ def zmq_sub():
     #     message = str(message_dict["time"])
     return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict, alert = alert)
 
-@app.route('/zmq_push')
+@app.route('/trigger')
 def my_form():
     try:
         print(session['usr'])
-        return render_template('zmq_push.html')
+        message_dict = query_by_order(db=db,first_child = "observation_status",second_child="Energy-Detection", order_by = "start_timestamp",limit_to=3, token=False )
+        return render_template('zmq_push.html', message_sub=message_dict)
     except KeyError:
         return redirect('login')
     
 
-@app.route('/zmq_push', methods=['GET', 'POST'])
+@app.route('/trigger', methods=['GET', 'POST'])
 def zmq_push():
     try:
         print(session['usr'])
@@ -205,7 +206,8 @@ def zmq_push():
         socket = context.socket(zmq.PUSH)
         socket.connect(str(target_ip))
         socket.send_pyobj({"message": message})
-        return render_template('zmq_push.html')
+        message_dict = query_by_order(db=db,first_child = "observation_status",second_child="Energy-Detection", order_by = "start_timestamp",limit_to=3, token=False )
+        return render_template('zmq_push.html',  message_sub=message_dict)
     except KeyError:
         return redirect('login')
 
