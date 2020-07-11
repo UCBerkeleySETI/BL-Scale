@@ -5,7 +5,6 @@ import requests
 from requests import Session
 from requests.exceptions import HTTPError
 import urllib.request, json 
-# First bit is pyrebase
 
 config = {
     "apiKey": "AIzaSyAWVDszEVzJ_GSopx-23slhwKM2Ha5qkbw",
@@ -21,18 +20,16 @@ config = {
 firebase = pyrebase.initialize_app(config)
 db = firebase.database()
 
-
-def query_by_order(db, order_by, limit_to, token):
-    users = db.child("breakthrough-listen-sandbox").child("flask_vars").child("obs").order_by_child(order_by).limit_to_last(limit_to)
+def query_by_order(db, first_child,second_child,order_by, limit_to, token):
+    users = db.child("breakthrough-listen-sandbox").child("flask_vars").child(first_child).child(second_child).order_by_child(order_by).limit_to_last(limit_to)
     request_edit = db.build_request_url(token)
     request_edit = request_edit.replace("%2522", "%22")
-
-
+    print(request_edit)
     with urllib.request.urlopen(request_edit) as url:
         data = json.loads(url.read().decode())
         return data
 
-data = query_by_order(db,order_by = "time",limit_to=3,token=False )
+data =  query_by_order(db=db,first_child = "processed_observations",second_child="Energy-Detection", order_by = "timestamp",limit_to=2,token=False )
 print(data)
 
 
@@ -45,9 +42,21 @@ print(data)
 #updating a specific record 
 # db.child("breakthrough-listen-sandbox").child("flask_vars").child("-MBkt_yIVsUfiHB4WF7c").update({"Message": "Mortiest Morty"})
 # Writing data
-# data = {"time": 3}
-# db.child("breakthrough-listen-sandbox").child("flask_vars").child('obs').push(data)
 
+
+# data = {"done": True, "message": "Energy Detection Done....", "object_uri":"1","processing_time":8000, "timestamp":190}
+
+# db.child("breakthrough-listen-sandbox").child("flask_vars").child('test_sub').child("HIP67287").set(data)
+# data = {"done": True, "message": "Energy Detection Done....", "object_uri":"2","processing_time":8000, "timestamp":90}
+# db.child("breakthrough-listen-sandbox").child("flask_vars").child('test_sub').child("HIP1907").set(data)
+# data = {"done": True, "message": "Energy Detection Done....", "object_uri":"3","processing_time":8000, "timestamp":290}
+# db.child("breakthrough-listen-sandbox").child("flask_vars").child('test_sub').child("HIP6111").set(data)
+# data = {"done": True, "message": "Energy Detection Done....", "object_uri":"4","processing_time":8000, "timestamp":81}
+# db.child("breakthrough-listen-sandbox").child("flask_vars").child('test_sub').child("HIP62227").set(data)
+# data = {"done": True, "message": "Energy Detection Done updated....", "object_uri":"5","processing_time":8000, "timestamp":4000}
+# db.child("breakthrough-listen-sandbox").child("flask_vars").child('test_sub').child("HIP67287").set(data)
+# data = {"done": True, "message": "Energy Detection Done", "object_uri":"5","processing_time":8000, "timestamp":4000}
+# db.child("breakthrough-listen-sandbox").child("flask_vars").child('test_sub').child("HIP2910").set(data)
 # # Posting data
 # firebase = firebase.FirebaseApplication('https://breakthrough-listen-sandbox.firebaseio.com/', None)
 # data =  { 'Message': 'test_send_one'}
