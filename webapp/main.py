@@ -22,12 +22,11 @@ import threading
 global cache
 import time
 import multiprocessing
-import urllib.request, json 
+import urllib.request, json
 
 
 cache = {}
 config = {
-    "apiKey": "AIzaSyAWVDszEVzJ_GSopx-23slhwKM2Ha5qkbw",
     "authDomain": "breakthrough-listen-sandbox.firebaseapp.com",
     "databaseURL": "https://breakthrough-listen-sandbox.firebaseio.com",
     "projectId": "breakthrough-listen-sandbox",
@@ -36,6 +35,8 @@ config = {
     "appId": "1:848306815127:web:52de0d53e030cac44029d2",
     "measurementId": "G-STR7QLT26Q"
 }
+config["apiKey"] = os.environ["apiKey"]
+firebase_secret_token = os.environ["FIREBASE_SECRET_TOKEN"]
 firebase = pyrebase.initialize_app(config)
 auth = firebase.auth()
 db = firebase.database()
@@ -74,8 +75,8 @@ def config_app():
 @app.route('/')
 @app.route('/index')
 def index():
-    
- 
+
+
     return render_template('index.html')
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -142,7 +143,7 @@ def get_sub():
             serialized_message_dict = sub.recv()
             print(serialized_message_dict)
             # Update the string variable
-            
+
             message_dict = pickle.loads(serialized_message_dict)
             db.child("breakthrough-listen-sandbox").child("flask_vars").child("sub_message").set(message_dict)
             if message_dict["done"] == True:
@@ -154,7 +155,7 @@ def get_sub():
             else:
                 algo_type = message_dict["algo_type"]
                 url = message_dict["url"]
-                
+
                 db.child("breakthrough-listen-sandbox").child("flask_vars").child('observation_status').child(algo_type).child(url).set(message_dict)
             app.logger.debug(f'Updated database with {message_dict}')
         time.sleep(1)
@@ -166,13 +167,13 @@ def hits_form():
 @app.route('/result', methods=['GET', 'POST'])
 def zmq_sub():
     alert = ""
-    message_dict = {} 
+    message_dict = {}
     try:
         hits = int(request.form['hits'])
         message_dict = query_by_order(db=db,first_child = "processed_observations",second_child="Energy-Detection", order_by = "timestamp",limit_to=hits,token=False )
     except:
         alert="invalid number"
-    
+
     # message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("sub_message").get().val()
     # if not message_dict:
     #     message = "No Data From Publisher Node"
@@ -192,7 +193,7 @@ def my_form():
         return render_template('zmq_push.html', message_sub=message_dict)
     except KeyError:
         return redirect('login')
-    
+
 
 @app.route('/trigger', methods=['GET', 'POST'])
 def zmq_push():
@@ -222,7 +223,7 @@ listener = threading.Thread(target=get_sub, args=())
 def home():
     try:
         print(session['usr'])
-      
+
         def get_data():
             message_list = []
             context = zmq.Context()
@@ -365,12 +366,12 @@ def home():
                 base64_obs[key] = cache[key][0]
         print("returning home")
         return render_template("home.html", title="Main Page", sample_urls=obs_filtered_url, plot_bytes=base64_obs)
-        
+
     except KeyError:
         return redirect('login')
     def get_cache():
         return cache
-    
+
 
 import monitor
 app.register_blueprint(monitor.bp)
