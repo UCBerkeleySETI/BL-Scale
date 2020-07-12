@@ -123,8 +123,12 @@ def query_by_order(db, first_child,second_child,order_by, limit_to, token):
     users = db.child("breakthrough-listen-sandbox").child("flask_vars").child(first_child).child(second_child).order_by_child(order_by).limit_to_last(limit_to)
     request_edit = db.build_request_url(token)
     request_edit = request_edit.replace("%2522", "%22")
+    print(firebase_secret_token)
+    print()
+    request_edit = request_edit+ "&auth="+firebase_secret_token
     print(request_edit)
     with urllib.request.urlopen(request_edit) as url:
+    
         data = json.loads(url.read().decode())
         return data
 
@@ -151,12 +155,12 @@ def get_sub():
                 algo_type = message_dict["algo_type"]
                 message_dict["timestamp"]= time_stamp
                 target_name = message_dict["target"]
-                db.child("breakthrough-listen-sandbox").child("flask_vars").child('processed_observations').child(algo_type).child(target_name).set(message_dict)
+                db.child("breakthrough-listen-sandbox").child("flask_vars").child('processed_observations').child(algo_type).child(target_name).set(message_dict, firebase_secret_token)
             else:
                 algo_type = message_dict["algo_type"]
                 url = message_dict["url"]
 
-                db.child("breakthrough-listen-sandbox").child("flask_vars").child('observation_status').child(algo_type).child(url).set(message_dict)
+                db.child("breakthrough-listen-sandbox").child("flask_vars").child('observation_status').child(algo_type).child(url).set(message_dict, firebase_secret_token)
             app.logger.debug(f'Updated database with {message_dict}')
         time.sleep(1)
 
@@ -173,16 +177,6 @@ def zmq_sub():
         message_dict = query_by_order(db=db,first_child = "processed_observations",second_child="Energy-Detection", order_by = "timestamp",limit_to=hits,token=False )
     except:
         alert="invalid number"
-
-    # message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("sub_message").get().val()
-    # if not message_dict:
-    #     message = "No Data From Publisher Node"
-    #     return render_template("zmq_sub.html", title="Main Page", message_sub=message)
-    # app.logger.debug(f" ---{message_dict}--- getting from webpage")
-    # if str(message_dict["time"]) == "":
-    #     message = "No Data From Publisher Node"
-    # else:
-    #     message = str(message_dict["time"])
     return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict, alert = alert)
 
 @app.route('/trigger')
