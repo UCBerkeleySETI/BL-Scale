@@ -35,7 +35,7 @@ config = {
     "appId": "1:848306815127:web:52de0d53e030cac44029d2",
     "measurementId": "G-STR7QLT26Q"
 }
-config["apiKey"] = os.environ["apiKey"]
+config["apiKey"] = os.environ["FIREBASE_API_KEY"]
 firebase_secret_token = os.environ["FIREBASE_SECRET_TOKEN"]
 firebase = pyrebase.initialize_app(config)
 auth = firebase.auth()
