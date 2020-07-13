@@ -91,6 +91,7 @@ def check_token_plus(self, database_url, path, access_token=None):
             return '{0}{1}.json?access_token={2}'.format(database_url, path, get_firebase_access_token())
 
 pyrebase.pyrebase.Database.build_request_url = build_request_url_plus
+pyrebase.pyrebase.Database.check_token = check_token_plus
 firebase = pyrebase.initialize_app(config)
 auth = firebase.auth()
 db = firebase.database()
