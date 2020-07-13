@@ -220,6 +220,7 @@ def zmq_sub():
     try:
         hits = int(request.form['hits'])
         message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("processed_observations").child("Energy-Detection").order_by_child("timestamp").limit_to_last(hits).get().val()
+        
     except:
         alert="invalid number"
     return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict, alert = alert)
