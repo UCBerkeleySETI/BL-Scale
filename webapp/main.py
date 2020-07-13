@@ -84,6 +84,7 @@ def build_request_url_plus(self, access_token=None):
     return request_ref
 
 pyrebase.pyrebase.Database.build_request_url = build_request_url_plus
+firebase = pyrebase.initialize_app(config)
 auth = firebase.auth()
 db = firebase.database()
 app = Flask(__name__, instance_relative_config=True)
