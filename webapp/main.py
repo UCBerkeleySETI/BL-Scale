@@ -23,6 +23,8 @@ global cache
 import time
 import multiprocessing
 import urllib.request, json
+from db import build_request_url_plus
+pyrebase.pyrebase.Database.build_request_url = build_request_url_plus
 
 
 cache = {}
@@ -36,7 +38,6 @@ config = {
     "measurementId": "G-STR7QLT26Q"
 }
 config["apiKey"] = os.environ["FIREBASE_API_KEY"]
-firebase_secret_token = os.environ["FIREBASE_SECRET_TOKEN"]
 firebase = pyrebase.initialize_app(config)
 auth = firebase.auth()
 db = firebase.database()
@@ -119,15 +120,6 @@ def logout():
 # ________________________________________START OF ZMQ NETWORKING__________________________________#
 ####################################################################################################
 
-def query_by_order(db, first_child,second_child,order_by, limit_to, token):
-    users = db.child("breakthrough-listen-sandbox").child("flask_vars").child(first_child).child(second_child).order_by_child(order_by).limit_to_last(limit_to)
-    request_edit = db.build_request_url(token)
-    request_edit = request_edit.replace("%2522", "%22")
-    print(request_edit)
-    with urllib.request.urlopen(request_edit) as url:
-        data = json.loads(url.read().decode())
-        return data
-
 def get_sub():
     context = zmq.Context()
     sub = context.socket(zmq.SUB)
@@ -158,7 +150,6 @@ def get_sub():
 
                 db.child("breakthrough-listen-sandbox").child("flask_vars").child('observation_status').child(algo_type).child(url).set(message_dict)
             app.logger.debug(f'Updated database with {message_dict}')
-        time.sleep(1)
 
 @app.route('/result')
 def hits_form():
@@ -170,7 +161,7 @@ def zmq_sub():
     message_dict = {}
     try:
         hits = int(request.form['hits'])
-        message_dict = query_by_order(db=db,first_child = "processed_observations",second_child="Energy-Detection", order_by = "timestamp",limit_to=hits,token=False )
+        message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("processed_observations").child("Energy-Detection").order_by_child("timestamp").limit_to_last(hits).get().val()
     except:
         alert="invalid number"
 
@@ -189,7 +180,7 @@ def zmq_sub():
 def my_form():
     try:
         print(session['usr'])
-        message_dict = query_by_order(db=db,first_child = "observation_status",second_child="Energy-Detection", order_by = "start_timestamp",limit_to=3, token=False )
+        message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("observation_status").child("Energy-Detection").order_by_child("start_timestamp").limit_to_last(3).get().val()
         return render_template('zmq_push.html', message_sub=message_dict)
     except KeyError:
         return redirect('login')
@@ -207,7 +198,7 @@ def zmq_push():
         socket = context.socket(zmq.PUSH)
         socket.connect(str(target_ip))
         socket.send_pyobj({"message": message})
-        message_dict = query_by_order(db=db,first_child = "observation_status",second_child="Energy-Detection", order_by = "start_timestamp",limit_to=3, token=False )
+        message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("observation_status").child("Energy-Detection").order_by_child("start_timestamp").limit_to_last(3).get().val()
         return render_template('zmq_push.html',  message_sub=message_dict)
     except KeyError:
         return redirect('login')
