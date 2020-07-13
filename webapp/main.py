@@ -84,6 +84,12 @@ def build_request_url_plus(self, access_token=None):
     self.build_query = {}
     return request_ref
 
+def check_token_plus(self, database_url, path, access_token=None):
+        if access_token:
+            return '{0}{1}.json?access_token={2}'.format(database_url, path, access_token)
+        else:
+            return '{0}{1}.json?access_token={2}'.format(database_url, path, get_firebase_access_token())
+
 pyrebase.pyrebase.Database.build_request_url = build_request_url_plus
 firebase = pyrebase.initialize_app(config)
 auth = firebase.auth()
