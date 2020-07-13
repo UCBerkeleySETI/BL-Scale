@@ -23,11 +23,9 @@ global cache
 import time
 import multiprocessing
 import urllib.request, json
-from db import build_request_url_plus
-pyrebase.pyrebase.Database.build_request_url = build_request_url_plus
+from urllib.parse import urlencode, quote
+from google.oauth2 import service_account
 
-
-cache = {}
 config = {
     "authDomain": "breakthrough-listen-sandbox.firebaseapp.com",
     "databaseURL": "https://breakthrough-listen-sandbox.firebaseio.com",
@@ -38,7 +36,54 @@ config = {
     "measurementId": "G-STR7QLT26Q"
 }
 config["apiKey"] = os.environ["FIREBASE_API_KEY"]
-firebase = pyrebase.initialize_app(config)
+
+def access_token_generator():
+    from google.auth.transport.requests import Request
+
+    scopes = ["https://www.googleapis.com/auth/firebase.database",
+                "https://www.googleapis.com/auth/userinfo.email",
+                "https://www.googleapis.com/auth/cloud-platform"]
+    credentials = service_account.Credentials.from_service_account_file(
+    os.environ["GOOGLE_APPLICATION_CREDENTIALS"], scopes=scopes)
+
+    last_refreshed_at = time.time()
+    request = Request()
+    credentials.refresh(request)
+    access_token = credentials.token
+
+    while True:
+        if (time.time() - last_refreshed_at) > 1800:
+            last_refreshed_at = time.time()
+            request = Request()
+            credentials.refresh(request)
+            access_token = credentials.token
+        yield access_token
+
+token_gen = access_token_generator()
+
+def get_firebase_access_token():
+    return next(token_gen)
+
+def build_request_url_plus(self, access_token=None):
+    parameters = {}
+    if access_token:
+        parameters['access_token'] = access_token
+    else:
+        parameters['access_token'] = get_firebase_access_token()
+    for param in list(self.build_query):
+        if type(self.build_query[param]) is str:
+            parameters[param] = f"\"{self.build_query[param]}\""
+        elif type(self.build_query[param]) is bool:
+            parameters[param] = "true" if self.build_query[param] else "false"
+        else:
+            parameters[param] = self.build_query[param]
+    # reset path and build_query for next query
+    request_ref = f"{self.database_url}{self.path}.json?{urlencode(parameters)}"
+    self.path = ""
+    self.build_query = {}
+    return request_ref
+
+pyrebase.pyrebase.Database.build_request_url = build_request_url_plus
 auth = firebase.auth()
 db = firebase.database()
 app = Flask(__name__, instance_relative_config=True)
@@ -72,12 +117,15 @@ def config_app():
 
     return app
 
+####################################################################################################
+# _______________________________________END OF APP CONFIG_________________________________________#
+# __________________________________START OF USER AUTHENTICATIONS__________________________________#
+####################################################################################################
+
 
 @app.route('/')
 @app.route('/index')
 def index():
-
-
     return render_template('index.html')
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -120,7 +168,7 @@ def logout():
 # ________________________________________START OF ZMQ NETWORKING__________________________________#
 ####################################################################################################
 
-def get_sub():
+def socket_listener():
     context = zmq.Context()
     sub = context.socket(zmq.SUB)
     sub.connect("tcp://10.0.3.141:5560")
@@ -204,7 +252,7 @@ def zmq_push():
     except KeyError:
         return redirect('login')
 
-listener = threading.Thread(target=get_sub, args=())
+listener = threading.Thread(target=socket_listener, args=())
 
 ####################################################################################################
 # _______________________________________END OF ZMQ PIPELINE_______________________________________#
@@ -369,6 +417,6 @@ import monitor
 app.register_blueprint(monitor.bp)
 
 if __name__ == '__main__':
-    p1 = threading.Thread(target=get_sub, args=())
+    p1 = threading.Thread(target=socket_listener, args=())
     p1.start()
     app.run()
