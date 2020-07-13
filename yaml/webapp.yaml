@@ -28,11 +28,6 @@ spec:
                       secretKeyRef:
                         name: firebase-api-key
                         key: FIREBASE_API_KEY
-                - name: FIREBASE_SECRET_TOKEN
-                  valueFrom:
-                      secretKeyRef:
-                        name: firebase-secret-token
-                        key: FIREBASE_SECRET_TOKEN
               volumeMounts:
               - name: "cred-key"
                 mountPath: "/var/run/secret/cloud.google.com"
