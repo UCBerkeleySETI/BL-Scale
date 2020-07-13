@@ -41,7 +41,7 @@ jobs:
           dockerfile: dockerfiles/zproxy.dockerfile
           tags: zproxy-latest
 
-    - name: Build and push Proxy Image to Google Container Registry
+    - name: Build and push Controller Image to Google Container Registry
       uses: docker/build-push-action@v1
       with:
           username: _json_key
