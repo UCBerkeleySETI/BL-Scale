@@ -150,7 +150,7 @@ def get_sub():
 
                 db.child("breakthrough-listen-sandbox").child("flask_vars").child('observation_status').child(algo_type).child(url).set(message_dict)
             app.logger.debug(f'Updated database with {message_dict}')
-        sleep(1)
+        time.sleep(1)
 
 @app.route('/result')
 def hits_form():
