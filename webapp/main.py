@@ -147,8 +147,8 @@ def login():
                 user = auth.refresh(user['refreshToken'])
                 user_id = user['idToken']
                 session['usr'] = user_id
-                template_returned = home()
-                return template_returned
+                # template_returned = home()
+                return redirect('home')
             except Exception as e:
                 app.logger.debug(e)
                 unsuccessful = 'Please check your credentials'
