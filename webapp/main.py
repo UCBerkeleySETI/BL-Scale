@@ -22,12 +22,12 @@ import threading
 global cache
 import time
 import multiprocessing
-import urllib.request, json 
-
-
+import urllib.request, json
+from urllib.parse import urlencode, quote
+from google.oauth2 import service_account
 cache = {}
+
 config = {
-    "apiKey": "AIzaSyAWVDszEVzJ_GSopx-23slhwKM2Ha5qkbw",
     "authDomain": "breakthrough-listen-sandbox.firebaseapp.com",
     "databaseURL": "https://breakthrough-listen-sandbox.firebaseio.com",
     "projectId": "breakthrough-listen-sandbox",
@@ -36,6 +36,62 @@ config = {
     "appId": "1:848306815127:web:52de0d53e030cac44029d2",
     "measurementId": "G-STR7QLT26Q"
 }
+config["apiKey"] = os.environ["FIREBASE_API_KEY"]
+
+def access_token_generator():
+    from google.auth.transport.requests import Request
+
+    scopes = ["https://www.googleapis.com/auth/firebase.database",
+                "https://www.googleapis.com/auth/userinfo.email",
+                "https://www.googleapis.com/auth/cloud-platform"]
+    credentials = service_account.Credentials.from_service_account_file(
+    os.environ["GOOGLE_APPLICATION_CREDENTIALS"], scopes=scopes)
+
+    last_refreshed_at = time.time()
+    request = Request()
+    credentials.refresh(request)
+    access_token = credentials.token
+
+    while True:
+        if (time.time() - last_refreshed_at) > 1800:
+            last_refreshed_at = time.time()
+            request = Request()
+            credentials.refresh(request)
+            access_token = credentials.token
+        yield access_token
+
+token_gen = access_token_generator()
+
+def get_firebase_access_token():
+    return next(token_gen)
+
+def build_request_url_plus(self, access_token=None):
+    parameters = {}
+    if access_token:
+        parameters['access_token'] = access_token
+    else:
+        parameters['access_token'] = get_firebase_access_token()
+    for param in list(self.build_query):
+        if type(self.build_query[param]) is str:
+            parameters[param] = f"\"{self.build_query[param]}\""
+        elif type(self.build_query[param]) is bool:
+            parameters[param] = "true" if self.build_query[param] else "false"
+        else:
+            parameters[param] = self.build_query[param]
+    # reset path and build_query for next query
+    request_ref = f"{self.database_url}{self.path}.json?{urlencode(parameters)}"
+    self.path = ""
+    self.build_query = {}
+    return request_ref
+
+def check_token_plus(self, database_url, path, access_token=None):
+        if access_token:
+            return '{0}{1}.json?access_token={2}'.format(database_url, path, access_token)
+        else:
+            return '{0}{1}.json?access_token={2}'.format(database_url, path, get_firebase_access_token())
+
+pyrebase.pyrebase.Database.build_request_url = build_request_url_plus
+pyrebase.pyrebase.Database.check_token = check_token_plus
 firebase = pyrebase.initialize_app(config)
 auth = firebase.auth()
 db = firebase.database()
@@ -66,16 +122,19 @@ except OSError:
 def config_app():
     if not listener.is_alive():
         listener.start()
-        print("Started Listener")
+        app.logger.debug("Started Listener")
 
     return app
+
+####################################################################################################
+# _______________________________________END OF APP CONFIG_________________________________________#
+# __________________________________START OF USER AUTHENTICATIONS__________________________________#
+####################################################################################################
 
 
 @app.route('/')
 @app.route('/index')
 def index():
-    
- 
     return render_template('index.html')
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -88,10 +147,10 @@ def login():
                 user = auth.refresh(user['refreshToken'])
                 user_id = user['idToken']
                 session['usr'] = user_id
-                print(user_id)
                 template_returned = home()
                 return template_returned
-            except:
+            except Exception as e:
+                app.logger.debug(e)
                 unsuccessful = 'Please check your credentials'
                 return render_template('login.html', umessage=unsuccessful)
     return render_template('login.html')
@@ -118,16 +177,7 @@ def logout():
 # ________________________________________START OF ZMQ NETWORKING__________________________________#
 ####################################################################################################
 
-def query_by_order(db, first_child,second_child,order_by, limit_to, token):
-    users = db.child("breakthrough-listen-sandbox").child("flask_vars").child(first_child).child(second_child).order_by_child(order_by).limit_to_last(limit_to)
-    request_edit = db.build_request_url(token)
-    request_edit = request_edit.replace("%2522", "%22")
-    print(request_edit)
-    with urllib.request.urlopen(request_edit) as url:
-        data = json.loads(url.read().decode())
-        return data
-
-def get_sub():
+def socket_listener():
     context = zmq.Context()
     sub = context.socket(zmq.SUB)
     sub.connect("tcp://10.0.3.141:5560")
@@ -140,9 +190,9 @@ def get_sub():
         socks = dict(poller.poll(2))
         if sub in socks and socks[sub] == zmq.POLLIN:
             serialized_message_dict = sub.recv()
-            print(serialized_message_dict)
+            app.logger.debug(serialized_message_dict)
             # Update the string variable
-            
+
             message_dict = pickle.loads(serialized_message_dict)
             db.child("breakthrough-listen-sandbox").child("flask_vars").child("sub_message").set(message_dict)
             if message_dict["done"] == True:
@@ -154,7 +204,7 @@ def get_sub():
             else:
                 algo_type = message_dict["algo_type"]
                 url = message_dict["url"]
-                
+
                 db.child("breakthrough-listen-sandbox").child("flask_vars").child('observation_status').child(algo_type).child(url).set(message_dict)
             app.logger.debug(f'Updated database with {message_dict}')
         time.sleep(1)
@@ -166,13 +216,13 @@ def hits_form():
 @app.route('/result', methods=['GET', 'POST'])
 def zmq_sub():
     alert = ""
-    message_dict = {} 
+    message_dict = {}
     try:
         hits = int(request.form['hits'])
-        message_dict = query_by_order(db=db,first_child = "processed_observations",second_child="Energy-Detection", order_by = "timestamp",limit_to=hits,token=False )
+        message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("processed_observations").child("Energy-Detection").order_by_child("timestamp").limit_to_last(hits).get().val()
     except:
         alert="invalid number"
-    
+
     # message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("sub_message").get().val()
     # if not message_dict:
     #     message = "No Data From Publisher Node"
@@ -188,11 +238,11 @@ def zmq_sub():
 def my_form():
     try:
         print(session['usr'])
-        message_dict = query_by_order(db=db,first_child = "observation_status",second_child="Energy-Detection", order_by = "start_timestamp",limit_to=3, token=False )
+        message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("observation_status").child("Energy-Detection").order_by_child("start_timestamp").limit_to_last(3).get().val()
         return render_template('zmq_push.html', message_sub=message_dict)
     except KeyError:
         return redirect('login')
-    
+
 
 @app.route('/trigger', methods=['GET', 'POST'])
 def zmq_push():
@@ -206,12 +256,12 @@ def zmq_push():
         socket = context.socket(zmq.PUSH)
         socket.connect(str(target_ip))
         socket.send_pyobj({"message": message})
-        message_dict = query_by_order(db=db,first_child = "observation_status",second_child="Energy-Detection", order_by = "start_timestamp",limit_to=3, token=False )
+        message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("observation_status").child("Energy-Detection").order_by_child("start_timestamp").limit_to_last(3).get().val()
         return render_template('zmq_push.html',  message_sub=message_dict)
     except KeyError:
         return redirect('login')
 
-listener = threading.Thread(target=get_sub, args=())
+listener = threading.Thread(target=socket_listener, args=())
 
 ####################################################################################################
 # _______________________________________END OF ZMQ PIPELINE_______________________________________#
@@ -222,7 +272,7 @@ listener = threading.Thread(target=get_sub, args=())
 def home():
     try:
         print(session['usr'])
-      
+
         def get_data():
             message_list = []
             context = zmq.Context()
@@ -365,17 +415,17 @@ def home():
                 base64_obs[key] = cache[key][0]
         print("returning home")
         return render_template("home.html", title="Main Page", sample_urls=obs_filtered_url, plot_bytes=base64_obs)
-        
+
     except KeyError:
         return redirect('login')
     def get_cache():
         return cache
-    
+
 
 import monitor
 app.register_blueprint(monitor.bp)
 
 if __name__ == '__main__':
-    p1 = threading.Thread(target=get_sub, args=())
+    p1 = threading.Thread(target=socket_listener, args=())
     p1.start()
     app.run()

@@ -23,6 +23,11 @@ spec:
             - env:
                 - name: GOOGLE_APPLICATION_CREDENTIALS
                   value: "/var/run/secret/cloud.google.com/bl-scale_key.json"
+                - name: FIREBASE_API_KEY
+                  valueFrom:
+                      secretKeyRef:
+                        name: firebase-api-key
+                        key: FIREBASE_API_KEY
               volumeMounts:
               - name: "cred-key"
                 mountPath: "/var/run/secret/cloud.google.com"
