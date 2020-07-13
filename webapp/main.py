@@ -141,6 +141,7 @@ def index():
 def login():
     if (request.method == 'POST'):
             email = request.form['name']
+            session['email'] = email
             password = request.form['password']
             try:
                 user = auth.sign_in_with_email_and_password(email, password)
@@ -341,63 +342,63 @@ def home():
         print(session['usr'])
         
 
-        #string list of pickles 'gs://bl-scale/GBT_58010_50176_HIP61317_fine/info_df.pkl' excluded
-        uris = ['gs://bl-scale/GBT_58014_69579_HIP77629_fine/info_df.pkl', 'gs://bl-scale/GBT_58110_60123_HIP91926_fine/info_df.pkl', 'gs://bl-scale/GBT_58202_60970_B0329+54_fine/info_df.pkl', 'gs://bl-scale/GBT_58210_37805_HIP103730_fine/info_df.pkl', 'gs://bl-scale/GBT_58210_39862_HIP105504_fine/info_df.pkl', 'gs://bl-scale/GBT_58210_40853_HIP106147_fine/info_df.pkl', 'gs://bl-scale/GBT_58210_41185_HIP105761_fine/info_df.pkl', 'gs://bl-scale/GBT_58307_26947_J1935+1616_fine/info_df.pkl', 'gs://bl-scale/GBT_58452_79191_HIP115687_fine/info_df.pkl']
+        # #string list of pickles 'gs://bl-scale/GBT_58010_50176_HIP61317_fine/info_df.pkl' excluded
+        # uris = ['gs://bl-scale/GBT_58014_69579_HIP77629_fine/info_df.pkl', 'gs://bl-scale/GBT_58110_60123_HIP91926_fine/info_df.pkl', 'gs://bl-scale/GBT_58202_60970_B0329+54_fine/info_df.pkl', 'gs://bl-scale/GBT_58210_37805_HIP103730_fine/info_df.pkl', 'gs://bl-scale/GBT_58210_39862_HIP105504_fine/info_df.pkl', 'gs://bl-scale/GBT_58210_40853_HIP106147_fine/info_df.pkl', 'gs://bl-scale/GBT_58210_41185_HIP105761_fine/info_df.pkl', 'gs://bl-scale/GBT_58307_26947_J1935+1616_fine/info_df.pkl', 'gs://bl-scale/GBT_58452_79191_HIP115687_fine/info_df.pkl']
 
-        #returns string observation
+        # #returns string observation
        
-        #returns string list of urls
+        # #returns string list of urls
         
 
-        #return base64 string of histogram
+        # #return base64 string of histogram
         
-        global cache
+        # global cache
 
-        db_cache_keys = []
-        retrieve_cache = db.child("breakthrough-listen-sandbox").child("flask_vars").child("cache").get()
-        for rc in retrieve_cache.each():
-            db_cache_keys += [str(rc.key())]
-        print(db_cache_keys)
+        # db_cache_keys = []
+        # retrieve_cache = db.child("breakthrough-listen-sandbox").child("flask_vars").child("cache").get()
+        # for rc in retrieve_cache.each():
+        #     db_cache_keys += [str(rc.key())]
+        # print(db_cache_keys)
 
-        if not cache:
-            print("cache empty")
-            for uri in uris[:8]:
-                # data = pd.read_pickle(uri)
-                #
-                observ = get_observation(uri)
-                #
-                # #base64_obs[observ] = get_base64_hist(data)
-                #
-                # processed_data = filter_images(data, 4)
+        # if not cache:
+        #     print("cache empty")
+        #     for uri in uris[:8]:
+        #         # data = pd.read_pickle(uri)
+        #         #
+        #         observ = get_observation(uri)
+        #         #
+        #         # #base64_obs[observ] = get_base64_hist(data)
+        #         #
+        #         # processed_data = filter_images(data, 4)
 
-                #obs_filtered_url[observ] = get_img_url(processed_data, observ)
-                cache[observ] = get_processed_hist_and_img(uri)
-                db.child("breakthrough-listen-sandbox").child("flask_vars").child("cache").child(observ).set(cache[observ])
-        else:
-            if all(db_k in cache.keys() for db_k in db_cache_keys):
-                print("cache all updated")
-                # for key in cache.keys():
-                #     obs_filtered_url[key] = cache[key][1]
-                #     base64_obs[key] = cache[key][0]
-            else:
-                print("adding additional to cache")
-                for db_k in db_cache_keys:
-                    if db_k not in cache.keys():
-                        for uri in uris:
-                            if get_observation(uri) == db_k:
-                                # data = pd.read_pickle(uri)
-                                #base64_obs[db_k] = get_base64_hist(data)
-                                # processed_data = filter_images(data, 4)
-                                #obs_filtered_url[db_k] = get_img_url(processed_data, db_k)
-                                cache[db_k] = get_processed_hist_and_img(uri)
-                                db.child("breakthrough-listen-sandbox").child("flask_vars").child("cache").child(db_k).set(cache[db_k])
+        #         #obs_filtered_url[observ] = get_img_url(processed_data, observ)
+        #         cache[observ] = get_processed_hist_and_img(uri)
+        #         db.child("breakthrough-listen-sandbox").child("flask_vars").child("cache").child(observ).set(cache[observ])
+        # else:
+        #     if all(db_k in cache.keys() for db_k in db_cache_keys):
+        #         print("cache all updated")
+        #         # for key in cache.keys():
+        #         #     obs_filtered_url[key] = cache[key][1]
+        #         #     base64_obs[key] = cache[key][0]
+        #     else:
+        #         print("adding additional to cache")
+        #         for db_k in db_cache_keys:
+        #             if db_k not in cache.keys():
+        #                 for uri in uris:
+        #                     if get_observation(uri) == db_k:
+        #                         # data = pd.read_pickle(uri)
+        #                         #base64_obs[db_k] = get_base64_hist(data)
+        #                         # processed_data = filter_images(data, 4)
+        #                         #obs_filtered_url[db_k] = get_img_url(processed_data, db_k)
+        #                         cache[db_k] = get_processed_hist_and_img(uri)
+        #                         db.child("breakthrough-listen-sandbox").child("flask_vars").child("cache").child(db_k).set(cache[db_k])
         # else:
         #     print("cache not empty")
         #     for key in cache.keys():
         #         obs_filtered_url[key] = cache[key][1]
         #         base64_obs[key] = cache[key][0]
         print("returning home")
-        return render_template("home.html", title="Main Page", sample_urls=cache)#sample_urls=obs_filtered_url, plot_bytes=base64_obs)
+        return render_template("home.html", title="Main Page", sample_urls=cache, email = session['email'])#sample_urls=obs_filtered_url, plot_bytes=base64_obs)
 
     except KeyError:
         return redirect('login')
