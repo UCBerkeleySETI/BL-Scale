@@ -220,14 +220,13 @@ def zmq_sub():
     try:
         hits = int(request.form['hits'])
         message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("processed_observations").child("Energy-Detection").order_by_child("timestamp").limit_to_last(hits).get().val()
-        uri_from_db = []
+        sample_urls = {}
         for key in message_dict:
-            uri_from_db.append(get_processed_hist_and_img(message_dict[key]["object_uri"]+"/info_df.pkl"))
-        print(uri_from_db)
-
+            sample_urls[key] = get_processed_hist_and_img(message_dict[key]["object_uri"]+"/info_df.pkl")
+            print(sample_urls[key][1])
     except:
         alert="invalid number"
-    return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict, alert = alert)
+    return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict, alert = alert, sample_urls = sample_urls )
 
 @app.route('/trigger')
 def my_form():
