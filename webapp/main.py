@@ -264,40 +264,6 @@ def home():
     try:
         print(session['usr'])
 
-        def get_data():
-            message_list = []
-            context = zmq.Context()
-            # Socket to talk to server
-            print("Connecting to server...")
-            socket = context.socket(zmq.REQ)
-            socket.connect("tcp://*:5555")
-
-            for request in range(1):
-                print("Sending request %s..." % request)
-                socket.send(b"Please send over data")
-
-                # Get the reply
-                message = pickle.loads(socket.recv())
-                message_list += [message]
-            return message_list
-
-        #server, send data
-        def send_data(info):
-            context = zmq.Context()
-            socket = context.socket(zmq.REP)
-            socket.bind("tcp://*:5555")
-
-            while True:
-                # Wait for next request from client
-                message = socket.recv()
-                print("Request received: %s" % message)
-
-                #D o some 'work'
-                time.sleep(1)
-
-                # Send reply back to client
-                socket.send(pickle.dumps(info))
-
         #NOT SURE IF WE NEED THIS YET
         def get_uri(bucket_name):
 
@@ -359,56 +325,77 @@ def home():
             #filter 1000 to 1400 freqs
             freq_1000_1400 = df[(df["freqs"] >= 1000) & (df["freqs"] <= 1400)]
             freq_1000_1400 = freq_1000_1400.sort_values("statistic", ascending=False).head(n)
-            # std_stat_1000_1400 = np.std(freq_1000_1400["statistic"])
-            # extr_1000_1400 = freq_1000_1400[freq_1000_1400["statistic"] >= 8*std_stat_1000_1400]
 
             #filter 1400 to 1700 freqs
             freq_1400_1700 = df[(df["freqs"] > 1400) & (df["freqs"] <= 1700)]
             freq_1400_1700 = freq_1400_1700.sort_values("statistic", ascending=False).head(n)
-            # std_stat_1400_1700 = np.std(freq_1400_1700["statistic"])
-            # extr_1400_1700 = freq_1400_1700[freq_1400_1700["statistic"] >= 7*std_stat_1400_1700]
 
             #filter 1700 plus freqs
             freq_1700 = df[df["freqs"] > 1700]
             freq_1700 = freq_1700.sort_values("statistic", ascending=False).head(n)
-            # std_stat_1700 = np.std(freq_1700["statistic"])
-            # extr_1700 = freq_1700[freq_1700["statistic"] >= 8*std_stat_1700]
 
             extr_all = pd.concat([freq_1000_1400, freq_1400_1700, freq_1700])
             return extr_all
 
-        #Dictionary, observation name for key, string list of urls for value
-        obs_filtered_url = {}
-        #Dictionary, observation name for key, string base64 of histogram for value
-        base64_obs = {}
-        #iterate through every observation dataframe in uri list
-        #fills in the obs_filtered_url and base64_obs dictionary to be passed into render_template
+        # returns list of base64 string hist for first element, list of string image
+        # urls for the second element. Intakes a string uri
+        def get_processed_hist_and_img(single_uri):
+            data = pd.read_pickle(single_uri)
+            observ = get_observation(single_uri)
+            processed_data = filter_images(data, 4)
+            return [get_base64_hist(data), get_img_url(processed_data, observ)]
+
         global cache
+
+        db_cache_keys = []
+        retrieve_cache = db.child("breakthrough-listen-sandbox").child("flask_vars").child("cache").get()
+        for rc in retrieve_cache.each():
+            db_cache_keys += [str(rc.key())]
+        print(db_cache_keys)
 
         if not cache:
             print("cache empty")
-            for uri in uris:
-
-                data = pd.read_pickle(uri)
-
+            for uri in uris[:8]:
+                # data = pd.read_pickle(uri)
+                #
                 observ = get_observation(uri)
+                #
+                # #base64_obs[observ] = get_base64_hist(data)
+                #
+                # processed_data = filter_images(data, 4)
 
-                base64_obs[observ] = get_base64_hist(data)
-
-                processed_data = filter_images(data, 4)
-
-                obs_filtered_url[observ] = get_img_url(processed_data, observ)
-                cache[observ] = [base64_obs[observ], obs_filtered_url[observ]]
+                #obs_filtered_url[observ] = get_img_url(processed_data, observ)
+                cache[observ] = get_processed_hist_and_img(uri)
+                db.child("breakthrough-listen-sandbox").child("flask_vars").child("cache").child(observ).set(cache[observ])
         else:
-            print("cache not empty")
-            for key in cache.keys():
-                obs_filtered_url[key] = cache[key][1]
-                base64_obs[key] = cache[key][0]
+            if all(db_k in cache.keys() for db_k in db_cache_keys):
+                print("cache all updated")
+                # for key in cache.keys():
+                #     obs_filtered_url[key] = cache[key][1]
+                #     base64_obs[key] = cache[key][0]
+            else:
+                print("adding additional to cache")
+                for db_k in db_cache_keys:
+                    if db_k not in cache.keys():
+                        for uri in uris:
+                            if get_observation(uri) == db_k:
+                                # data = pd.read_pickle(uri)
+                                #base64_obs[db_k] = get_base64_hist(data)
+                                # processed_data = filter_images(data, 4)
+                                #obs_filtered_url[db_k] = get_img_url(processed_data, db_k)
+                                cache[db_k] = get_processed_hist_and_img(uri)
+                                db.child("breakthrough-listen-sandbox").child("flask_vars").child("cache").child(db_k).set(cache[db_k])
+        # else:
+        #     print("cache not empty")
+        #     for key in cache.keys():
+        #         obs_filtered_url[key] = cache[key][1]
+        #         base64_obs[key] = cache[key][0]
         print("returning home")
-        return render_template("home.html", title="Main Page", sample_urls=obs_filtered_url, plot_bytes=base64_obs)
+        return render_template("home.html", title="Main Page", sample_urls=cache)#sample_urls=obs_filtered_url, plot_bytes=base64_obs)
 
     except KeyError:
         return redirect('login')
+
     def get_cache():
         return cache
 
