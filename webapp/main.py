@@ -375,7 +375,6 @@ def home():
 
                 #obs_filtered_url[observ] = get_img_url(processed_data, observ)
                 cache[observ] = get_processed_hist_and_img(uri)
-                print(cache)
                 db.child("breakthrough-listen-sandbox").child("flask_vars").child("cache").child(observ).set(cache[observ])
         else:
             if all(db_k in cache.keys() for db_k in db_cache_keys):
