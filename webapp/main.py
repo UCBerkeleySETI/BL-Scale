@@ -25,6 +25,7 @@ import multiprocessing
 import urllib.request, json
 from urllib.parse import urlencode, quote
 from google.oauth2 import service_account
+cache = {}
 
 config = {
     "authDomain": "breakthrough-listen-sandbox.firebaseapp.com",
@@ -114,7 +115,7 @@ except OSError:
 def config_app():
     if not listener.is_alive():
         listener.start()
-        print("Started Listener")
+        app.logger.debug("Started Listener")
 
     return app
 
@@ -139,10 +140,10 @@ def login():
                 user = auth.refresh(user['refreshToken'])
                 user_id = user['idToken']
                 session['usr'] = user_id
-                print(user_id)
                 template_returned = home()
                 return template_returned
-            except:
+            except Exception as e:
+                app.logger.debug(e)
                 unsuccessful = 'Please check your credentials'
                 return render_template('login.html', umessage=unsuccessful)
     return render_template('login.html')
@@ -182,7 +183,7 @@ def socket_listener():
         socks = dict(poller.poll(2))
         if sub in socks and socks[sub] == zmq.POLLIN:
             serialized_message_dict = sub.recv()
-            print(serialized_message_dict)
+            app.logger.debug(serialized_message_dict)
             # Update the string variable
 
             message_dict = pickle.loads(serialized_message_dict)
