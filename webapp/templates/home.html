@@ -172,7 +172,9 @@
 				</div>
 				<div class="row">
 					{% for sample in sample_urls[key][1] %}
-						<div class="col-sm-3"><img class='img-responsive' src='{{ sample }}' height="40" width="200" style="margin:15px" class="center"></div>
+						<div class="col-sm-3">
+							<img class='img-responsive' src='{{ sample }}' height="40" width="200" style="margin:15px" class="center">
+						</div>
 					{%endfor%}
 				</div>
 			{%endfor%}
