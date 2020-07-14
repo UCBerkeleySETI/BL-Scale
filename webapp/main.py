@@ -95,6 +95,12 @@ def check_token_plus(self, database_url, path, access_token=None):
             return '{0}{1}.json?access_token={2}'.format(database_url, path, access_token)
         else:
             return '{0}{1}.json?access_token={2}'.format(database_url, path, get_firebase_access_token())
+def check_if_login():
+    try:
+        print(session['usr'])
+        return True
+    except KeyError:
+        return False
 
 def get_random_string(length):
     letters = string.ascii_lowercase
@@ -224,7 +230,9 @@ def socket_listener():
 
 @app.route('/result')
 def hits_form():
-    return render_template('zmq_sub.html')
+    test_login = check_if_login()
+    
+    return render_template('zmq_sub.html',test_login = test_login )
 
 @app.route('/result', methods=['GET', 'POST'])
 def zmq_sub():
@@ -232,13 +240,14 @@ def zmq_sub():
     message_dict = {}
     try:
         hits = int(request.form['hits'])
+        test_login = check_if_login()
         message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("processed_observations").child("Energy-Detection").order_by_child("timestamp").limit_to_last(hits).get().val()
         sample_urls = {}
         for key in message_dict:
             sample_urls[key] = get_processed_hist_and_img(message_dict[key]["object_uri"]+"/info_df.pkl")
     except:
         alert="invalid number"
-    return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict, alert = alert, sample_urls = sample_urls )
+    return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict, alert = alert, sample_urls = sample_urls ,test_login = test_login)
 
 @app.route('/trigger')
 def my_form():

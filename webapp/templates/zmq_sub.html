@@ -102,7 +102,7 @@
 							</li>
 							<!-- End Off-Canvas Navigation Toggle -->
 							
-							
+							{% if not test_login %}
 							<!-- Link -->
 							<li>
 							
@@ -167,11 +167,52 @@
 							
 								<div style="padding-top: 20%; padding-left: 20%;" >
 									<a class="btn btn-small btn-orange border-radius-50 sm-display-table xs-no-margin-bottom "  href="./login" >Login</a>	
-							</div>		
+							</div>
+							<li><a style="padding-left: 0;" href="https://github.com/UCBerkeleySETI"><img style="width: 25%;"src="../static/images/BL_Scale_icon.png"  ></a></li>
+							{% else %}
+
+
+							<li>
+
+								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="../home">Dashboard</a>
+
+
+							</li>
+							<li>
+
+								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="./trigger">Trigger</a>
+
+
+							</li>
+							<li>
+
+								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="./result">Results</a>
+
+
+							</li>
+
+							<!-- Link -->
+							<li>
+
+								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="{{ url_for('monitor.base') }}">Monitor</a>
+
+
+							</li>
+						
+							<li>
+								<div style="padding-top: 20%; padding-left: 20%;" >
+									<a class="btn btn-small btn-orange border-radius-50 sm-display-table xs-no-margin-bottom "  href="{{ url_for('index') }}" >Logout</a>
+							</div>
 
 							</li>
 							<!-- End Link -->
 							<li><a style="padding-left: 0;" href="https://github.com/UCBerkeleySETI"><img style="width: 25%;"src="../static/images/BL_Scale_icon.png"  ></a></li>
+
+							{% endif %}	
+
+							</li>
+							<!-- End Link -->
+							
 
 						</ul>
 						<!-- End Links -->
