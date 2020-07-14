@@ -52,4 +52,3 @@ numpy
 numpydoc
 pyzmq
 gcsfs
-Flask-Session
