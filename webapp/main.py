@@ -15,7 +15,7 @@ import time
 import pickle
 import logging
 from google.cloud import storage
-from flask import render_template, request, redirect, session, Flask, g
+from flask import render_template, request, redirect, session, Flask
 import time
 import os
 import threading
@@ -25,7 +25,8 @@ import multiprocessing
 import urllib.request, json
 from urllib.parse import urlencode, quote
 from google.oauth2 import service_account
-from flask_session import Session
+import random
+import string
 
 cache = {}
 
@@ -92,16 +93,20 @@ def check_token_plus(self, database_url, path, access_token=None):
         else:
             return '{0}{1}.json?access_token={2}'.format(database_url, path, get_firebase_access_token())
 
+def get_random_string(length):
+    letters = string.ascii_lowercase
+    result_str = ''.join(random.choice(letters) for i in range(length))
+    return result_str
+
 pyrebase.pyrebase.Database.build_request_url = build_request_url_plus
 pyrebase.pyrebase.Database.check_token = check_token_plus
 firebase = pyrebase.initialize_app(config)
 auth = firebase.auth()
 db = firebase.database()
 app = Flask(__name__, instance_relative_config=True)
-SESSION_TYPE = 'filesystem'
-app.config.from_object(__name__)
-Session(app)
+secret_key = get_random_string(10)
 session = {}
+app.secret_key = bytes(secret_key, 'utf-8')
 if __name__ != '__main__':
     gunicorn_logger = logging.getLogger('gunicorn.error')
     app.logger.handlers = gunicorn_logger.handlers
@@ -236,7 +241,7 @@ def zmq_sub():
 @app.route('/trigger')
 def my_form():
     try:
-        print(session.get('usr'))
+        print(session['usr'])
         message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("observation_status").child("Energy-Detection").order_by_child("start_timestamp").limit_to_last(3).get().val()
         return render_template('zmq_push.html', message_sub=message_dict)
     except KeyError:
@@ -246,7 +251,7 @@ def my_form():
 @app.route('/trigger', methods=['GET', 'POST'])
 def zmq_push():
     try:
-        print(session.get('usr'))
+        print(session['usr'])
         target_ip = request.form['target_ip']
         message = request.form['message']
         app.logger.debug(str(target_ip))
@@ -343,7 +348,7 @@ def get_processed_hist_and_img(single_uri):
 @app.route('/home', methods=['GET', 'POST'])
 def home():
     try:
-        print(session.get('usr'))
+        print(session['usr'])
         
 
         # #string list of pickles 'gs://bl-scale/GBT_58010_50176_HIP61317_fine/info_df.pkl' excluded
@@ -402,7 +407,7 @@ def home():
         #         obs_filtered_url[key] = cache[key][1]
         #         base64_obs[key] = cache[key][0]
         print("returning home")
-        return render_template("home.html", title="Main Page", sample_urls=cache, email = session.get('email'))#sample_urls=obs_filtered_url, plot_bytes=base64_obs)
+        return render_template("home.html", title="Main Page", sample_urls=cache, email = session['email'])#sample_urls=obs_filtered_url, plot_bytes=base64_obs)
 
     except KeyError:
         return redirect('login')
