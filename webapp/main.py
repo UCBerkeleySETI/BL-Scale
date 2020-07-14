@@ -27,6 +27,8 @@ from urllib.parse import urlencode, quote
 from google.oauth2 import service_account
 import utils
 from PIL import Image
+import os.path
+from os import path
 cache = {}
 
 config = {
@@ -304,7 +306,6 @@ def home():
 
         #returns string list of urls
         def get_img_url(df, observation):
-
             indexes = []
             samples_url = []
             blockn = []
@@ -318,7 +319,10 @@ def home():
         # takes in string observation name (the key), returns list of base64 strings
         def get_base64_images(observation_name):
             # downloads the best_hits.npy file from the observation bucket
-            utils.download_blob("bl-scale", observation_name + "/best_hits.npy", observation_name + "_best_hits.npy")
+            if path.exists(observation_name + "_best_hits.npy"):
+                print("Files already downloaded")
+            else:
+                utils.download_blob("bl-scale", observation_name + "/best_hits.npy", observation_name + "_best_hits.npy")
             img_array = np.load(observation_name + "_best_hits.npy")
             base64_images = []
             for i in np.arange(0, img_array.shape[0]):
@@ -387,7 +391,7 @@ def home():
             for uri in uris:
                 observ = get_observation(uri)
                 cache[observ] = get_processed_hist_and_img(uri)
-                # db.child("breakthrough-listen-sandbox").child("flask_vars").child("cache").child(observ).set(cache[observ])
+                db.child("breakthrough-listen-sandbox").child("flask_vars").child("cache").child(observ).set(cache[observ])
         else:
             if all(db_k in cache.keys() for db_k in db_cache_keys):
                 print("cache all updated")
