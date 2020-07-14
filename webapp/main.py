@@ -15,7 +15,7 @@ import time
 import pickle
 import logging
 from google.cloud import storage
-from flask import render_template, request, redirect, session, Flask
+from flask import render_template, request, redirect, session, Flask, g
 import time
 import os
 import threading
@@ -25,6 +25,8 @@ import multiprocessing
 import urllib.request, json
 from urllib.parse import urlencode, quote
 from google.oauth2 import service_account
+from flask_session import Session
+
 cache = {}
 
 config = {
@@ -96,7 +98,9 @@ firebase = pyrebase.initialize_app(config)
 auth = firebase.auth()
 db = firebase.database()
 app = Flask(__name__, instance_relative_config=True)
-app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
+SESSION_TYPE = 'filesystem'
+app.config.from_object(__name__)
+Session(app)
 session = {}
 if __name__ != '__main__':
     gunicorn_logger = logging.getLogger('gunicorn.error')
@@ -232,7 +236,7 @@ def zmq_sub():
 @app.route('/trigger')
 def my_form():
     try:
-        print(session['usr'])
+        print(session.get('usr'))
         message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("observation_status").child("Energy-Detection").order_by_child("start_timestamp").limit_to_last(3).get().val()
         return render_template('zmq_push.html', message_sub=message_dict)
     except KeyError:
@@ -242,7 +246,7 @@ def my_form():
 @app.route('/trigger', methods=['GET', 'POST'])
 def zmq_push():
     try:
-        print(session['usr'])
+        print(session.get('usr'))
         target_ip = request.form['target_ip']
         message = request.form['message']
         app.logger.debug(str(target_ip))
@@ -339,7 +343,7 @@ def get_processed_hist_and_img(single_uri):
 @app.route('/home', methods=['GET', 'POST'])
 def home():
     try:
-        print(session['usr'])
+        print(session.get('usr'))
         
 
         # #string list of pickles 'gs://bl-scale/GBT_58010_50176_HIP61317_fine/info_df.pkl' excluded
@@ -398,7 +402,7 @@ def home():
         #         obs_filtered_url[key] = cache[key][1]
         #         base64_obs[key] = cache[key][0]
         print("returning home")
-        return render_template("home.html", title="Main Page", sample_urls=cache, email = session['email'])#sample_urls=obs_filtered_url, plot_bytes=base64_obs)
+        return render_template("home.html", title="Main Page", sample_urls=cache, email = session.get('email'))#sample_urls=obs_filtered_url, plot_bytes=base64_obs)
 
     except KeyError:
         return redirect('login')
