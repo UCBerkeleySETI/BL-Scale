@@ -346,6 +346,7 @@ def get_processed_hist_and_img(single_uri):
 
 
 @app.route('/home', methods=['GET', 'POST'])
+
 def home():
     try:
         print(session['usr'])
