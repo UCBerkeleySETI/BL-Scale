@@ -25,6 +25,7 @@ import multiprocessing
 import urllib.request, json
 from urllib.parse import urlencode, quote
 from google.oauth2 import service_account
+import utils
 cache = {}
 
 config = {
@@ -313,19 +314,17 @@ def home():
                     samples_url += ["https://storage.cloud.google.com/bl-scale/"+observation+"/filtered/"+str(blockn[i])+"/"+str(indexes[i])+".png"]
             return samples_url
 
-        def get_base64_images():
-            img_array = np.load('GBT_58452_79191_HIP115687_fine_best_hits.npy')
-            pic_IObytes = io.BytesIO()
-            plt.savefig(pic_IObytes,  format='png')
-            pic_IObytes.seek(0)
-            pic_hash = base64.b64encode(pic_IObytes.read())
-            base64_img = "data:image/jpeg;base64, " + str(pic_hash.decode("utf8"))
-            return base64_img
-            # img_array = img_array[0]
-            # img_array.tobytes()
-            # pic_hash = base64.b64encode(img_array)
-            # img = "data:image/jpeg;base64, " + str(pic_hash.decode("utf8"))
-            # return img
+        # takes in string observation name (the key), returns list of base64 strings
+        def get_base64_images(observation_name):
+            utils.download_blob("bl-scale", observation_name + "/best_hits.npy", observation_name + "_best_hits.npy")
+            img_array = np.load(observation_name + "_best_hits.npy")
+            base64_images = []
+            for i in np.arange(0, img_array.shape[0]):
+                img_array[i].tobytes()
+                pic_hash = base64.b64encode(img_array[i])
+                img = "data:image/jpeg;base64, " + str(pic_hash.decode("utf8"))
+                base64_images += [img]
+            return base64_images
 
         #return base64 string of histogram
         def get_base64_hist(df):
@@ -369,7 +368,7 @@ def home():
             observ = get_observation(single_uri)
             processed_data = filter_images(data, 4)
             #return [get_base64_hist(data), get_img_url(processed_data, observ)]
-            return [get_base64_hist(data), get_base64_images()]
+            return [get_base64_hist(data), get_base64_images(observ)]
 
         global cache
 
@@ -384,7 +383,7 @@ def home():
             for uri in uris[:1]:
                 observ = get_observation(uri)
                 cache[observ] = get_processed_hist_and_img(uri)
-                db.child("breakthrough-listen-sandbox").child("flask_vars").child("cache").child(observ).set(cache[observ])
+                # db.child("breakthrough-listen-sandbox").child("flask_vars").child("cache").child(observ).set(cache[observ])
         else:
             if all(db_k in cache.keys() for db_k in db_cache_keys):
                 print("cache all updated")
