@@ -226,6 +226,11 @@
 
 				</div>
 				<div class="row">
+					{% for sample in sample_urls[key][1] %}
+						<div class="col-sm-3"><img class='img-responsive' src='{{ sample }}' height="40" width="200" style="margin:15px" class="center"></div>
+					{%endfor%}
+				</div>
+				<div class="row">
 
 					<div class="col-4">
 						<p class="text-white text-weight-400 no-margin-bottom"><b>Algorithm Type:</b> {{ message_sub[key]["algo_type"] }}</p>
