@@ -26,6 +26,7 @@ import urllib.request, json
 from urllib.parse import urlencode, quote
 from google.oauth2 import service_account
 import utils
+from PIL import Image
 cache = {}
 
 config = {
@@ -293,7 +294,7 @@ def home():
             return uris
 
         #string list of pickles 'gs://bl-scale/GBT_58010_50176_HIP61317_fine/info_df.pkl' excluded
-        uris = ['gs://bl-scale/GBT_58452_79191_HIP115687_fine/info_df.pkl','gs://bl-scale/GBT_58014_69579_HIP77629_fine/info_df.pkl', 'gs://bl-scale/GBT_58110_60123_HIP91926_fine/info_df.pkl', 'gs://bl-scale/GBT_58202_60970_B0329+54_fine/info_df.pkl', 'gs://bl-scale/GBT_58210_37805_HIP103730_fine/info_df.pkl', 'gs://bl-scale/GBT_58210_39862_HIP105504_fine/info_df.pkl', 'gs://bl-scale/GBT_58210_40853_HIP106147_fine/info_df.pkl', 'gs://bl-scale/GBT_58210_41185_HIP105761_fine/info_df.pkl', 'gs://bl-scale/GBT_58307_26947_J1935+1616_fine/info_df.pkl', 'gs://bl-scale/GBT_58452_79191_HIP115687_fine/info_df.pkl']
+        uris = ['gs://bl-scale/GBT_58452_79191_HIP115687_fine/info_df.pkl','gs://bl-scale/GBT_58452_78532_HIP115673_fine/info_df.pkl', 'gs://bl-scale/GBT_58452_77868_HIP115570_fine/info_df.pkl', 'gs://bl-scale/GBT_58452_74835_HIP117779_fine/info_df.pkl', 'gs://bl-scale/GBT_58452_75833_HIP117150_fine/info_df.pkl']
 
         #returns string observation
         def get_observation(uri_str):
@@ -316,12 +317,15 @@ def home():
 
         # takes in string observation name (the key), returns list of base64 strings
         def get_base64_images(observation_name):
+            # downloads the best_hits.npy file from the observation bucket
             utils.download_blob("bl-scale", observation_name + "/best_hits.npy", observation_name + "_best_hits.npy")
             img_array = np.load(observation_name + "_best_hits.npy")
             base64_images = []
             for i in np.arange(0, img_array.shape[0]):
-                img_array[i].tobytes()
-                pic_hash = base64.b64encode(img_array[i])
+                rawBytes = io.BytesIO()
+                plt.imsave(rawBytes,arr=img_array[i], cmap="viridis")
+                rawBytes.seek(0)  # return to the start of the file
+                pic_hash = base64.b64encode(rawBytes.read())
                 img = "data:image/jpeg;base64, " + str(pic_hash.decode("utf8"))
                 base64_images += [img]
             return base64_images
@@ -380,7 +384,7 @@ def home():
 
         if not cache:
             print("cache empty")
-            for uri in uris[:1]:
+            for uri in uris:
                 observ = get_observation(uri)
                 cache[observ] = get_processed_hist_and_img(uri)
                 # db.child("breakthrough-listen-sandbox").child("flask_vars").child("cache").child(observ).set(cache[observ])
