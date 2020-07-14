@@ -2,3 +2,5 @@
 venv
 *key.json
 *__pycache__*
+spec/*.npy
+*.npy

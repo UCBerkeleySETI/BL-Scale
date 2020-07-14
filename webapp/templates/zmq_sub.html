@@ -102,7 +102,7 @@
 							</li>
 							<!-- End Off-Canvas Navigation Toggle -->
 							
-							
+							{% if not test_login %}
 							<!-- Link -->
 							<li>
 							
@@ -167,11 +167,52 @@
 							
 								<div style="padding-top: 20%; padding-left: 20%;" >
 									<a class="btn btn-small btn-orange border-radius-50 sm-display-table xs-no-margin-bottom "  href="./login" >Login</a>	
-							</div>		
+							</div>
+							<li><a style="padding-left: 0;" href="https://github.com/UCBerkeleySETI"><img style="width: 25%;"src="../static/images/BL_Scale_icon.png"  ></a></li>
+							{% else %}
+
+
+							<li>
+
+								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="../home">Dashboard</a>
+
+
+							</li>
+							<li>
+
+								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="./trigger">Trigger</a>
+
+
+							</li>
+							<li>
+
+								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="./result">Results</a>
+
+
+							</li>
+
+							<!-- Link -->
+							<li>
+
+								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="{{ url_for('monitor.base') }}">Monitor</a>
+
+
+							</li>
+						
+							<li>
+								<div style="padding-top: 20%; padding-left: 20%;" >
+									<a class="btn btn-small btn-orange border-radius-50 sm-display-table xs-no-margin-bottom "  href="{{ url_for('index') }}" >Logout</a>
+							</div>
 
 							</li>
 							<!-- End Link -->
 							<li><a style="padding-left: 0;" href="https://github.com/UCBerkeleySETI"><img style="width: 25%;"src="../static/images/BL_Scale_icon.png"  ></a></li>
+
+							{% endif %}	
+
+							</li>
+							<!-- End Link -->
+							
 
 						</ul>
 						<!-- End Links -->
@@ -214,8 +255,49 @@
 			  <p>&nbsp;</p>
 				<p>&nbsp;</p>
 				<h2 class="text-weight-800 Raleway text-white">Results</h2>
+
+				{%for key in sample_urls%}
+				<div class="row">
+					<div class="col-sm-12" style="padding-top: 10%;"><h4 class="text-weight-600 Raleway text-white">{{ key }} Unusual Filtered Samples</h4></div>
+				</div>
 				
-			{%for key in message_sub%}
+				<div class="row">
+					<div class="col-sm-12"><img src='{{ sample_urls[key][0] }}'></div>
+					
+
+				</div>
+				<div class="row">
+					{% for sample in sample_urls[key][1] %}
+						<div class="col-sm-3"><img class='img-responsive' src='{{ sample }}' height="40" width="200" style="margin:15px" class="center"></div>
+					{%endfor%}
+				</div>
+				<div class="row">
+
+					<div class="col-4">
+						<p class="text-white text-weight-400 no-margin-bottom"><b>Algorithm Type:</b> {{ message_sub[key]["algo_type"] }}</p>
+		
+						</div>
+					<div class="col-4">
+					<p class="text-white text-weight-400 no-margin-bottom"><b>Timestamp:</b> {{ message_sub[key]["timestamp"] }}</p>
+	
+					</div>
+					<div class="col-4">
+						<p class="text-white text-weight-400 no-margin-bottom"><b>Processing Time:</b> {{ message_sub[key]["processing_time"] /60 }} minutes</p>
+					</div>
+					<p>&nbsp;</p>
+					<p>&nbsp;</p>
+				
+				</div>
+				<div class="row">
+					
+				</div>
+			{%endfor%}
+
+
+
+
+				
+			<!-- {%for key in message_sub%}
 			<div class="row">
 				
 				<h4 class="text-weight-500 Raleway text-white">
@@ -237,7 +319,7 @@
 			
 			</div>
 		  {%endfor%}
-		
+		 -->
 
 
 
