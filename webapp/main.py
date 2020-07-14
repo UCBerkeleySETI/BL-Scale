@@ -292,7 +292,7 @@ def home():
             return uris
 
         #string list of pickles 'gs://bl-scale/GBT_58010_50176_HIP61317_fine/info_df.pkl' excluded
-        uris = ['gs://bl-scale/GBT_58014_69579_HIP77629_fine/info_df.pkl', 'gs://bl-scale/GBT_58110_60123_HIP91926_fine/info_df.pkl', 'gs://bl-scale/GBT_58202_60970_B0329+54_fine/info_df.pkl', 'gs://bl-scale/GBT_58210_37805_HIP103730_fine/info_df.pkl', 'gs://bl-scale/GBT_58210_39862_HIP105504_fine/info_df.pkl', 'gs://bl-scale/GBT_58210_40853_HIP106147_fine/info_df.pkl', 'gs://bl-scale/GBT_58210_41185_HIP105761_fine/info_df.pkl', 'gs://bl-scale/GBT_58307_26947_J1935+1616_fine/info_df.pkl', 'gs://bl-scale/GBT_58452_79191_HIP115687_fine/info_df.pkl']
+        uris = ['gs://bl-scale/GBT_58452_79191_HIP115687_fine/info_df.pkl','gs://bl-scale/GBT_58014_69579_HIP77629_fine/info_df.pkl', 'gs://bl-scale/GBT_58110_60123_HIP91926_fine/info_df.pkl', 'gs://bl-scale/GBT_58202_60970_B0329+54_fine/info_df.pkl', 'gs://bl-scale/GBT_58210_37805_HIP103730_fine/info_df.pkl', 'gs://bl-scale/GBT_58210_39862_HIP105504_fine/info_df.pkl', 'gs://bl-scale/GBT_58210_40853_HIP106147_fine/info_df.pkl', 'gs://bl-scale/GBT_58210_41185_HIP105761_fine/info_df.pkl', 'gs://bl-scale/GBT_58307_26947_J1935+1616_fine/info_df.pkl', 'gs://bl-scale/GBT_58452_79191_HIP115687_fine/info_df.pkl']
 
         #returns string observation
         def get_observation(uri_str):
@@ -313,8 +313,23 @@ def home():
                     samples_url += ["https://storage.cloud.google.com/bl-scale/"+observation+"/filtered/"+str(blockn[i])+"/"+str(indexes[i])+".png"]
             return samples_url
 
+        def get_base64_images():
+            img_array = np.load('GBT_58452_79191_HIP115687_fine_best_hits.npy')
+            pic_IObytes = io.BytesIO()
+            plt.savefig(pic_IObytes,  format='png')
+            pic_IObytes.seek(0)
+            pic_hash = base64.b64encode(pic_IObytes.read())
+            base64_img = "data:image/jpeg;base64, " + str(pic_hash.decode("utf8"))
+            return base64_img
+            # img_array = img_array[0]
+            # img_array.tobytes()
+            # pic_hash = base64.b64encode(img_array)
+            # img = "data:image/jpeg;base64, " + str(pic_hash.decode("utf8"))
+            # return img
+
         #return base64 string of histogram
         def get_base64_hist(df):
+
             plt.style.use("dark_background")
             plt.figure(figsize=(8,6))
             plt.hist(df["freqs"], bins = np.arange(min(df["freqs"]),max(df["freqs"]), 0.8116025973))
@@ -349,10 +364,12 @@ def home():
         # returns list of base64 string hist for first element, list of string image
         # urls for the second element. Intakes a string uri
         def get_processed_hist_and_img(single_uri):
+
             data = pd.read_pickle(single_uri)
             observ = get_observation(single_uri)
             processed_data = filter_images(data, 4)
-            return [get_base64_hist(data), get_img_url(processed_data, observ)]
+            #return [get_base64_hist(data), get_img_url(processed_data, observ)]
+            return [get_base64_hist(data), get_base64_images()]
 
         global cache
 
@@ -364,41 +381,21 @@ def home():
 
         if not cache:
             print("cache empty")
-            for uri in uris[:8]:
-                # data = pd.read_pickle(uri)
-                #
+            for uri in uris[:1]:
                 observ = get_observation(uri)
-                #
-                # #base64_obs[observ] = get_base64_hist(data)
-                #
-                # processed_data = filter_images(data, 4)
-
-                #obs_filtered_url[observ] = get_img_url(processed_data, observ)
                 cache[observ] = get_processed_hist_and_img(uri)
                 db.child("breakthrough-listen-sandbox").child("flask_vars").child("cache").child(observ).set(cache[observ])
         else:
             if all(db_k in cache.keys() for db_k in db_cache_keys):
                 print("cache all updated")
-                # for key in cache.keys():
-                #     obs_filtered_url[key] = cache[key][1]
-                #     base64_obs[key] = cache[key][0]
             else:
                 print("adding additional to cache")
                 for db_k in db_cache_keys:
                     if db_k not in cache.keys():
                         for uri in uris:
                             if get_observation(uri) == db_k:
-                                # data = pd.read_pickle(uri)
-                                #base64_obs[db_k] = get_base64_hist(data)
-                                # processed_data = filter_images(data, 4)
-                                #obs_filtered_url[db_k] = get_img_url(processed_data, db_k)
                                 cache[db_k] = get_processed_hist_and_img(uri)
                                 db.child("breakthrough-listen-sandbox").child("flask_vars").child("cache").child(db_k).set(cache[db_k])
-        # else:
-        #     print("cache not empty")
-        #     for key in cache.keys():
-        #         obs_filtered_url[key] = cache[key][1]
-        #         base64_obs[key] = cache[key][0]
         print("returning home")
         return render_template("home.html", title="Main Page", sample_urls=cache)#sample_urls=obs_filtered_url, plot_bytes=base64_obs)
 
