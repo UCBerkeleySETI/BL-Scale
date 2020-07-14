@@ -318,9 +318,10 @@ def home():
 
         # takes in string observation name (the key), returns list of base64 strings
         def get_base64_images(observation_name):
+            # checks if you already have file downloaded, else
             # downloads the best_hits.npy file from the observation bucket
             if path.exists(observation_name + "_best_hits.npy"):
-                print("Files already downloaded")
+                print("File already downloaded")
             else:
                 utils.download_blob("bl-scale", observation_name + "/best_hits.npy", observation_name + "_best_hits.npy")
             img_array = np.load(observation_name + "_best_hits.npy")
@@ -374,7 +375,7 @@ def home():
 
             data = pd.read_pickle(single_uri)
             observ = get_observation(single_uri)
-            processed_data = filter_images(data, 4)
+            #processed_data = filter_images(data, 4)
             #return [get_base64_hist(data), get_img_url(processed_data, observ)]
             return [get_base64_hist(data), get_base64_images(observ)]
 
