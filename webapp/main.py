@@ -251,23 +251,21 @@ def zmq_sub():
         global cache
         if not cache:
             print("Cache empty")
-            sample_urls = {}
+            # sample_urls = {}
             for key in message_dict:
-                sample_urls[key] = get_processed_hist_and_img(message_dict[key]["object_uri"]+"/info_df.pkl")
-                cache[key] = sample_urls[key]
+                # sample_urls[key] = get_processed_hist_and_img(message_dict[key]["object_uri"]+"/info_df.pkl")
+                cache[key] = get_processed_hist_and_img(message_dict[key]["object_uri"]+"/info_df.pkl")
                 db.child("breakthrough-listen-sandbox").child("flask_vars").child("cache").child(key).set(cache[key])
         else:
             print("cache all updated")
-    #         if all(db_k in cache.keys() for db_k in db_cache_keys):
-    #             print("cache all updated")
-    #         else:
-    #             print("adding additional to cache")
-    #             for db_k in db_cache_keys:
-    #                 if db_k not in cache.keys():
-    #                     for key in message_dict:
-    #                         if key == db_k:
-    #                             cache[db_k] = get_processed_hist_and_img(message_dict[key]["object_uri"]+"/info_df.pkl")
-    #                             db.child("breakthrough-listen-sandbox").child("flask_vars").child("cache").child(db_k).set(cache[db_k])
+            # if all(db_k in cache.keys() for db_k in db_cache_keys):
+            #     print("cache all updated")
+            # else:
+            #     print("adding additional to cache")
+            #     for db_k in db_cache_keys:
+            #         if db_k not in cache.keys():
+            #            cache[db_k] = get_processed_hist_and_img(message_dict[db_k]["object_uri"]+"/info_df.pkl")
+            #            db.child("breakthrough-listen-sandbox").child("flask_vars").child("cache").child(db_k).set(cache[db_k])
     except:
         alert="invalid number"
     return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict, alert = alert, sample_urls = cache ,test_login = test_login)
