@@ -242,12 +242,35 @@ def zmq_sub():
         hits = int(request.form['hits'])
         test_login = check_if_login()
         message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("processed_observations").child("Energy-Detection").order_by_child("timestamp").limit_to_last(hits).get().val()
-        sample_urls = {}
-        for key in message_dict:
-            sample_urls[key] = get_processed_hist_and_img(message_dict[key]["object_uri"]+"/info_df.pkl")
+        db_cache_keys = []
+        retrieve_cache = db.child("breakthrough-listen-sandbox").child("flask_vars").child("cache").get()
+        for rc in retrieve_cache.each():
+            db_cache_keys += [str(rc.key())]
+        print(db_cache_keys)
+
+        global cache
+        if not cache:
+            print("Cache empty")
+            sample_urls = {}
+            for key in message_dict:
+                sample_urls[key] = get_processed_hist_and_img(message_dict[key]["object_uri"]+"/info_df.pkl")
+                cache[key] = sample_urls[key]
+                db.child("breakthrough-listen-sandbox").child("flask_vars").child("cache").child(key).set(cache[key])
+        else:
+            print("cache all updated")
+    #         if all(db_k in cache.keys() for db_k in db_cache_keys):
+    #             print("cache all updated")
+    #         else:
+    #             print("adding additional to cache")
+    #             for db_k in db_cache_keys:
+    #                 if db_k not in cache.keys():
+    #                     for key in message_dict:
+    #                         if key == db_k:
+    #                             cache[db_k] = get_processed_hist_and_img(message_dict[key]["object_uri"]+"/info_df.pkl")
+    #                             db.child("breakthrough-listen-sandbox").child("flask_vars").child("cache").child(db_k).set(cache[db_k])
     except:
         alert="invalid number"
-    return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict, alert = alert, sample_urls = sample_urls ,test_login = test_login)
+    return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict, alert = alert, sample_urls = cache ,test_login = test_login)
 
 @app.route('/trigger')
 def my_form():
@@ -309,8 +332,9 @@ def get_img_url(df, observation):
     for i in range(0, len(indexes)):
             samples_url += ["https://storage.cloud.google.com/bl-scale/"+observation+"/filtered/"+str(blockn[i])+"/"+str(indexes[i])+".png"]
     return samples_url
-    
+
 def get_base64_images(observation_name):
+    #checks to see if you already have the file, else
     # downloads the best_hits.npy file from the observation bucket
     if path.exists(observation_name + "_best_hits.npy"):
         print("Files already downloaded")
@@ -363,7 +387,7 @@ def filter_images(df, n):
 def get_processed_hist_and_img(single_uri):
     data = pd.read_pickle(single_uri)
     observ = get_observation(single_uri)
-    processed_data = filter_images(data, 4)
+    #processed_data = filter_images(data, 4)
     #return [get_base64_hist(data), get_img_url(processed_data, observ)]
     return [get_base64_hist(data), get_base64_images(observ)]
 
