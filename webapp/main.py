@@ -31,6 +31,8 @@ import os.path
 from os import path
 import random 
 import string 
+from flask_wtf.csrf import CSRFProtect
+from flask_wtf.csrf import CSRFError
 cache = {}
 
 config = {
@@ -116,6 +118,9 @@ app = Flask(__name__, instance_relative_config=True)
 secret_key = get_random_string(10)
 session = {}
 app.secret_key = bytes(secret_key, 'utf-8')
+csrf = CSRFProtect(app)
+csrf.init_app(app)
+
 if __name__ != '__main__':
     gunicorn_logger = logging.getLogger('gunicorn.error')
     app.logger.handlers = gunicorn_logger.handlers
@@ -191,6 +196,9 @@ def logout():
     session = {}
     return render_template('login.html')
 
+@app.errorhandler(CSRFError)
+def handle_csrf_error(e):
+    return render_template('csrf_error.html', reason=e.description), 400
 ####################################################################################################
 # ___________________________________END OF USER AUTHENTICATIONS___________________________________#
 # ________________________________________START OF ZMQ NETWORKING__________________________________#
