@@ -1,5 +1,6 @@
 Click
 Flask
+Flask-WTF
 firebase
 gcloud
 googleapis-common-protos
