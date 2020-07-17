@@ -15,7 +15,7 @@ import time
 import pickle
 import logging
 from google.cloud import storage
-from flask import render_template, request, redirect, session, Flask
+from flask import render_template, request, redirect, session, Flask, jsonify
 import time
 import os
 import threading
@@ -31,8 +31,8 @@ import os.path
 from os import path
 import random 
 import string 
-from flask_wtf.csrf import CSRFProtect
-from flask_wtf.csrf import CSRFError
+
+
 cache = {}
 
 config = {
@@ -115,6 +115,7 @@ firebase = pyrebase.initialize_app(config)
 auth = firebase.auth()
 db = firebase.database()
 app = Flask(__name__, instance_relative_config=True)
+
 secret_key = get_random_string(10)
 session = {}
 app.secret_key = bytes(secret_key, 'utf-8')
@@ -160,21 +161,21 @@ def index():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    if (request.method == 'POST'):
-            email = request.form['name']
-            session['email'] = email
-            password = request.form['password']
-            try:
-                user = auth.sign_in_with_email_and_password(email, password)
-                user = auth.refresh(user['refreshToken'])
-                user_id = user['idToken']
-                session['usr'] = user_id
-                # template_returned = home()
-                return redirect('home')
-            except Exception as e:
-                app.logger.debug(e)
-                unsuccessful = 'Please check your credentials'
-                return render_template('login.html', umessage=unsuccessful)
+    # if (request.method == 'POST'):
+    #         email = request.form['name']
+    #         session['email'] = email
+    #         password = request.form['password']
+    #         try:
+    #             user = auth.sign_in_with_email_and_password(email, password)
+    #             user = auth.refresh(user['refreshToken'])
+    #             user_id = user['idToken']
+    #             session['usr'] = user_id
+    #             # template_returned = home()
+    #             return redirect('home')
+    #         except Exception as e:
+    #             app.logger.debug(e)
+    #             unsuccessful = 'Please check your credentials'
+    #             return render_template('login.html', umessage=unsuccessful)
     return render_template('login.html')
 
 
@@ -398,12 +399,10 @@ def get_processed_hist_and_img(single_uri):
 
 @app.route('/home', methods=['GET', 'POST'])
 def home():
-    try:
-        print(session['usr'])
-        return render_template("home.html", title="Main Page", sample_urls=cache, email = session['email'])
+    
+    return render_template("home.html", title="Main Page", sample_urls=cache)
 
-    except KeyError:
-        return redirect('login')
+ 
 
     def get_cache():
         return cache
