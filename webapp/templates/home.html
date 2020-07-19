@@ -13,7 +13,7 @@
         <meta name="description" content="">
         <!-- keywords -->
         <meta name="keywords" content="">
-
+		<meta id="uid" content="{{ uid }}">
 
 		<!--Start Title -->
 		<title>BL@Scale</title>
@@ -51,17 +51,17 @@
 		<script  src="https://www.gstatic.com/firebasejs/7.16.0/firebase.js"></script>
 		<script  src="https://www.gstatic.com/firebasejs/7.16.0/firebase-app.js"></script>
 		<script  src="https://www.gstatic.com/firebasejs/7.16.0/firebase-auth.js"></script>
-		
+
 		<script  src="https://www.gstatic.com/firebasejs/7.16.0/firebase-analytics.js"></script>
 		<script  src="https://www.gstatic.com/firebasejs/7.16.0/firebase-firestore.js"></script>
 		<script  src="https://www.gstatic.com/firebasejs/7.16.0/firebase-messaging.js"></script>
 		<script  src="https://www.gstatic.com/firebasejs/7.16.0/firebase-functions.js"></script>
 
 
-		<script type="text/javascript" src="http://code.jquery.com/jquery-3.3.1.min.js"></script>		
+		<script type="text/javascript" src="http://code.jquery.com/jquery-3.3.1.min.js"></script>
 
 		<script src="../static/js/login.js"></script>
-		<script>
+		<script defer>
 			// Initialize Firebase
 			// TODO: Replace with your project's customized code snippet
 			var config = {
@@ -75,13 +75,9 @@
 				apiKey:"AIzaSyAWVDszEVzJ_GSopx-23slhwKM2Ha5qkbw"
 			};
 			firebase.initializeApp(config);
-			console.log(get_user_info());
-			
 
-			
-		
-			
-			
+			console.log(document.getElementById("uid").getAttribute("content"));
+			console.log(user.uid);
 		</script>
 
 
@@ -96,60 +92,60 @@
 		}
 
 		</style>
-	
+
 	<!-- Resources -->
 	<script src="https://www.amcharts.com/lib/4/core.js"></script>
 	<script src="https://www.amcharts.com/lib/4/charts.js"></script>
 	<script src="https://www.amcharts.com/lib/4/themes/dark.js"></script>
 	<script src="https://www.amcharts.com/lib/4/themes/animated.js"></script>
-	
+
 	<!-- Chart code -->
 	<script>
 	am4core.ready(function() {
-	
+
 	// Themes begin
 	am4core.useTheme(am4themes_dark);
 	am4core.useTheme(am4themes_animated);
 	// Themes end
-	
-	
-	
-	
+
+
+
+
 	// Create chart instance
 	var chart = am4core.create("chartdiv", am4charts.XYChart);
-	
+
 	// Create axes
 	var dateAxis = chart.xAxes.push(new am4charts.DateAxis());
 	var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
-	
+
 	for (var i = 0; i < 3; i++) {
 	  createSeries("value" + i, "Series #" + i);
 	}
-	
+
 	// Create series
 	function createSeries(s, name) {
 	  var series = chart.series.push(new am4charts.LineSeries());
 	  series.dataFields.valueY = "value" + s;
 	  series.dataFields.dateX = "date";
 	  series.name = name;
-	
+
 	  var segment = series.segments.template;
 	  segment.interactionsEnabled = true;
-	
+
 	  var hoverState = segment.states.create("hover");
 	  hoverState.properties.strokeWidth = 3;
-	
+
 	  var dimmed = segment.states.create("dimmed");
 	  dimmed.properties.stroke = am4core.color("#dadada");
-	
+
 	  segment.events.on("over", function(event) {
 		processOver(event.target.parent.parent.parent);
 	  });
-	
+
 	  segment.events.on("out", function(event) {
 		processOut(event.target.parent.parent.parent);
 	  });
-	
+
 	  var data = [];
 	  var value = Math.round(Math.random() * 100) + 100;
 	  for (var i = 1; i < 100; i++) {
@@ -158,29 +154,29 @@
 		dataItem["value" + s] = value;
 		data.push(dataItem);
 	  }
-	
+
 	  series.data = data;
 	  return series;
 	}
-	
+
 	chart.legend = new am4charts.Legend();
 	chart.legend.position = "right";
 	chart.legend.scrollable = true;
 	chart.legend.itemContainers.template.events.on("over", function(event) {
 	  processOver(event.target.dataItem.dataContext);
 	})
-	
+
 	chart.legend.itemContainers.template.events.on("out", function(event) {
 	  processOut(event.target.dataItem.dataContext);
 	})
-	
+
 	function processOver(hoveredSeries) {
 	  hoveredSeries.toFront();
-	
+
 	  hoveredSeries.segments.each(function(segment) {
 		segment.setState("hover");
 	  })
-	
+
 	  chart.series.each(function(series) {
 		if (series != hoveredSeries) {
 		  series.segments.each(function(segment) {
@@ -190,7 +186,7 @@
 		}
 	  });
 	}
-	
+
 	function processOut(hoveredSeries) {
 	  chart.series.each(function(series) {
 		series.segments.each(function(segment) {
@@ -199,7 +195,7 @@
 		series.bulletsContainer.setState("default");
 	  });
 	}
-	
+
 	}); // end am4core.ready()
 	</script>
 
@@ -256,19 +252,19 @@
 							<!-- End Off-Canvas Navigation Toggle -->
 							<li>
 
-								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="../home">Dashboard</a>
+								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="{{ '../home/' + uid }}">Dashboard</a>
 
 
 							</li>
 							<li>
 
-								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="./trigger">Trigger</a>
+								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="{{ '../trigger/' + uid }}">Trigger</a>
 
 
 							</li>
 							<li>
 
-								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="./result">Results</a>
+								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="{{ '../result/' + uid }}">Results</a>
 
 
 							</li>
@@ -276,7 +272,7 @@
 							<!-- Link -->
 							<li>
 
-								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="{{ url_for('monitor.base') }}">Monitor</a>
+								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="{{ url_for('monitor.base', uid=uid) }}">Monitor</a>
 
 
 							</li>
@@ -315,26 +311,26 @@
 		<p>&nbsp;</p>
 		<p>&nbsp;</p>
 		<div class="row" style="padding-left: 5%; padding-right: 5%; ">
-			
+
 		<div class="col-3" style="border: 3px solid #fc5603; border-radius:5%;">
 			<p>&nbsp;</p>
 			<div style="padding-left: 5%; padding-right: 5%;">
 			<h2 class="text-weight-800 Raleway text-white">Hey!👋 </h2>
 			<h6><span class="badge badge-danger" style="background-color: #fc5603">{{email}}</span></h6>
 				<p class="text-white text-weight-400 no-margin-bottom">
-					You are currently logged in as {{email}}. This is the admin page where you can control and oversee the 
+					You are currently logged in as {{email}}. This is the admin page where you can control and oversee the
 					scaling and the status of various triggers.
-					
-					Account activity will be tracked with each trigger to log the results. 
+
+					Account activity will be tracked with each trigger to log the results.
 
 				</p>
 				<p>&nbsp;</p>
 				<p class="text-white text-weight-400 no-margin-bottom"><b>NOTE</b>:
-					This page is still in development and may include a few bugs. Please let, Yuhong, Peter or Shirley know about any issues. 
+					This page is still in development and may include a few bugs. Please let, Yuhong, Peter or Shirley know about any issues.
 				</p>
 				<p>&nbsp;</p>
-				
-				
+
+
 					<div>
 						<a class="btn btn-small btn-orange border-radius-50 sm-display-table xs-no-margin-bottom "  href="{{ url_for('index') }}" >Logout</a>
 				</div>
@@ -343,52 +339,52 @@
 			</div>
 		</div>
 		<div class="col-1" style=" border-radius:10%;">
-			
+
 		</div>
 		<div class="col-4" style="border: 3px solid #fc5603; border-radius:5%;">
 			<p>&nbsp;</p>
 			<div style="padding-left: 5%;">
 			<h2 class="text-weight-800 Raleway text-white">Monitor Health 🌡️</h2>
-		
+
 			</div>
 			<!-- https://www.amcharts.com/demos/ -->
 			<div id="chartdiv"></div>
 			<p>&nbsp;</p>
-			
+
 
 				<div style="padding-left: 5%;">
 					<p class="text-white text-weight-400 no-margin-bottom">
 						Monitor the kubernetes cluster remotely!
 					</p>
 						<p>&nbsp;</p>
-					<a class="btn btn-small btn-orange border-radius-50 sm-display-table xs-no-margin-bottom "  href="{{ url_for('monitor.base') }}" >Monitor</a>
+					<a class="btn btn-small btn-orange border-radius-50 sm-display-table xs-no-margin-bottom "  href="{{ url_for('monitor.base', uid=uid)}}" >Monitor</a>
 
-				
+
 					</div>
 				<p>&nbsp;</p>
 		</div>
 		<div class="col-1" >
-			
+
 		</div>
 		<div class="col-3" style=" border-radius:5%; border: 3px solid #fc5603;">
 			<p>&nbsp;</p>
 			<div style="padding-left: 5%; padding-right: 5%;">
 			<h2 class="text-weight-800 Raleway text-white">Results </h2>
 			<img src="../static/images/histogram.jpg">
-				
+
 			<p>&nbsp;</p>
 				<p class="text-white text-weight-400 no-margin-bottom">
 					Checkout the results from the latest searches.
 				</p>
 				<p>&nbsp;</p>
-				
+
 					<div>
-						<a class="btn btn-small btn-orange border-radius-50 sm-display-table xs-no-margin-bottom "  href="../result"  >Results</a>
+						<a class="btn btn-small btn-orange border-radius-50 sm-display-table xs-no-margin-bottom "  href="{{ '../result/' + uid }}"  >Results</a>
 				</div>
 				<p>&nbsp;</p>
 
 			</div>
-			
+
 		</div>
 
 		</div>
@@ -401,32 +397,32 @@
 		</div>
 
 		<div class="row" style="padding-left: 5%; padding-right: 5%; ">
-			
+
 			<div class="col-4" style="border: 3px solid #fc5603; border-radius:10%;">
 				<p>&nbsp;</p>
 				<div style="padding-left: 5%; padding-right: 5%;">
 				<h2 class="text-weight-800 Raleway text-white">Trigger 💥 </h2>
 				<img src="../static/images/diagram_kub_edit.png">
-				
+
 					<p >&nbsp;</p>
-					
-					
-					
-					
+
+
+
+
 					<div>
-				
+
 						<p class="text-white text-weight-400 no-margin-bottom">
 							You can trigger the latest searches from this page.
 						</p>
 						<p >&nbsp;</p>
-						<a class="btn btn-small btn-orange border-radius-50 sm-display-table xs-no-margin-bottom "  href="../trigger" >Trigger</a>
+						<a class="btn btn-small btn-orange border-radius-50 sm-display-table xs-no-margin-bottom "  href="{{ '../trigger/' + uid }}" >Trigger</a>
 					</div>
 					<p>&nbsp;</p>
-	
+
 				</div>
 			</div>
 			<div class="col-1" style=" border-radius:3%;">
-				
+
 			</div>
 			<div class="col-3" style="border: 3px solid #fc5603; border-radius:10%;">
 				<p>&nbsp;</p>
@@ -439,12 +435,12 @@
 				<p >&nbsp;</p>
 				<div style="padding-left: 5%;">
 				<h2 class="text-weight-800 Raleway text-white">Coming Soon!</h2>
-			
+
 				</div>
-			
+
 			</div>
 			<div class="col-1" >
-				
+
 			</div>
 			<div class="col-3" style=" border-radius:10%;border: 3px solid #fc5603;">
 				<p>&nbsp;</p>
@@ -455,12 +451,12 @@
 				<p >&nbsp;</p>
 				<div style="padding-left: 5%; padding-right: 5%;">
 				<h2 class="text-weight-800 Raleway text-white">Coming Soon! </h2>
-			
-	
+
+
 				</div>
-				
+
 			</div>
-	
+
 			</div>
 
 		<p>&nbsp;</p>
@@ -537,7 +533,7 @@
 
 		<!-- Custom Scripts -->
 		<script src="../static/js/custom.js"></script>
-	
+
 	</body>
 
 </html>

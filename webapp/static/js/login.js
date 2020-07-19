@@ -1,4 +1,4 @@
-  
+
 $(document).ready(function () {
     $("#signup_btn").click(function () {
         $("#main").animate({left: "22.5%"}, 400);
@@ -46,9 +46,9 @@ function login() {
     let email = $("#loginform > input[type=email]").val();
     let password = $("#loginform > input[type=password]").val();
     console.log(email);
-    signin_user(email, password, "/home");
     console.log("Signing In");
     console.log("User ID: " + fetch_user_id() + " signed in")
+    signin_user(email, password, "/home/" + fetch_user_id());
 }
 
 
@@ -157,10 +157,18 @@ function button_signin() {
     console.log("Logging In")
 }
 
+function append_uid(url) {
+    return url + "/" + fetch_user_id();
+}
+
+function open_with_uid(url) {
+    window.open(url + "/" + fetch_user_id(), "_self");
+}
+
 function signin_user(email, password, url = null) {
     firebase.auth().signInWithEmailAndPassword(email, password).then(function () {
         if (url != null) {
-            window.open(url);
+            window.open(url, "_self");
         }
     }).catch(function (error) {
         // Handle Errors here.

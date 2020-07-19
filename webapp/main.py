@@ -29,8 +29,8 @@ import utils
 from PIL import Image
 import os.path
 from os import path
-import random 
-import string 
+import random
+import string
 
 
 cache = {}
@@ -233,14 +233,14 @@ def socket_listener():
             app.logger.debug(f'Updated database with {message_dict}')
         time.sleep(1)
 
-@app.route('/result')
-def hits_form():
+@app.route('/result/<uid>')
+def hits_form(uid):
     test_login = check_if_login()
 
-    return render_template('zmq_sub.html',test_login = test_login )
+    return render_template('zmq_sub.html',test_login = test_login, uid=uid)
 
-@app.route('/result', methods=['GET', 'POST'])
-def zmq_sub():
+@app.route('/result/<uid>', methods=['GET', 'POST'])
+def zmq_sub(uid):
     alert = ""
     message_dict = {}
     try:
@@ -273,20 +273,20 @@ def zmq_sub():
             #            db.child("breakthrough-listen-sandbox").child("flask_vars").child("cache").child(db_k).set(cache[db_k])
     except:
         alert="invalid number"
-    return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict, alert = alert, sample_urls = cache ,test_login = test_login)
+    return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict, alert = alert, sample_urls = cache ,test_login = test_login, uid=uid)
 
-@app.route('/trigger')
-def my_form():
+@app.route('/trigger/<uid>')
+def my_form(uid):
     try:
         print(session['usr'])
         message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("observation_status").child("Energy-Detection").order_by_child("start_timestamp").limit_to_last(3).get().val()
-        return render_template('zmq_push.html', message_sub=message_dict)
+        return render_template('zmq_push.html', message_sub=message_dict, uid=uid)
     except KeyError:
         return redirect('login')
 
 
-@app.route('/trigger', methods=['GET', 'POST'])
-def zmq_push():
+@app.route('/trigger/<uid>', methods=['GET', 'POST'])
+def zmq_push(uid):
     try:
         print(session['usr'])
         target_ip = request.form['target_ip']
@@ -298,7 +298,7 @@ def zmq_push():
         socket.connect(str(target_ip))
         socket.send_pyobj({"message": message})
         message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("observation_status").child("Energy-Detection").order_by_child("start_timestamp").limit_to_last(3).get().val()
-        return render_template('zmq_push.html',  message_sub=message_dict)
+        return render_template('zmq_push.html',  message_sub=message_dict, uid=uid)
     except KeyError:
         return redirect('login')
 
@@ -397,15 +397,10 @@ def get_processed_hist_and_img(single_uri):
 
 
 
-@app.route('/home', methods=['GET', 'POST'])
-def home():
-    
-    return render_template("home.html", title="Main Page", sample_urls=cache)
-
- 
-
-    def get_cache():
-        return cache
+@app.route('/home/<uid>', methods=['GET', 'POST'])
+def home(uid=None):
+    app.logger.debug(uid)
+    return render_template("home.html", title="Main Page", uid=uid)
 
 
 import monitor
