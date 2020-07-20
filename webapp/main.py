@@ -25,6 +25,8 @@ import multiprocessing
 import urllib.request, json
 from urllib.parse import urlencode, quote
 from google.oauth2 import service_account
+from firebase_admin import auth
+import firebase_admin
 import utils
 from PIL import Image
 import os.path
@@ -98,6 +100,7 @@ def check_token_plus(self, database_url, path, access_token=None):
         else:
             return '{0}{1}.json?access_token={2}'.format(database_url, path, get_firebase_access_token())
 def check_if_login():
+  
     try:
         print(session['usr'])
         return True
@@ -109,10 +112,23 @@ def get_random_string(length):
     result_str = ''.join(random.choice(letters) for i in range(length))
     return result_str
 
+def uid_checker(uid):
+    print("testing uid")
+    try:
+        user = auth.get_user(uid, app=default_app)
+        print('Successfully fetched user data: {0}'.format(user.uid))
+        if uid+"_email" in session and uid+"_token"in session:
+            pass
+        else:
+            return redirect('../login')
+    except:
+       return redirect('../login')
+
 pyrebase.pyrebase.Database.build_request_url = build_request_url_plus
 pyrebase.pyrebase.Database.check_token = check_token_plus
 firebase = pyrebase.initialize_app(config)
-auth = firebase.auth()
+default_app = firebase_admin.initialize_app()
+
 db = firebase.database()
 app = Flask(__name__, instance_relative_config=True)
 
@@ -161,21 +177,6 @@ def index():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    # if (request.method == 'POST'):
-    #         email = request.form['name']
-    #         session['email'] = email
-    #         password = request.form['password']
-    #         try:
-    #             user = auth.sign_in_with_email_and_password(email, password)
-    #             user = auth.refresh(user['refreshToken'])
-    #             user_id = user['idToken']
-    #             session['usr'] = user_id
-    #             # template_returned = home()
-    #             return redirect('home')
-    #         except Exception as e:
-    #             app.logger.debug(e)
-    #             unsuccessful = 'Please check your credentials'
-    #             return render_template('login.html', umessage=unsuccessful)
     return render_template('login.html')
 
 
@@ -191,6 +192,7 @@ def forgot_password():
 @app.route('/logout', methods=['GET', 'POST'])
 @app.route('/')
 def logout():
+    
     auth.current_user = None
     session = {}
     return render_template('login.html')
@@ -235,6 +237,7 @@ def socket_listener():
 
 @app.route('/result/<uid>')
 def hits_form(uid):
+    print(uid)
     test_login = check_if_login()
 
     return render_template('zmq_sub.html',test_login = test_login, uid=uid)
@@ -244,6 +247,7 @@ def zmq_sub(uid):
     alert = ""
     message_dict = {}
     try:
+        print(uid)
         hits = int(request.form['hits'])
         test_login = check_if_login()
         message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("processed_observations").child("Energy-Detection").order_by_child("timestamp").limit_to_last(hits).get().val()
@@ -277,30 +281,25 @@ def zmq_sub(uid):
 
 @app.route('/trigger/<uid>')
 def my_form(uid):
-    try:
-        print(session['usr'])
-        message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("observation_status").child("Energy-Detection").order_by_child("start_timestamp").limit_to_last(3).get().val()
-        return render_template('zmq_push.html', message_sub=message_dict, uid=uid)
-    except KeyError:
-        return redirect('login')
+    uid_checker(uid)
+    message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("observation_status").child("Energy-Detection").order_by_child("start_timestamp").limit_to_last(3).get().val()
+    return render_template('zmq_push.html', message_sub=message_dict, uid=uid)
+
 
 
 @app.route('/trigger/<uid>', methods=['GET', 'POST'])
 def zmq_push(uid):
-    try:
-        print(session['usr'])
-        target_ip = request.form['target_ip']
-        message = request.form['message']
-        app.logger.debug(str(target_ip))
-        app.logger.debug(message)
-        context = zmq.Context()
-        socket = context.socket(zmq.PUSH)
-        socket.connect(str(target_ip))
-        socket.send_pyobj({"message": message})
-        message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("observation_status").child("Energy-Detection").order_by_child("start_timestamp").limit_to_last(3).get().val()
-        return render_template('zmq_push.html',  message_sub=message_dict, uid=uid)
-    except KeyError:
-        return redirect('login')
+    uid_checker(uid)
+    target_ip = request.form['target_ip']
+    message = request.form['message']
+    app.logger.debug(str(target_ip))
+    app.logger.debug(message)
+    context = zmq.Context()
+    socket = context.socket(zmq.PUSH)
+    socket.connect(str(target_ip))
+    socket.send_pyobj({"message": message})
+    message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("observation_status").child("Energy-Detection").order_by_child("start_timestamp").limit_to_last(3).get().val()
+    return render_template('zmq_push.html',  message_sub=message_dict, uid=uid)
 
 listener = threading.Thread(target=socket_listener, args=())
 
@@ -399,8 +398,20 @@ def get_processed_hist_and_img(single_uri):
 
 @app.route('/home/<uid>', methods=['GET', 'POST'])
 def home(uid=None):
-    app.logger.debug(uid)
-    return render_template("home.html", title="Main Page", uid=uid)
+
+    try:
+        print("trying to get user")
+        user = auth.get_user(uid, app=default_app)
+        print('Successfully fetched user data: {0}'.format(user.uid))
+        session[uid+"_email"] = user.email
+        session[uid+"_token"] = "user.token"
+        print(session[uid+"_token"])
+        app.logger.debug(uid)
+        return render_template("home.html",email = session[uid+"_email"], title="Main Page", uid=uid)
+    except:
+        return redirect('../login')
+    
+    
 
 
 import monitor

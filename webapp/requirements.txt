@@ -53,3 +53,4 @@ numpy
 numpydoc
 pyzmq
 gcsfs
+firebase-admin
