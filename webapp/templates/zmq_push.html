@@ -104,30 +104,27 @@
 							<!-- End Off-Canvas Navigation Toggle -->
 							<li>
 
-								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="../home">Dashboard</a>
-
-
-							</li>
-
-
-							<li>
-
-								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="../trigger">Trigger</a>
+								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="{{ '../home/' + uid }}">Dashboard</a>
 
 
 							</li>
 							<li>
 
-								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="../result">Results</a>
+								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="{{ '../trigger/' + uid }}">Trigger</a>
 
 
 							</li>
+							<li>
 
+								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="{{ '../result/' + uid }}">Results</a>
+
+
+							</li>
 
 							<!-- Link -->
 							<li>
 
-								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="{{ url_for('monitor.base') }}">Monitor</a>
+								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="{{ url_for('monitor.base', uid=uid) }}">Monitor</a>
 
 
 							</li>

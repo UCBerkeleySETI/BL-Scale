@@ -112,17 +112,7 @@ def get_random_string(length):
     result_str = ''.join(random.choice(letters) for i in range(length))
     return result_str
 
-def uid_checker(uid):
-    print("testing uid")
-    try:
-        user = auth.get_user(uid, app=default_app)
-        print('Successfully fetched user data: {0}'.format(user.uid))
-        if uid+"_email" in session and uid+"_token"in session:
-            pass
-        else:
-            return redirect('../login')
-    except:
-       return redirect('../login')
+
 
 pyrebase.pyrebase.Database.build_request_url = build_request_url_plus
 pyrebase.pyrebase.Database.check_token = check_token_plus
@@ -197,7 +187,18 @@ def logout():
     session = {}
     return render_template('login.html')
 
-
+def uid_checker(uid):
+    print("testing uid")
+    try:
+        user = auth.get_user(uid, app=default_app)
+        print('Successfully fetched user data: {0}'.format(user.uid))
+        if uid+"_email" in session and uid+"_token"in session:
+            pass
+        else:
+            return redirect('../login')
+    except:
+        print("returning to login")
+        return redirect('../login')
 ####################################################################################################
 # ___________________________________END OF USER AUTHENTICATIONS___________________________________#
 # ________________________________________START OF ZMQ NETWORKING__________________________________#
@@ -238,68 +239,108 @@ def socket_listener():
 @app.route('/result/<uid>')
 def hits_form(uid):
     print(uid)
-    test_login = check_if_login()
+    print("testing uid")
+    try:
+        user = auth.get_user(uid, app=default_app)
+        print('Successfully fetched user data: {0}'.format(user.uid))
+        if uid+"_email" in session and uid+"_token"in session:
+            test_login = check_if_login()
 
-    return render_template('zmq_sub.html',test_login = test_login, uid=uid)
+            return render_template('zmq_sub.html',test_login = test_login, uid=uid)
+        else:
+            return redirect('../login')
+    except:
+        print("returning to login")
+        return redirect('../login')
+    
 
 @app.route('/result/<uid>', methods=['GET', 'POST'])
 def zmq_sub(uid):
-    alert = ""
-    message_dict = {}
+    print("testing uid")
     try:
-        print(uid)
-        hits = int(request.form['hits'])
-        test_login = check_if_login()
-        message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("processed_observations").child("Energy-Detection").order_by_child("timestamp").limit_to_last(hits).get().val()
-        db_cache_keys = []
-        retrieve_cache = db.child("breakthrough-listen-sandbox").child("flask_vars").child("cache").get()
-        for rc in retrieve_cache.each():
-            db_cache_keys += [str(rc.key())]
-        print(db_cache_keys)
+        user = auth.get_user(uid, app=default_app)
+        print('Successfully fetched user data: {0}'.format(user.uid))
+        if uid+"_email" in session and uid+"_token"in session:
+            alert = ""
+            message_dict = {}
+            try:
+                print(uid)
+                hits = int(request.form['hits'])
+                test_login = check_if_login()
+                message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("processed_observations").child("Energy-Detection").order_by_child("timestamp").limit_to_last(hits).get().val()
+                db_cache_keys = []
+                retrieve_cache = db.child("breakthrough-listen-sandbox").child("flask_vars").child("cache").get()
+                for rc in retrieve_cache.each():
+                    db_cache_keys += [str(rc.key())]
+                print(db_cache_keys)
 
-        global cache
-        if not cache:
-            print("Cache empty")
-            # sample_urls = {}
-            for key in message_dict:
-                # sample_urls[key] = get_processed_hist_and_img(message_dict[key]["object_uri"]+"/info_df.pkl")
-                cache[key] = get_processed_hist_and_img(message_dict[key]["object_uri"]+"/info_df.pkl")
-                db.child("breakthrough-listen-sandbox").child("flask_vars").child("cache").child(key).set(cache[key])
+                global cache
+                if not cache:
+                    print("Cache empty")
+                    # sample_urls = {}
+                    for key in message_dict:
+                        # sample_urls[key] = get_processed_hist_and_img(message_dict[key]["object_uri"]+"/info_df.pkl")
+                        cache[key] = get_processed_hist_and_img(message_dict[key]["object_uri"]+"/info_df.pkl")
+                        db.child("breakthrough-listen-sandbox").child("flask_vars").child("cache").child(key).set(cache[key])
+                else:
+                    print("cache all updated")
+                    # if all(db_k in cache.keys() for db_k in db_cache_keys):
+                    #     print("cache all updated")
+                    # else:
+                    #     print("adding additional to cache")
+                    #     for db_k in db_cache_keys:
+                    #         if db_k not in cache.keys():
+                    #            cache[db_k] = get_processed_hist_and_img(message_dict[db_k]["object_uri"]+"/info_df.pkl")
+                    #            db.child("breakthrough-listen-sandbox").child("flask_vars").child("cache").child(db_k).set(cache[db_k])
+            except:
+                alert="invalid number"
+            return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict, alert = alert, sample_urls = cache ,test_login = test_login, uid=uid)
         else:
-            print("cache all updated")
-            # if all(db_k in cache.keys() for db_k in db_cache_keys):
-            #     print("cache all updated")
-            # else:
-            #     print("adding additional to cache")
-            #     for db_k in db_cache_keys:
-            #         if db_k not in cache.keys():
-            #            cache[db_k] = get_processed_hist_and_img(message_dict[db_k]["object_uri"]+"/info_df.pkl")
-            #            db.child("breakthrough-listen-sandbox").child("flask_vars").child("cache").child(db_k).set(cache[db_k])
+            return redirect('../login')
     except:
-        alert="invalid number"
-    return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict, alert = alert, sample_urls = cache ,test_login = test_login, uid=uid)
+        print("returning to login")
+        return redirect('../login')
+    
+    
 
 @app.route('/trigger/<uid>')
 def my_form(uid):
-    uid_checker(uid)
-    message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("observation_status").child("Energy-Detection").order_by_child("start_timestamp").limit_to_last(3).get().val()
-    return render_template('zmq_push.html', message_sub=message_dict, uid=uid)
-
-
+    try:
+        user = auth.get_user(uid, app=default_app)
+        print('Successfully fetched user data: {0}'.format(user.uid))
+        if uid+"_email" in session and uid+"_token"in session:
+            message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("observation_status").child("Energy-Detection").order_by_child("start_timestamp").limit_to_last(3).get().val()
+            return render_template('zmq_push.html', message_sub=message_dict, uid=uid)
+        else:
+            return redirect('../login')
+    except:
+        print("returning to login")
+        return redirect('../login')
+    
 
 @app.route('/trigger/<uid>', methods=['GET', 'POST'])
 def zmq_push(uid):
-    uid_checker(uid)
-    target_ip = request.form['target_ip']
-    message = request.form['message']
-    app.logger.debug(str(target_ip))
-    app.logger.debug(message)
-    context = zmq.Context()
-    socket = context.socket(zmq.PUSH)
-    socket.connect(str(target_ip))
-    socket.send_pyobj({"message": message})
-    message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("observation_status").child("Energy-Detection").order_by_child("start_timestamp").limit_to_last(3).get().val()
-    return render_template('zmq_push.html',  message_sub=message_dict, uid=uid)
+    print("testing uid")
+    try:
+        user = auth.get_user(uid, app=default_app)
+        print('Successfully fetched user data: {0}'.format(user.uid))
+        if uid+"_email" in session and uid+"_token"in session:
+            target_ip = request.form['target_ip']
+            message = request.form['message']
+            app.logger.debug(str(target_ip))
+            app.logger.debug(message)
+            context = zmq.Context()
+            socket = context.socket(zmq.PUSH)
+            socket.connect(str(target_ip))
+            socket.send_pyobj({"message": message})
+            message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("observation_status").child("Energy-Detection").order_by_child("start_timestamp").limit_to_last(3).get().val()
+            return render_template('zmq_push.html',  message_sub=message_dict, uid=uid)
+        else:
+            return redirect('../login')
+    except:
+        print("returning to login")
+        return redirect('../login')
+    
 
 listener = threading.Thread(target=socket_listener, args=())
 
