@@ -83,122 +83,7 @@
 
 		<!-- Styles -->
 <!-- Styles -->
-		<style>
-		body { background-color: #000; color: #fc5603; }
-		#chartdiv {
-			width: 100%;
-			height: 300px;
-			max-width: 100%;
-		}
-
-		</style>
-
-	<!-- Resources -->
-	<script src="https://www.amcharts.com/lib/4/core.js"></script>
-	<script src="https://www.amcharts.com/lib/4/charts.js"></script>
-	<script src="https://www.amcharts.com/lib/4/themes/dark.js"></script>
-	<script src="https://www.amcharts.com/lib/4/themes/animated.js"></script>
-
-	<!-- Chart code -->
-	<script>
-	am4core.ready(function() {
-
-	// Themes begin
-	am4core.useTheme(am4themes_dark);
-	am4core.useTheme(am4themes_animated);
-	// Themes end
-
-
-
-
-	// Create chart instance
-	var chart = am4core.create("chartdiv", am4charts.XYChart);
-
-	// Create axes
-	var dateAxis = chart.xAxes.push(new am4charts.DateAxis());
-	var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
-
-	for (var i = 0; i < 3; i++) {
-	  createSeries("value" + i, "Series #" + i);
-	}
-
-	// Create series
-	function createSeries(s, name) {
-	  var series = chart.series.push(new am4charts.LineSeries());
-	  series.dataFields.valueY = "value" + s;
-	  series.dataFields.dateX = "date";
-	  series.name = name;
-
-	  var segment = series.segments.template;
-	  segment.interactionsEnabled = true;
-
-	  var hoverState = segment.states.create("hover");
-	  hoverState.properties.strokeWidth = 3;
-
-	  var dimmed = segment.states.create("dimmed");
-	  dimmed.properties.stroke = am4core.color("#dadada");
-
-	  segment.events.on("over", function(event) {
-		processOver(event.target.parent.parent.parent);
-	  });
-
-	  segment.events.on("out", function(event) {
-		processOut(event.target.parent.parent.parent);
-	  });
-
-	  var data = [];
-	  var value = Math.round(Math.random() * 100) + 100;
-	  for (var i = 1; i < 100; i++) {
-		value += Math.round((Math.random() < 0.5 ? 1 : -1) * Math.random() * 30 + i / 5);
-		var dataItem = { date: new Date(2020, 0, i) };
-		dataItem["value" + s] = value;
-		data.push(dataItem);
-	  }
-
-	  series.data = data;
-	  return series;
-	}
-
-	chart.legend = new am4charts.Legend();
-	chart.legend.position = "right";
-	chart.legend.scrollable = true;
-	chart.legend.itemContainers.template.events.on("over", function(event) {
-	  processOver(event.target.dataItem.dataContext);
-	})
-
-	chart.legend.itemContainers.template.events.on("out", function(event) {
-	  processOut(event.target.dataItem.dataContext);
-	})
-
-	function processOver(hoveredSeries) {
-	  hoveredSeries.toFront();
-
-	  hoveredSeries.segments.each(function(segment) {
-		segment.setState("hover");
-	  })
-
-	  chart.series.each(function(series) {
-		if (series != hoveredSeries) {
-		  series.segments.each(function(segment) {
-			segment.setState("dimmed");
-		  })
-		  series.bulletsContainer.setState("dimmed");
-		}
-	  });
-	}
-
-	function processOut(hoveredSeries) {
-	  chart.series.each(function(series) {
-		series.segments.each(function(segment) {
-		  segment.setState("default");
-		})
-		series.bulletsContainer.setState("default");
-	  });
-	}
-
-	}); // end am4core.ready()
-	</script>
-
+		
 
 	</head>
 	<!-- End Head -->
@@ -443,9 +328,10 @@
 
 						</div>
 						<!-- https://www.amcharts.com/demos/ -->
-						<div id="chartdiv"></div>
 						<p>&nbsp;</p>
-
+						<p>&nbsp;</p>
+						<p>&nbsp;</p>
+						<p>&nbsp;</p>
 
 						<div style="padding-left: 5%;">
 							<p class="text-white text-weight-400 no-margin-bottom">
@@ -483,22 +369,22 @@
 				</div>
 				<div class="col-3" >
 					<div style="border: 3px solid #fc5603; border-radius:5%;">
-					<p>&nbsp;</p>
-					<div style="padding-left: 5%; padding-right: 5%;">
-					<h2 class="text-weight-800 Raleway text-white">Trigger 💥 </h2>
-					<img src="../static/images/diagram_kub_edit.png">
+						<p>&nbsp;</p>
+						<div style="padding-left: 5%; padding-right: 5%;">
+						<h2 class="text-weight-800 Raleway text-white">Trigger 💥 </h2>
+						<img src="../static/images/diagram_kub_edit.png">
 
-						<p >&nbsp;</p>
+							<p>&nbsp;</p>
 
-						<div>
+							<div>
 
-							<p class="text-white text-weight-400 no-margin-bottom">
-								You can trigger the latest searches from this page.
-							</p>
-							<p >&nbsp;</p>
-							<a class="btn btn-small btn-orange border-radius-50 sm-display-table xs-no-margin-bottom "  href="{{ '../trigger/' + uid }}" >Trigger</a>
-						</div>
-						<p >&nbsp;</p>
+								<p class="text-white text-weight-400 no-margin-bottom">
+									You can trigger the latest searches from this page.
+								</p>
+								<p >&nbsp;</p>
+								<a class="btn btn-small btn-orange border-radius-50 sm-display-table xs-no-margin-bottom "  href="{{ '../trigger/' + uid }}" >Trigger</a>
+							</div>
+							<p>&nbsp;</p>
 
 					</div>
 				</div>
@@ -518,10 +404,6 @@
 		<!-- Footer Detailed 4 Colums -->
 		<!-- Footer Detailed 4 Colums -->
 		<footer data-uk-scrollspy="cls:uk-animation-fade" id="foot">
-
-
-
-
 
 			<!-- Row -->
 			<div class="row bg-black padding-top-bottom-50px padding-left-right-twelve-percent">
