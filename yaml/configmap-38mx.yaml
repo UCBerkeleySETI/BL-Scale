@@ -1,0 +1,14 @@
+apiVersion: v1
+data:
+  ALG_NAME: energy_detection
+  ALG_SUB_PACKAGE: energy_detection
+kind: ConfigMap
+metadata:
+  creationTimestamp: "2020-06-28T19:33:09Z"
+  labels:
+    app: bl-scale
+  name: bl-scale-config-38mx
+  namespace: algo-compute
+  resourceVersion: "3561974"
+  selfLink: /api/v1/namespaces/default/configmaps/bl-scale-config-38mx
+  uid: 3281f358-b976-11ea-bd59-42010a80015f
