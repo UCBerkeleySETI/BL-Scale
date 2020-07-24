@@ -95,7 +95,9 @@ Exclusively available here: https://themeforest.net/user/fourtabsthemes
     border: 3px solid #fc5603; 
     border-radius:5%;
 }
-
+.hamburger{
+    width: 30px;
+}
 @media only screen and (max-width: 600px) {
     .splash_heading{
         font-size: 40px;
@@ -112,6 +114,9 @@ Exclusively available here: https://themeforest.net/user/fourtabsthemes
     }
     .login_font{
         font-size: 50px;
+    }
+    .hamburger{
+        width: 100px;
     }
     
 }
