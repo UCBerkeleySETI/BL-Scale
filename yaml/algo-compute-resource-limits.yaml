@@ -12,8 +12,8 @@ spec:
       cpu: "15000m"
       memory: "24G"
     defaultRequest:
-      cpu: "15000m"
-      memory: "24G"
+      cpu: "8000m"
+      memory: "12G"
     min:
       cpu: "8000m"
       memory: "10G"
