@@ -8,7 +8,7 @@ sess = Session()
 app = Flask(__name__, instance_relative_config=False)
 app.config.from_object('config.Config')
 
-def create_app():
+def config_app():
 
     sess.init_app(app)
 
