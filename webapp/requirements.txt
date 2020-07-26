@@ -1,5 +1,6 @@
 Click
 Flask
+Flask-WTF
 firebase
 gcloud
 googleapis-common-protos
@@ -52,3 +53,4 @@ numpy
 numpydoc
 pyzmq
 gcsfs
+firebase-admin

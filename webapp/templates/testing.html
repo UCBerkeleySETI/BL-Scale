@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="http://code.jquery.com/jquery-latest.min.js" type="text/javascript"></script>
+
+  {{ JSGlue.include() }}
+</head>
+<body>
+    <script language="javascript" type="text/jscript">
+        $(window).load(
+            function () {
+                var GUID = function () {
+                 
+                    var S4 = function () {
+                        return(
+                                Math.floor(
+                                        Math.random() * 0x10000 /* 65536 */
+                                    ).toString(16)
+                            );
+                    };
+                    return (
+                            S4() + S4() + "-" +
+                            S4() + "-" +
+                            S4() + "-" +
+                            S4() + "-" +
+                            S4() + S4() + S4()
+                        );
+                };
+            
+                if (!window.name.match(/^GUID-/)) {
+                    window.name = "GUID-" + GUID();
+                }
+                var package = {
+                  'key':window.name
+                }
+                $.post( "/postmethod", {
+                    canvas_data: JSON.stringify(package)
+                    }, function(err, req, resp){
+                    window.location.href = "/results/"+resp["responseJSON"]["uuid"];  
+                    });
+            }
+        )
+    </script>
+
+
+</body>
+
+</html>

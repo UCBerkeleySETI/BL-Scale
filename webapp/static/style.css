@@ -4,12 +4,15 @@ html {
 
 body {
     width: 100vw;
-    font-family: 'Quattrocento Sans', sans-serif;
+    font-family: "Montserrat", sans-serif;
     font-weight: normal;
     font-size: 10pt;
-    color: lightskyblue;
-    text-shadow: 0 0 3px lightskyblue;;
-    background-color: white;
+    color: white;
+    /* text-shadow: 0 0 3px lightskyblue;; */
+    background: black;
+    background-image: url("bl.png");
+    background-repeat:no-repeat;
+    background-size: auto;
 }
 a:hover {
     color: inherit;
@@ -34,6 +37,8 @@ sup {
     margin-left: 5px;
     top: -16px;
 }
+
+
 
 ul {
     padding: 0;
