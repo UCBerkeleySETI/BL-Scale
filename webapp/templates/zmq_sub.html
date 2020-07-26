@@ -433,7 +433,7 @@
         <div  data-uk-scrollspy="cls:uk-animation-fade" class="row">
           <div class="col-md-4">
           </div>
-          <div class="col-md-4" style="padding-left: 10%; padding-right: 10% ">
+          <div class="col-md-4">
 			<h2 class="text-weight-800 Raleway text-white">Query Results<img style="width: 10%;"src="../static/images/BL_Scale_icon.png"  ></h2>
 			<p class="text-white text-weight-400 no-margin-bottom">Enter a number to query for the <i>nth</i> most recent result from energy detection.</p>
 			<!-- {% if alert %} -->
@@ -450,11 +450,11 @@
 			  </form>
 			  <p>&nbsp;</p>
 				<p>&nbsp;</p>
-				<h2 class="text-weight-800 Raleway text-white">Results</h2>
+				<h5 class="text-weight-800 Raleway text-white">Results</h5>
 
 				{%for key in sample_urls%}
 				<div class="row">
-					<div class="col-sm-12" style="padding-top: 10%;"><h4 class="text-weight-600 Raleway text-white">{{ key }} Unusual Filtered Samples</h4></div>
+					<div class="col-sm-12" style="padding-top: 10%;"><h6 class="text-weight-600 Raleway text-white">{{ key }} Unusual Filtered Samples</h6></div>
 				</div>
 
 				<div class="row">
