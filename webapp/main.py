@@ -1,9 +1,10 @@
 import pyrebase
-from flask import render_template, request, redirect, session
+from flask import (render_template, request, redirect, session,
+  render_template, request, redirect, Flask, jsonify)
+from flask_session import Session
 import os
 import base64
 import io
-import asyncio
 import re
 import pyrebase
 import pandas as pd
@@ -15,7 +16,6 @@ import time
 import pickle
 import logging
 from google.cloud import storage
-from flask import render_template, request, redirect, session, Flask, jsonify
 import time
 import os
 import threading
@@ -37,7 +37,7 @@ import string
 
 cache = {}
 
-config = {
+firebase_config = {
     "authDomain": "breakthrough-listen-sandbox.firebaseapp.com",
     "databaseURL": "https://breakthrough-listen-sandbox.firebaseio.com",
     "projectId": "breakthrough-listen-sandbox",
@@ -46,7 +46,7 @@ config = {
     "appId": "1:848306815127:web:52de0d53e030cac44029d2",
     "measurementId": "G-STR7QLT26Q"
 }
-config["apiKey"] = os.environ["FIREBASE_API_KEY"]
+firebase_config["apiKey"] = os.environ["FIREBASE_API_KEY"]
 
 def access_token_generator():
     from google.auth.transport.requests import Request
@@ -99,47 +99,29 @@ def check_token_plus(self, database_url, path, access_token=None):
             return '{0}{1}.json?access_token={2}'.format(database_url, path, access_token)
         else:
             return '{0}{1}.json?access_token={2}'.format(database_url, path, get_firebase_access_token())
+
+
 def check_if_login():
-  
     try:
         print(session['usr'])
         return True
     except KeyError:
         return False
 
-def get_random_string(length):
-    letters = string.ascii_lowercase
-    result_str = ''.join(random.choice(letters) for i in range(length))
-    return result_str
-
-
-
 pyrebase.pyrebase.Database.build_request_url = build_request_url_plus
 pyrebase.pyrebase.Database.check_token = check_token_plus
-firebase = pyrebase.initialize_app(config)
+firebase = pyrebase.initialize_app(firebase_config)
 default_app = firebase_admin.initialize_app()
 
 db = firebase.database()
-app = Flask(__name__, instance_relative_config=True)
-
-secret_key = get_random_string(10)
-session = {}
-app.secret_key = bytes(secret_key, 'utf-8')
+sess = Session()
+app = Flask(__name__, instance_relative_config=False)
+app.config.from_object('config.Config')
 
 if __name__ != '__main__':
     gunicorn_logger = logging.getLogger('gunicorn.error')
     app.logger.handlers = gunicorn_logger.handlers
     app.logger.setLevel(gunicorn_logger.level)
-
-test_config=None
-
-
-if test_config is None:
-    # load the instance config, if it exists, when not testing
-    app.config.from_pyfile('config.py', silent=True)
-else:
-    # load the test config if passed in
-    app.config.from_mapping(test_config)
 
 # ensure the instance folder exists
 try:
@@ -148,6 +130,7 @@ except OSError:
     pass
 
 def config_app():
+    sess.init_app(app)
     if not listener.is_alive():
         listener.start()
         app.logger.debug("Started Listener")
@@ -182,9 +165,8 @@ def forgot_password():
 @app.route('/logout', methods=['GET', 'POST'])
 @app.route('/')
 def logout():
-    
+
     auth.current_user = None
-    session = {}
     return render_template('login.html')
 
 def uid_checker(uid):
@@ -252,7 +234,7 @@ def hits_form(uid):
     except:
         print("returning to login")
         return redirect('../login')
-    
+
 
 @app.route('/result/<uid>', methods=['GET', 'POST'])
 def zmq_sub(uid):
@@ -300,8 +282,8 @@ def zmq_sub(uid):
     except:
         print("returning to login")
         return redirect('../login')
-    
-    
+
+
 
 @app.route('/trigger/<uid>')
 def my_form(uid):
@@ -316,7 +298,7 @@ def my_form(uid):
     except:
         print("returning to login")
         return redirect('../login')
-    
+
 
 @app.route('/trigger/<uid>', methods=['GET', 'POST'])
 def zmq_push(uid):
@@ -340,7 +322,7 @@ def zmq_push(uid):
     except:
         print("returning to login")
         return redirect('../login')
-    
+
 
 listener = threading.Thread(target=socket_listener, args=())
 
@@ -451,8 +433,11 @@ def home(uid=None):
         return render_template("home.html",email = session[uid+"_email"], title="Main Page", uid=uid)
     except:
         return redirect('../login')
-    
-    
+
+@app.route('/test_counter')
+def counter():
+    session["counter"] = session.get("counter", 0) + 1
+    return str(session["counter"])
 
 
 import monitor
