@@ -45,8 +45,8 @@ spec:
                       #     cpu: "15000m"
                       #     memory: "30G"
                       requests:
-                          cpu: "15000m"
-                          memory: "20G"
+                          cpu: "7000m"
+                          memory: "12G"
             volumes:
               - name: "cred-key"
                 secret:
@@ -57,4 +57,4 @@ spec:
             restartPolicy: Always
             schedulerName: default-scheduler
             securityContext: {}
-            terminationGracePeriodSeconds: 600
+            terminationGracePeriodSeconds: 300
