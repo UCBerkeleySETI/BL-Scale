@@ -7,6 +7,6 @@ from flask import (
 bp = Blueprint('monitor', __name__, url_prefix='/monitor')
 
 
-@bp.route('/')
-def base():
-    return render_template("monitor.html", title="Monitor")
+@bp.route('/<uid>')
+def base(uid=None):
+    return render_template("monitor.html", title="Monitor", uid=uid)

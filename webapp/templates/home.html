@@ -8,19 +8,19 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<meta name="text" content="">
 		<meta name="author" content="">
-		
+
 		<!-- description -->
         <meta name="description" content="">
         <!-- keywords -->
         <meta name="keywords" content="">
-		
-		
+		<meta id="uid" content="{{ uid }}">
+
 		<!--Start Title -->
-		<title>BL@Scale</title>
+		<title>Breakthrough Listen @ Scale</title>
 		<!--End Title -->
-		
-		
-		
+
+
+
 		<!-- Start Favicon -->
 		<link rel="shortcut icon" href="../static/images/BL_Scale_icon.ico">
 		<link rel="icon" href="../static/images/BL_Scale_icon.ico" type="image/x-icon">
@@ -28,9 +28,9 @@
         <link rel="apple-touch-icon" sizes="72x72" href="../static/images/BL_Scale_icon.ico">
         <link rel="apple-touch-icon" sizes="114x114" href="../static/images/BL_Scale_icon.ico">
 		<!-- END Favicon -->
-		
-		
-		
+
+
+
 
 		<!-- Uikit Framework -->
 		<link rel="stylesheet" href="../static/css/uikit.min.css" />
@@ -46,91 +46,131 @@
 		
 		<!-- Responsive -->
 		<link rel="stylesheet" href="../static/css/responsive.css">
+
+
+		<script  src="https://www.gstatic.com/firebasejs/7.16.0/firebase.js"></script>
+		<script  src="https://www.gstatic.com/firebasejs/7.16.0/firebase-app.js"></script>
+		<script  src="https://www.gstatic.com/firebasejs/7.16.0/firebase-auth.js"></script>
+
+		<script  src="https://www.gstatic.com/firebasejs/7.16.0/firebase-analytics.js"></script>
+		<script  src="https://www.gstatic.com/firebasejs/7.16.0/firebase-firestore.js"></script>
+		<script  src="https://www.gstatic.com/firebasejs/7.16.0/firebase-messaging.js"></script>
+		<script  src="https://www.gstatic.com/firebasejs/7.16.0/firebase-functions.js"></script>
+
+
+		<script type="text/javascript" src="http://code.jquery.com/jquery-3.3.1.min.js"></script>
+
+		<script src="../static/js/login.js"></script>
+		<script defer>
+			// Initialize Firebase
+			// TODO: Replace with your project's customized code snippet
+			var config = {
+				authDomain: "breakthrough-listen-sandbox.firebaseapp.com",
+				databaseURL: "https://breakthrough-listen-sandbox.firebaseio.com",
+				projectId: "breakthrough-listen-sandbox",
+				storageBucket: "breakthrough-listen-sandbox.appspot.com",
+				messagingSenderId: "848306815127",
+				appId: "1:848306815127:web:52de0d53e030cac44029d2",
+				measurementId: "G-STR7QLT26Q",
+				apiKey:"AIzaSyAWVDszEVzJ_GSopx-23slhwKM2Ha5qkbw"
+			};
+			firebase.initializeApp(config);
+
+			console.log(document.getElementById("uid").getAttribute("content"));
+			console.log(user.uid);
+		</script>
+
+
+		<!-- Styles -->
+<!-- Styles -->
 		
-	
-	
+
 	</head>
 	<!-- End Head -->
-	
 
-	
+
+
 	<!-- Main Body -->
 	<body>
-		
+
 		<a href="javascript:" id="return-to-top"><span data-uk-icon="icon: arrow-up; ratio: 1" class="text-gray-extra-dark"></span></a>
 
-	
-		
-		
+
+
+
 		<!-- Header Transparent -->
 		<div class="uk-position-top z-index-999">
-			
+
 			<!-- Header Options -->
 			<div class="navbar-dark" data-uk-sticky="animation: uk-animation-slide-top-small; sel-target: .uk-navbar-container; cls-active: uk-navbar-sticky; cls-inactive: uk-navbar-transparent; top: 200">
 
 				<!-- Header Container -->
 				<nav class="uk-navbar-container uk-navbar-transparent" data-uk-navbar="boundary-align: true; align: center;">
-				
+
 					<!-- Navigation Left Side -->
 					<div class="uk-navbar-left padding-left-four-percent">
-					
+
 						<!-- Logo Image -->
 						<a class="uk-navbar-item uk-logo" href="./index" data-uk-scroll><img src="../static/images/BL-scale-logo.png" alt="" /></a>
-					
+
 					</div>
 					<!-- End Navigation Left Side -->
-					
-					
-					
+
+
+
 					<!-- Navigation Right Side -->
 					<div class="uk-navbar-right uk-dark padding-right-four-percent">
 
 						<!-- Links -->
 						<ul class="uk-navbar-nav text-weight-600">
-							
+
 							<!-- Off-Canvas Navigation Toggle -->
 							<li>
-							
+
 								<div class="uk-navbar-left uk-hidden@l">
-								
-									<a class="uk-navbar-toggle" data-uk-navbar-toggle-icon data-uk-toggle="target: #offcanvas-nav"></a>
-									
+
+									<a class="uk-navbar-toggle" data-uk-navbar-toggle-icon data-uk-toggle="target: #offcanvas-nav"> <img class="hamburger" src="../static/images/menu.png"></a>
+
 								</div>
-							
+
 							</li>
 							<!-- End Off-Canvas Navigation Toggle -->
 							<li>
-							
-								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="./trigger">Trigger</a>
-								
+
+								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="{{ '../home/' + uid }}">Dashboard</a>
+
 
 							</li>
 							<li>
-							
-								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="./result">Results</a>
-								
+
+								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="{{ '../trigger/' + uid }}">Trigger</a>
+
 
 							</li>
-							
+							<li>
+
+								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="{{ '../result/' + uid }}">Results</a>
+
+
+							</li>
+
 							<!-- Link -->
 							<li>
-							
-								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="{{ url_for('monitor.base') }}">Monitor</a>
-								
+
+								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="{{ url_for('monitor.base', uid=uid) }}">Monitor</a>
+
 
 							</li>
 							<!-- End Link -->
-							
-						
+
+
 							<!-- End Link -->
-							
-							
-							
+
+
+
 							<!-- Link -->
 							<li>
-								<div style="padding-top: 20%; padding-left: 20%;" >
-									<a class="btn btn-small btn-orange border-radius-50 sm-display-table xs-no-margin-bottom "  href="{{ url_for('index') }}" >Logout</a>	
-							</div>		
+								<a class="btn-orange  "  href="{{ url_for('index') }}" >Logout</a>
 
 							</li>
 							<!-- End Link -->
@@ -138,95 +178,255 @@
 
 						</ul>
 						<!-- End Links -->
-						
+
 					</div>
 					<!-- End Navigation Right Side -->
-					
+
 				</nav>
 				<!-- End Header Container -->
-				
+
 			</div>
 			<!-- End Header Options -->
-		
+
 		</div>
 		<!-- End Header Transparent -->
-		<p>&nbsp;</p>
-		<p>&nbsp;</p>
-		<p>&nbsp;</p>
-		<p>&nbsp;</p>
-		<p>&nbsp;</p>
-		<div class="row">
-		<div class="col-3">
+			<!-- End Header Transparent -->
+			<div id="offcanvas-nav" data-uk-offcanvas="mode: reveal; overlay: true; esc-close: true;">
+		
+				<!-- Off-Canvas Bar -->
+				<div class="uk-offcanvas-bar menu-white bg-black">
+	
+					<!-- Off-Canvas Links-->
+					<ul class="uk-nav-sub text-left" data-uk-nav>
+					
+						
+						<li><a class="uk-navbar-item uk-logo" href="index.html" data-uk-scroll><img src="../static/images/BL-scale-logo.png" alt="" /></a></li>
+	
+						<!-- Link -->
+						<li class="margin-bottom-10px">
+						
+							<a href="{{ '../home/' + uid }}" class="bottom-border border-1px border-color-white-extra-light"><span class="text-small text-white text-uppercase text-weight-700 padding-bottom-20px">
+								Dashboard
+								<span class="margin-left-10px" ></span></span></a>
+	
+						</li>
+						<!-- End Link -->
+	
+						<!-- Link -->
+						<li class="margin-bottom-10px">
+							<a  href="{{ '../trigger/' + uid }}" class="bottom-border border-1px border-color-gray-extra-light"><span class="text-small text-white text-uppercase text-weight-700 padding-bottom-20px">
+								Trigger
+								<span class="margin-left-10px" ></span></span></a>
+							
+							
+						</li>
+						<!-- End Link -->
+						
+						
+						
+						
+						
+						<!-- Link -->
+						<li class=" margin-bottom-10px">
+						
+							<a href="{{ '../result/' + uid }}" class="bottom-border border-1px border-color-gray-extra-light"><span class="text-small text-white text-uppercase text-weight-700 padding-bottom-20px">
+								Result
+								<span class="margin-left-10px" ></span></span></a>
+							
+						</li>
+						<!-- End Link -->
+						
+						
+						
+						
+						
+						<!-- Link -->
+						<li class="margin-bottom-10px">
+						
+							<a href="{{ url_for('monitor.base', uid=uid) }}" class="bottom-border border-1px border-color-gray-extra-light"><span class="text-small text-white text-uppercase text-weight-700 padding-bottom-20px">
+								Monitor
+								<span class="margin-left-10px" ></span></span></a>
+							
+						</li>
+						<!-- End Link -->
+						
+						
+						
+					
+						
+	
+						<!-- Link -->
+						<li class="margin-bottom-10px">
+						
+							<a href="{{ url_for('index') }}" class="bottom-border border-1px border-color-gray-extra-light"><span class="text-small btn-orange text-uppercase text-weight-700 padding-bottom-20px">
+								Login
+								<span class="margin-left-10px" ></span></span></a>
+						</li>
+						<!-- End Link -->
+	
+					</ul>
+					<!-- End Off-Canvas Links -->
+					
+					
+					
+					<!-- Navigation Footer -->
+					<div class="nav-footer margin-top-100px">
+						<!-- Copyright Information -->
+						<p class="no-margin-bottom margin-top-20px text-small text-gray-dark text-weight-400">Copyright © 2020 of <a href="http://seti.berkeley.edu/" target="_blank">UC Berkeley SETI Research Center.</a></p>
+						<p class="no-margin-bottom text-small text-gray-dark text-weight-400 text-black">All rights reserved.</p>
+						<!-- End Copyright Information -->
+					</div>
+					<!-- End Navigation Footer -->
+	
+				</div>
+				<!-- End Off-Canvas Bar -->
+				
+			</div>
+			<!-- End Off-Canvas Navigation -->
 
-		</div>
-		<div class="col-6">
-			<h1 class="text-weight-600 Raleway text-white">Unusual or extreme images from each observation</h1>
-			
-			<div class="container-fluid">
-			{%for key in sample_urls%}
-				<div class="row">
-					<div class="col-sm-12" style="padding-top: 10%;"><h4 class="text-weight-600 Raleway text-white">{{ key }} Unusual Filtered Samples</h4></div>
+
+
+
+		<p>&nbsp;</p>
+		<p>&nbsp;</p>
+		<p>&nbsp;</p>
+
+		<div class="row" style="padding-left: 5%; padding-right: 5%; ">
+				<div class="col-md-3" style="padding-bottom: 10%; height:90%" >
+					<div style="border: 3px solid #fc5603; border-radius:5%;">
+						<p>&nbsp;</p>
+						<div style="padding-left: 5%; padding-right: 5%;">
+						<h4 class="text-weight-800 Raleway text-white">Hey!👋 </h4>
+						<p><span class="badge badge-danger" style="background-color: #fc5603">{{email}}</span></p>
+							<p class="text-white text-weight-400 no-margin-bottom">
+								You are currently logged in as {{email}}. This is the admin page where you can control and oversee the
+								scaling and the status of various triggers.
+
+								Account activity will be tracked with each trigger to log the results.
+
+							</p>
+							<p>&nbsp;</p>
+							<p class="text-white text-weight-400 no-margin-bottom"><b>NOTE</b>:
+								Please let, Yuhong, Peter or Shirley know about any issues.
+							</p>
+							<p>&nbsp;</p>
+
+
+								<div>
+									<a class="btn btn-small btn-orange border-radius-50 sm-display-table xs-no-margin-bottom "  href="{{ url_for('index') }}" >Logout</a>
+							</div>
+							<p>&nbsp;</p>
+
+						</div>
+					</div>
 				</div>
-				<div class="row">
-					<div class="col-sm-12"><img src='{{ plot_bytes[key] }}'></div>
+
+				<div class="col-md-3" style="padding-bottom: 10%;">
+					<div style="border: 3px solid #fc5603; border-radius:5%; height:90%">
+						<p>&nbsp;</p>
+						<div style="padding-left: 5%;">
+						<h4 class="text-weight-800 Raleway text-white">Monitor 🌡️</h4>
+
+						</div>
+						<!-- https://www.amcharts.com/demos/ -->
+						<p>&nbsp;</p>
+						<p>&nbsp;</p>
+						<p>&nbsp;</p>
+						<p>&nbsp;</p>
+
+						<div style="padding-left: 5%;">
+							<p class="text-white text-weight-400 no-margin-bottom">
+								Monitor the kubernetes cluster remotely!
+							</p>
+							<p>&nbsp;</p>
+							<a class="btn btn-small btn-orange border-radius-50 sm-display-table xs-no-margin-bottom "  href="{{ url_for('monitor.base', uid=uid)}}" >Monitor</a>
+
+
+						</div>
+						<p>&nbsp;</p>
+					</div>
 				</div>
-				<div class="row">
-					{% for sample in sample_urls[key] %}
-						<div class="col-sm-3"><img class='img-responsive' src='{{ sample }}' height="40" width="200" style="margin:15px" class="center"></div>
-					{%endfor%}
+
+				<div class="col-md-3" style="padding-bottom: 10%; height:90%" >
+					<div style="border: 3px solid #fc5603; border-radius:5%; ">
+						<p>&nbsp;</p>
+						<div style="padding-left: 5%; padding-right: 5%;">
+						<h4 class="text-weight-800 Raleway text-white">Results </h4>
+						<img src="../static/images/histogram.jpg">
+
+						<p>&nbsp;</p>
+						<p class="text-white text-weight-400 no-margin-bottom">
+							Checkout the results from the latest searches.
+						</p>
+						<p>&nbsp;</p>
+
+							<div>
+								<a class="btn btn-small btn-orange border-radius-50 sm-display-table xs-no-margin-bottom "  href="{{ '../result/' + uid }}"  >Results</a>
+							</div>
+						<p>&nbsp;</p>
+
+						</div>
+					</div>
 				</div>
-			{%endfor%}
+				<div class="col-md-3" style="padding-bottom: 10%;">
+					<div style="border: 3px solid #fc5603; border-radius:5%; height:90%">
+						<p>&nbsp;</p>
+						<div style="padding-left: 5%; padding-right: 5%;">
+						<h4 class="text-weight-800 Raleway text-white">Trigger 💥 </h4>
+						<img src="../static/images/diagram_kub_edit.png">
+
+							<p>&nbsp;</p>
+
+							<div>
+
+								<p class="text-white text-weight-400 no-margin-bottom">
+									You can trigger the latest searches from this page.
+								</p>
+								<p >&nbsp;</p>
+								<a class="btn btn-small btn-orange border-radius-50 sm-display-table xs-no-margin-bottom "  href="{{ '../trigger/' + uid }}" >Trigger</a>
+							</div>
+							<p>&nbsp;</p>
+
+					</div>
+				</div>
 			</div>
 		</div>
-		<div class="col-3">
 
-		</div>
 
-		</div>
+		
+
 
 		<p>&nbsp;</p>
 		<p>&nbsp;</p>
 		<p>&nbsp;</p>
 		<p>&nbsp;</p>
-		<p>&nbsp;</p>
-		<p>&nbsp;</p>
-		<p>&nbsp;</p>
-		<p>&nbsp;</p>
-		<p>&nbsp;</p>
-		<p>&nbsp;</p>
-		<p>&nbsp;</p>
-		<p>&nbsp;</p>
-    
+
+
 		<!-- Footer Detailed 4 Colums -->
 		<!-- Footer Detailed 4 Colums -->
 		<footer data-uk-scrollspy="cls:uk-animation-fade" id="foot">
-		
-			
-				
-			
-			
+
 			<!-- Row -->
 			<div class="row bg-black padding-top-bottom-50px padding-left-right-twelve-percent">
-				
+
 				<!-- Column -->
 				<div class="col-md-8 col-sm-12 col-xs-12">
-				
+
 					<!-- Text / Copyright -->
-					<p class="no-margin-bottom text-small text-gray-light text-weight-400 sm-text-center sm-margin-bottom-20px">Copyright © 2020 of <a href="http://seti.berkeley.edu/" target="_blank" class="text-white">UC Berkeley SETI Research Center</a> All rights reserved. 
+					<p class="no-margin-bottom text-small text-gray-light text-weight-400 sm-text-center sm-margin-bottom-20px">Copyright © 2020 of <a href="http://seti.berkeley.edu/" target="_blank" class="text-white">UC Berkeley SETI Research Center</a> All rights reserved.
 						<img src="../static/images/BSRClogo.png" style="width: 10%;">
 					</p>
-				
+
 				</div>
-			
-			
+
+
 			</div>
 			<!-- End Row -->
-			
+
 		</footer>
 		<!-- End Footer -->
-		
-		
-		
+
+	
 		<!-- jQuery Library -->
 		<script src="../static/js/jquery.min.js"></script>
 		
@@ -266,6 +466,7 @@
 		<!-- Custom Scripts -->
 		<script src="../static/js/custom.js"></script>
 	
+
 	</body>
 
 </html>

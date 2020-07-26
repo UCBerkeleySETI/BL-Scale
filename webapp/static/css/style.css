@@ -63,7 +63,7 @@ Exclusively available here: https://themeforest.net/user/fourtabsthemes
     display: block;
     margin-left: auto;
     margin-right: auto;
-    width: 50%;
+    width: 90%;
 }
 .group-pic{
     padding-top: 100px;
@@ -85,7 +85,41 @@ Exclusively available here: https://themeforest.net/user/fourtabsthemes
     padding-right: 35%;
 
 }
-
+.splash_heading{
+    font-size: 70px;
+}
+.splash_cloud{
+    font-size: 70px;
+}
+.login_border{
+    border: 3px solid #fc5603; 
+    border-radius:5%;
+}
+.hamburger{
+    width: 30px;
+}
+@media only screen and (max-width: 600px) {
+    .splash_heading{
+        font-size: 40px;
+    }
+    .splash_cloud{
+        font-size: 60px;
+    }
+    .backimg-wave{
+        background-size: 0% !important;
+    }
+    .login_border{
+        border: 3px solid #000; 
+        border-radius:5%;
+    }
+    .login_font{
+        font-size: 50px;
+    }
+    .hamburger{
+        width: 100px;
+    }
+    
+}
 
 .backimg{
     background: url('../images/radio-telescope-background2.png') no-repeat;
