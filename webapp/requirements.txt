@@ -1,6 +1,7 @@
 Click
 Flask
 Flask-WTF
+flask-session
 firebase
 gcloud
 googleapis-common-protos
@@ -17,6 +18,7 @@ pycryptodome>=3.4.3
 Pyrebase
 python-dotenv
 python-jwt
+redis
 requests
 requests-toolbelt
 rsa

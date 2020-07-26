@@ -28,6 +28,15 @@ spec:
                       secretKeyRef:
                         name: firebase-api-key
                         key: FIREBASE_API_KEY
+                - name: SECRET_KEY
+                  valueFrom:
+                      secretKeyRef:
+                        name: flask-session-secrets
+                        key: secret-key
+                - name: SESSION_REDIS
+                  valueFrom:
+                      secretKeyRef:
+                        name: redis-url
               volumeMounts:
               - name: "cred-key"
                 mountPath: "/var/run/secret/cloud.google.com"
