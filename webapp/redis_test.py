@@ -21,4 +21,4 @@ def index():
         session["count"]+=1
     else:
         session["count"]=1
-    return str(count)
+    return str(session["count"])
