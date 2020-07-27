@@ -332,7 +332,7 @@ def get_img_url(df, observation):
     return samples_url
 
 def get_base64_images(observation_name):
-    #checks to see if you already have the file, else
+    # checks to see if you already have the file, else
     # downloads the best_hits.npy file from the observation bucket
     if path.exists(observation_name + "_best_hits.npy"):
         print("Files already downloaded")
