@@ -444,6 +444,5 @@ import monitor
 app.register_blueprint(monitor.bp)
 
 if __name__ == '__main__':
-    p1 = threading.Thread(target=socket_listener, args=())
-    p1.start()
+    app = config_app()
     app.run()
