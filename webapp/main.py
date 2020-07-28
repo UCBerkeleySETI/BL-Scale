@@ -156,8 +156,8 @@ def login():
     if (request.method == 'POST'):
             email = request.form['name']
             password = request.form['password']
-           
-            
+
+
             try:
                 user = auth.sign_in_with_email_and_password(email, password)
                 session['user'] = user
@@ -235,7 +235,7 @@ def hits_form():
         else:
             return render_template('zmq_sub.html',test_login = False)
     except:
-    
+
         return render_template('zmq_sub.html',test_login = False)
 
 
@@ -246,7 +246,7 @@ def zmq_sub():
             alert = ""
             message_dict = {}
             try:
-            
+
                 hits = int(request.form['hits'])
                 test_login = check_if_login()
                 message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("processed_observations").child("Energy-Detection").order_by_child("timestamp").limit_to_last(hits).get().val()
@@ -302,7 +302,6 @@ def my_form():
 def zmq_push():
     try:
         if session['token']!= None:
-            compute_request = {}
             compute_request = {}
             for key in request.form:
                 compute_request[key] = request.form[key]
