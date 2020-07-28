@@ -37,6 +37,8 @@ import string
 
 cache = {}
 
+compute_service_address = "tcp://34.66.198.113:5555"
+
 firebase_config = {
     "authDomain": "breakthrough-listen-sandbox.firebaseapp.com",
     "databaseURL": "https://breakthrough-listen-sandbox.firebaseio.com",
@@ -306,15 +308,16 @@ def zmq_push(uid):
     try:
         user = auth.get_user(uid, app=default_app)
         print('Successfully fetched user data: {0}'.format(user.uid))
-        if uid+"_email" in session and uid+"_token"in session:
-            target_ip = request.form['target_ip']
-            message = request.form['message']
-            app.logger.debug(str(target_ip))
-            app.logger.debug(message)
+        if uid+"_email" in session and uid+"_token" in session:
+            compute_request = {}
+            for key in request.form:
+                compute_request[key] = request.form[key]
+            app.logger.debug(compute_request)
             context = zmq.Context()
             socket = context.socket(zmq.PUSH)
-            socket.connect(str(target_ip))
-            socket.send_pyobj({"message": message})
+            socket.connect(compute_service_address)
+            socket.send_pyobj(compute_request)
+            # keys are "alg_package", "alg_name", and "input_file_url"
             message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("observation_status").child("Energy-Detection").order_by_child("start_timestamp").limit_to_last(3).get().val()
             return render_template('zmq_push.html',  message_sub=message_dict, uid=uid)
         else:

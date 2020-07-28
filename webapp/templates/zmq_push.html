@@ -130,9 +130,9 @@
 							</li>
 							<!-- Link -->
 							<li>
-							
+
 									<a class="btn-orange  "  href="{{ url_for('index') }}" >Logout</a>
-						
+
 							<!-- End Link -->
 
 
@@ -158,19 +158,19 @@
 		</div>
 		<!-- End Header Transparent -->
 		<div id="offcanvas-nav" data-uk-offcanvas="mode: reveal; overlay: true; esc-close: true;">
-		
+
 			<!-- Off-Canvas Bar -->
 			<div class="uk-offcanvas-bar menu-white bg-black">
 
 				<!-- Off-Canvas Links-->
 				<ul class="uk-nav-sub text-left" data-uk-nav>
-				
-					
+
+
 					<li><a class="uk-navbar-item uk-logo" href="index.html" data-uk-scroll><img src="../static/images/BL-scale-logo.png" alt="" /></a></li>
 
 					<!-- Link -->
 					<li class="margin-bottom-10px">
-					
+
 						<a href="{{ '../home/' + uid }}" class="bottom-border border-1px border-color-white-extra-light"><span class="text-small text-white text-uppercase text-weight-700 padding-bottom-20px">
 							Dashboard
 							<span class="margin-left-10px" ></span></span></a>
@@ -183,47 +183,47 @@
 						<a  href="{{ '../trigger/' + uid }}" class="bottom-border border-1px border-color-gray-extra-light"><span class="text-small text-white text-uppercase text-weight-700 padding-bottom-20px">
 							Trigger
 							<span class="margin-left-10px" ></span></span></a>
-						
-						
+
+
 					</li>
 					<!-- End Link -->
-					
-					
-					
-					
-					
+
+
+
+
+
 					<!-- Link -->
 					<li class=" margin-bottom-10px">
-					
+
 						<a href="{{ '../result/' + uid }}" class="bottom-border border-1px border-color-gray-extra-light"><span class="text-small text-white text-uppercase text-weight-700 padding-bottom-20px">
 							Result
 							<span class="margin-left-10px" ></span></span></a>
-						
+
 					</li>
 					<!-- End Link -->
-					
-					
-					
-					
-					
-					<!-- Link -->
-					<li class="margin-bottom-10px">
-					
-						<a href="{{ url_for('monitor.base', uid=uid) }}" class="bottom-border border-1px border-color-gray-extra-light"><span class="text-small text-white text-uppercase text-weight-700 padding-bottom-20px">
-							Monitor
-							<span class="margin-left-10px" ></span></span></a>
-						
-					</li>
-					<!-- End Link -->
-					
-					
-					
-				
-					
+
+
+
+
 
 					<!-- Link -->
 					<li class="margin-bottom-10px">
-					
+
+						<a href="{{ url_for('monitor.base', uid=uid) }}" class="bottom-border border-1px border-color-gray-extra-light"><span class="text-small text-white text-uppercase text-weight-700 padding-bottom-20px">
+							Monitor
+							<span class="margin-left-10px" ></span></span></a>
+
+					</li>
+					<!-- End Link -->
+
+
+
+
+
+
+					<!-- Link -->
+					<li class="margin-bottom-10px">
+
 						<a href="{{ url_for('index') }}" class="bottom-border border-1px border-color-gray-extra-light"><span class="text-small btn-orange text-uppercase text-weight-700 padding-bottom-20px">
 							Logout
 							<span class="margin-left-10px" ></span></span></a>
@@ -232,9 +232,9 @@
 
 				</ul>
 				<!-- End Off-Canvas Links -->
-				
-				
-				
+
+
+
 				<!-- Navigation Footer -->
 				<div class="nav-footer margin-top-100px">
 					<!-- Copyright Information -->
@@ -246,7 +246,7 @@
 
 			</div>
 			<!-- End Off-Canvas Bar -->
-			
+
 		</div>
 		<!-- End Off-Canvas Navigation -->
     <p>&nbsp;</p>
@@ -257,14 +257,15 @@
 
         <div  data-uk-scrollspy="cls:uk-animation-fade" class="row">
           <div class="col-md-6" style="padding-left: 5% ">
-			
+
 
 			<form method="POST" style="padding-left: 5%; padding-right: 5% ">
-				<h2 class="text-weight-800 Raleway text-white">Target IP  </h2>
-                <input name="target_ip" type="text">
+				<h2 class="text-weight-800 Raleway text-white">Algorithm Package</h2>
+                    <input name="alg_package" type="text">
+                <h2 class="text-weight-800 Raleway text-white">Algorithm Name</h2>
+                    <input name="alg_name" type="text">
                 <h2 class="text-weight-800 Raleway text-white">File URL</h2>
-
-              <input name="message" type="text">
+                    <input name="input_file_url" type="text">
               <button type="submit" name="submit" class="btn btn-primary">Submit</button>
               <!-- <input type="submit"> -->
           </form>
