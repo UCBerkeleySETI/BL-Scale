@@ -13,7 +13,7 @@
         <meta name="description" content="">
         <!-- keywords -->
         <meta name="keywords" content="">
-		<meta id="uid" content="{{ uid }}">
+		
 
 		<!--Start Title -->
 		<title>Breakthrough Listen @ Scale</title>
@@ -28,8 +28,6 @@
         <link rel="apple-touch-icon" sizes="72x72" href="../static/images/BL_Scale_icon.ico">
         <link rel="apple-touch-icon" sizes="114x114" href="../static/images/BL_Scale_icon.ico">
 		<!-- END Favicon -->
-
-
 
 
 		<!-- Uikit Framework -->
@@ -48,37 +46,8 @@
 		<link rel="stylesheet" href="../static/css/responsive.css">
 
 
-		<script  src="https://www.gstatic.com/firebasejs/7.16.0/firebase.js"></script>
-		<script  src="https://www.gstatic.com/firebasejs/7.16.0/firebase-app.js"></script>
-		<script  src="https://www.gstatic.com/firebasejs/7.16.0/firebase-auth.js"></script>
-
-		<script  src="https://www.gstatic.com/firebasejs/7.16.0/firebase-analytics.js"></script>
-		<script  src="https://www.gstatic.com/firebasejs/7.16.0/firebase-firestore.js"></script>
-		<script  src="https://www.gstatic.com/firebasejs/7.16.0/firebase-messaging.js"></script>
-		<script  src="https://www.gstatic.com/firebasejs/7.16.0/firebase-functions.js"></script>
-
-
 		<script type="text/javascript" src="http://code.jquery.com/jquery-3.3.1.min.js"></script>
 
-		<script src="../static/js/login.js"></script>
-		<script defer>
-			// Initialize Firebase
-			// TODO: Replace with your project's customized code snippet
-			var config = {
-				authDomain: "breakthrough-listen-sandbox.firebaseapp.com",
-				databaseURL: "https://breakthrough-listen-sandbox.firebaseio.com",
-				projectId: "breakthrough-listen-sandbox",
-				storageBucket: "breakthrough-listen-sandbox.appspot.com",
-				messagingSenderId: "848306815127",
-				appId: "1:848306815127:web:52de0d53e030cac44029d2",
-				measurementId: "G-STR7QLT26Q",
-				apiKey:"AIzaSyAWVDszEVzJ_GSopx-23slhwKM2Ha5qkbw"
-			};
-			firebase.initializeApp(config);
-
-			console.log(document.getElementById("uid").getAttribute("content"));
-			console.log(user.uid);
-		</script>
 
 
 		<!-- Styles -->
@@ -137,19 +106,19 @@
 							<!-- End Off-Canvas Navigation Toggle -->
 							<li>
 
-								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="{{ '../home/' + uid }}">Dashboard</a>
+								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="{{ '../home'  }}">Dashboard</a>
 
 
 							</li>
 							<li>
 
-								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="{{ '../trigger/' + uid }}">Trigger</a>
+								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="{{ '../trigger'}}">Trigger</a>
 
 
 							</li>
 							<li>
 
-								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="{{ '../result/' + uid }}">Results</a>
+								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="{{ '../result' }}">Results</a>
 
 
 							</li>
@@ -157,7 +126,7 @@
 							<!-- Link -->
 							<li>
 
-								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="{{ url_for('monitor.base', uid=uid) }}">Monitor</a>
+								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="{{ url_for('monitor.base') }}">Monitor</a>
 
 
 							</li>
@@ -170,7 +139,7 @@
 
 							<!-- Link -->
 							<li>
-								<a class="btn-orange  "  href="{{ url_for('index') }}" >Logout</a>
+								<a class="btn-orange  "  href="{{ url_for('logout') }}" >Logout</a>
 
 							</li>
 							<!-- End Link -->
@@ -205,7 +174,7 @@
 						<!-- Link -->
 						<li class="margin-bottom-10px">
 						
-							<a href="{{ '../home/' + uid }}" class="bottom-border border-1px border-color-white-extra-light"><span class="text-small text-white text-uppercase text-weight-700 padding-bottom-20px">
+							<a href="{{ '../home/' }}" class="bottom-border border-1px border-color-white-extra-light"><span class="text-small text-white text-uppercase text-weight-700 padding-bottom-20px">
 								Dashboard
 								<span class="margin-left-10px" ></span></span></a>
 	
@@ -214,7 +183,7 @@
 	
 						<!-- Link -->
 						<li class="margin-bottom-10px">
-							<a  href="{{ '../trigger/' + uid }}" class="bottom-border border-1px border-color-gray-extra-light"><span class="text-small text-white text-uppercase text-weight-700 padding-bottom-20px">
+							<a  href="{{ '../trigger' }}" class="bottom-border border-1px border-color-gray-extra-light"><span class="text-small text-white text-uppercase text-weight-700 padding-bottom-20px">
 								Trigger
 								<span class="margin-left-10px" ></span></span></a>
 							
@@ -229,7 +198,7 @@
 						<!-- Link -->
 						<li class=" margin-bottom-10px">
 						
-							<a href="{{ '../result/' + uid }}" class="bottom-border border-1px border-color-gray-extra-light"><span class="text-small text-white text-uppercase text-weight-700 padding-bottom-20px">
+							<a href="{{ '../result' }}" class="bottom-border border-1px border-color-gray-extra-light"><span class="text-small text-white text-uppercase text-weight-700 padding-bottom-20px">
 								Result
 								<span class="margin-left-10px" ></span></span></a>
 							
@@ -243,7 +212,7 @@
 						<!-- Link -->
 						<li class="margin-bottom-10px">
 						
-							<a href="{{ url_for('monitor.base', uid=uid) }}" class="bottom-border border-1px border-color-gray-extra-light"><span class="text-small text-white text-uppercase text-weight-700 padding-bottom-20px">
+							<a href="{{ url_for('monitor.base') }}" class="bottom-border border-1px border-color-gray-extra-light"><span class="text-small text-white text-uppercase text-weight-700 padding-bottom-20px">
 								Monitor
 								<span class="margin-left-10px" ></span></span></a>
 							
@@ -258,8 +227,8 @@
 						<!-- Link -->
 						<li class="margin-bottom-10px">
 						
-							<a href="{{ url_for('index') }}" class="bottom-border border-1px border-color-gray-extra-light"><span class="text-small btn-orange text-uppercase text-weight-700 padding-bottom-20px">
-								Login
+							<a href="{{ url_for('logout') }}" class="bottom-border border-1px border-color-gray-extra-light"><span class="text-small btn-orange text-uppercase text-weight-700 padding-bottom-20px">
+								logout
 								<span class="margin-left-10px" ></span></span></a>
 						</li>
 						<!-- End Link -->
@@ -313,7 +282,7 @@
 
 
 								<div>
-									<a class="btn btn-small btn-orange border-radius-50 sm-display-table xs-no-margin-bottom "  href="{{ url_for('index') }}" >Logout</a>
+									<a class="btn btn-small btn-orange border-radius-50 sm-display-table xs-no-margin-bottom "  href="{{ url_for('logout') }}" >Logout</a>
 							</div>
 							<p>&nbsp;</p>
 
@@ -339,7 +308,7 @@
 								Monitor the kubernetes cluster remotely!
 							</p>
 							<p>&nbsp;</p>
-							<a class="btn btn-small btn-orange border-radius-50 sm-display-table xs-no-margin-bottom "  href="{{ url_for('monitor.base', uid=uid)}}" >Monitor</a>
+							<a class="btn btn-small btn-orange border-radius-50 sm-display-table xs-no-margin-bottom "  href="{{ url_for('monitor.base')}}" >Monitor</a>
 
 
 						</div>
@@ -361,7 +330,7 @@
 						<p>&nbsp;</p>
 
 							<div>
-								<a class="btn btn-small btn-orange border-radius-50 sm-display-table xs-no-margin-bottom "  href="{{ '../result/' + uid }}"  >Results</a>
+								<a class="btn btn-small btn-orange border-radius-50 sm-display-table xs-no-margin-bottom "  href="{{ '../result' }}"  >Results</a>
 							</div>
 						<p>&nbsp;</p>
 
@@ -383,7 +352,7 @@
 									You can trigger the latest searches from this page.
 								</p>
 								<p >&nbsp;</p>
-								<a class="btn btn-small btn-orange border-radius-50 sm-display-table xs-no-margin-bottom "  href="{{ '../trigger/' + uid }}" >Trigger</a>
+								<a class="btn btn-small btn-orange border-radius-50 sm-display-table xs-no-margin-bottom "  href="{{ '../trigger' }}" >Trigger</a>
 							</div>
 							<p>&nbsp;</p>
 

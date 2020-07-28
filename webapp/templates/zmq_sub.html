@@ -13,7 +13,7 @@
 
 		<!-- description -->
         <meta name="description" content="">
-		<meta id="uid" content="{{ uid }}">
+		
         <!-- keywords -->
         <meta name="keywords" content="">
 
@@ -107,19 +107,19 @@
 							<!-- Link -->
 							<li>
 
-								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="{{ '../home/' + uid }}">Dashboard</a>
+								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="{{ '../home' }}">Dashboard</a>
 
 
 							</li>
 							<li>
 
-								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="{{ '../trigger/' + uid }}">Trigger</a>
+								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="{{ '../trigger'  }}">Trigger</a>
 
 
 							</li>
 							<li>
 
-								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="{{ '../result/' + uid }}">Results</a>
+								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="{{ '../result' }}">Results</a>
 
 
 							</li>
@@ -127,13 +127,13 @@
 							<!-- Link -->
 							<li>
 
-								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="{{ url_for('monitor.base', uid=uid) }}">Monitor</a>
+								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="{{ url_for('monitor.base') }}">Monitor</a>
 
 
 							</li>
 							<li>
 							
-								<a class="btn-orange  "  href="{{ url_for('index') }}" >Logout</a>
+								<a class="btn-orange  "  href="{{ url_for('logout') }}" >Logout</a>
 					
 						<!-- End Link -->
 
@@ -176,7 +176,7 @@
 							<li>
 								<li>
 							
-									<a class="btn-orange  "  href="{{ url_for('index') }}" >Logout</a>
+									<a class="btn-orange  "  href="{{ url_for('logout') }}" >Logout</a>
 						
 							<!-- End Link -->
 
@@ -225,7 +225,7 @@
 					<!-- Link -->
 					<li class="margin-bottom-10px">
 					
-						<a href="{{ '../home/' + uid }}" class="bottom-border border-1px border-color-white-extra-light"><span class="text-small text-white text-uppercase text-weight-700 padding-bottom-20px">
+						<a href="{{ '../home'  }}" class="bottom-border border-1px border-color-white-extra-light"><span class="text-small text-white text-uppercase text-weight-700 padding-bottom-20px">
 							Dashboard
 							<span class="margin-left-10px" ></span></span></a>
 	
@@ -234,7 +234,7 @@
 	
 					<!-- Link -->
 					<li class="margin-bottom-10px">
-						<a  href="{{ '../trigger/' + uid }}" class="bottom-border border-1px border-color-gray-extra-light"><span class="text-small text-white text-uppercase text-weight-700 padding-bottom-20px">
+						<a  href="{{ '../trigger' }}" class="bottom-border border-1px border-color-gray-extra-light"><span class="text-small text-white text-uppercase text-weight-700 padding-bottom-20px">
 							Trigger
 							<span class="margin-left-10px" ></span></span></a>
 						
@@ -249,7 +249,7 @@
 					<!-- Link -->
 					<li class=" margin-bottom-10px">
 					
-						<a href="{{ '../result/' + uid }}" class="bottom-border border-1px border-color-gray-extra-light"><span class="text-small text-white text-uppercase text-weight-700 padding-bottom-20px">
+						<a href="{{ '../result'  }}" class="bottom-border border-1px border-color-gray-extra-light"><span class="text-small text-white text-uppercase text-weight-700 padding-bottom-20px">
 							Result
 							<span class="margin-left-10px" ></span></span></a>
 						
@@ -263,7 +263,7 @@
 					<!-- Link -->
 					<li class="margin-bottom-10px">
 					
-						<a href="{{ url_for('monitor.base', uid=uid) }}" class="bottom-border border-1px border-color-gray-extra-light"><span class="text-small text-white text-uppercase text-weight-700 padding-bottom-20px">
+						<a href="{{ url_for('monitor.base' ) }}" class="bottom-border border-1px border-color-gray-extra-light"><span class="text-small text-white text-uppercase text-weight-700 padding-bottom-20px">
 							Monitor
 							<span class="margin-left-10px" ></span></span></a>
 						
@@ -274,7 +274,7 @@
 					
 					<li>
 							
-						<a class="btn-orange  "  href="{{ url_for('index') }}" >Logout</a>
+						<a class="btn-orange  "  href="{{ url_for('logout') }}" >Logout</a>
 			
 				<!-- End Link -->
 
@@ -517,38 +517,6 @@
 
 				</div>
 			{%endfor%}
-
-
-
-
-
-			<!-- {%for key in message_sub%}
-			<div class="row">
-
-				<h4 class="text-weight-500 Raleway text-white">
-				{{ message_sub[key]["target"] }}
-				</h4>
-				<div class="col-4">
-					<p class="text-white text-weight-400 no-margin-bottom"><b>Algorithm Type:</b> {{ message_sub[key]["algo_type"] }}</p>
-
-					</div>
-				<div class="col-4">
-				<p class="text-white text-weight-400 no-margin-bottom"><b>Timestamp:</b> {{ message_sub[key]["timestamp"] }}</p>
-
-				</div>
-				<div class="col-4">
-					<p class="text-white text-weight-400 no-margin-bottom"><b>Processing Time:</b> {{ message_sub[key]["processing_time"] /60 }} minutes</p>
-				</div>
-				<p>&nbsp;</p>
-				<p>&nbsp;</p>
-
-			</div>
-		  {%endfor%}
-		 -->
-
-
-
-
 
 
         </div>

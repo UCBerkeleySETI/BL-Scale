@@ -111,6 +111,7 @@ def check_if_login():
 pyrebase.pyrebase.Database.build_request_url = build_request_url_plus
 pyrebase.pyrebase.Database.check_token = check_token_plus
 firebase = pyrebase.initialize_app(firebase_config)
+auth = firebase.auth()
 default_app = firebase_admin.initialize_app()
 
 db = firebase.database()
@@ -150,6 +151,21 @@ def index():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    if (request.method == 'POST'):
+            email = request.form['name']
+            password = request.form['password']
+           
+            
+            try:
+                user = auth.sign_in_with_email_and_password(email, password)
+                session['user'] = user
+                session['email'] = email
+                session['token'] = user['idToken']
+                print("completed logging in "+ session['token'])
+                return redirect('/home')
+            except:
+                unsuccessful = 'Please check your credentials'
+                return render_template('login.html', umessage=unsuccessful)
     return render_template('login.html')
 
 
@@ -163,24 +179,14 @@ def forgot_password():
 
 
 @app.route('/logout', methods=['GET', 'POST'])
-@app.route('/')
 def logout():
-
+    print("passed through")
+    session['token'] = None
+    print(session['token'])
     auth.current_user = None
     return render_template('login.html')
 
-def uid_checker(uid):
-    print("testing uid")
-    try:
-        user = auth.get_user(uid, app=default_app)
-        print('Successfully fetched user data: {0}'.format(user.uid))
-        if uid+"_email" in session and uid+"_token"in session:
-            pass
-        else:
-            return redirect('../login')
-    except:
-        print("returning to login")
-        return redirect('../login')
+
 ####################################################################################################
 # ___________________________________END OF USER AUTHENTICATIONS___________________________________#
 # ________________________________________START OF ZMQ NETWORKING__________________________________#
@@ -218,35 +224,27 @@ def socket_listener():
             app.logger.debug(f'Updated database with {message_dict}')
         time.sleep(1)
 
-@app.route('/result/<uid>')
-def hits_form(uid):
-    print(uid)
-    print("testing uid")
-    try:
-        user = auth.get_user(uid, app=default_app)
-        print('Successfully fetched user data: {0}'.format(user.uid))
-        if uid+"_email" in session and uid+"_token"in session:
-            test_login = check_if_login()
+@app.route('/result')
+def hits_form():
 
-            return render_template('zmq_sub.html',test_login = test_login, uid=uid)
+    try:
+        if session['token'] !=None:
+            return render_template('zmq_sub.html', test_login = True)
         else:
-            return redirect('../login')
+            return render_template('zmq_sub.html',test_login = False)
     except:
-        print("returning to login")
-        return redirect('../login')
+    
+        return render_template('zmq_sub.html',test_login = False)
 
 
-@app.route('/result/<uid>', methods=['GET', 'POST'])
-def zmq_sub(uid):
-    print("testing uid")
+@app.route('/result', methods=['GET', 'POST'])
+def zmq_sub():
     try:
-        user = auth.get_user(uid, app=default_app)
-        print('Successfully fetched user data: {0}'.format(user.uid))
-        if uid+"_email" in session and uid+"_token"in session:
+        if session['token'] !=None:
             alert = ""
             message_dict = {}
             try:
-                print(uid)
+            
                 hits = int(request.form['hits'])
                 test_login = check_if_login()
                 message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("processed_observations").child("Energy-Detection").order_by_child("timestamp").limit_to_last(hits).get().val()
@@ -276,7 +274,7 @@ def zmq_sub(uid):
                     #            db.child("breakthrough-listen-sandbox").child("flask_vars").child("cache").child(db_k).set(cache[db_k])
             except:
                 alert="invalid number"
-            return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict, alert = alert, sample_urls = cache ,test_login = test_login, uid=uid)
+            return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict, alert = alert, sample_urls = cache ,test_login = test_login)
         else:
             return redirect('../login')
     except:
@@ -285,14 +283,12 @@ def zmq_sub(uid):
 
 
 
-@app.route('/trigger/<uid>')
-def my_form(uid):
+@app.route('/trigger')
+def my_form():
     try:
-        user = auth.get_user(uid, app=default_app)
-        print('Successfully fetched user data: {0}'.format(user.uid))
-        if uid+"_email" in session and uid+"_token"in session:
+        if session['token'] !=None:
             message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("observation_status").child("Energy-Detection").order_by_child("start_timestamp").limit_to_last(3).get().val()
-            return render_template('zmq_push.html', message_sub=message_dict, uid=uid)
+            return render_template('zmq_push.html', message_sub=message_dict)
         else:
             return redirect('../login')
     except:
@@ -300,13 +296,11 @@ def my_form(uid):
         return redirect('../login')
 
 
-@app.route('/trigger/<uid>', methods=['GET', 'POST'])
-def zmq_push(uid):
-    print("testing uid")
+@app.route('/trigger', methods=['GET', 'POST'])
+def zmq_push():
+  
     try:
-        user = auth.get_user(uid, app=default_app)
-        print('Successfully fetched user data: {0}'.format(user.uid))
-        if uid+"_email" in session and uid+"_token"in session:
+        if session['token']!= None:
             target_ip = request.form['target_ip']
             message = request.form['message']
             app.logger.debug(str(target_ip))
@@ -316,7 +310,7 @@ def zmq_push(uid):
             socket.connect(str(target_ip))
             socket.send_pyobj({"message": message})
             message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("observation_status").child("Energy-Detection").order_by_child("start_timestamp").limit_to_last(3).get().val()
-            return render_template('zmq_push.html',  message_sub=message_dict, uid=uid)
+            return render_template('zmq_push.html',  message_sub=message_dict)
         else:
             return redirect('../login')
     except:
@@ -419,18 +413,16 @@ def get_processed_hist_and_img(single_uri):
 
 
 
-@app.route('/home/<uid>', methods=['GET', 'POST'])
-def home(uid=None):
+@app.route('/home', methods=['GET', 'POST'])
+def home():
 
     try:
-        print("trying to get user")
-        user = auth.get_user(uid, app=default_app)
-        print('Successfully fetched user data: {0}'.format(user.uid))
-        session[uid+"_email"] = user.email
-        session[uid+"_token"] = "user.token"
-        print(session[uid+"_token"])
-        app.logger.debug(uid)
-        return render_template("home.html",email = session[uid+"_email"], title="Main Page", uid=uid)
+        if session['token'] !=None:
+            print("entering home")
+            app.logger.debug(session['user'])
+            return render_template("home.html",email = session['email'], title="Main Page")
+        else:
+            return redirect('../login')
     except:
         return redirect('../login')
 
