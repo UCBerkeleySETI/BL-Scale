@@ -53,60 +53,6 @@
   
 	
 
-
-		<script  src="https://www.gstatic.com/firebasejs/7.16.0/firebase.js"></script>
-		<script  src="https://www.gstatic.com/firebasejs/7.16.0/firebase-app.js"></script>
-		<script  src="https://www.gstatic.com/firebasejs/7.16.0/firebase-auth.js"></script>
-		
-		<script  src="https://www.gstatic.com/firebasejs/7.16.0/firebase-analytics.js"></script>
-		<script  src="https://www.gstatic.com/firebasejs/7.16.0/firebase-firestore.js"></script>
-		<script  src="https://www.gstatic.com/firebasejs/7.16.0/firebase-messaging.js"></script>
-		<script  src="https://www.gstatic.com/firebasejs/7.16.0/firebase-functions.js"></script>
-
-
-		<script type="text/javascript" src="http://code.jquery.com/jquery-3.3.1.min.js"></script>		
-
-		<script src="../static/js/login.js"></script>
-		<script>
-			// Initialize Firebase
-			// TODO: Replace with your project's customized code snippet
-			var config = {
-				authDomain: "breakthrough-listen-sandbox.firebaseapp.com",
-				databaseURL: "https://breakthrough-listen-sandbox.firebaseio.com",
-				projectId: "breakthrough-listen-sandbox",
-				storageBucket: "breakthrough-listen-sandbox.appspot.com",
-				messagingSenderId: "848306815127",
-				appId: "1:848306815127:web:52de0d53e030cac44029d2",
-				measurementId: "G-STR7QLT26Q",
-				apiKey:"AIzaSyAWVDszEVzJ_GSopx-23slhwKM2Ha5qkbw"
-			};
-			firebase.initializeApp(config);
-		
-			firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION)
-				.then(function() {
-					// Existing and future Auth states are now persisted in the current
-					// session only. Closing the window would clear any existing state even
-					// if a user forgets to sign out.
-					// ...
-					// New sign-in will be persisted with session persistence.
-					return firebase.auth().signInWithEmailAndPassword(email, password);
-				})
-				.catch(function(error) {
-					// Handle Errors here.
-					var errorCode = error.code;
-					var errorMessage = error.message;
-				});
-		
-			firebase.auth().onAuthStateChanged(function (user) {
-				if (user) {
-					// User is signed in.
-					//window.open("./groupPage.html")
-				} 
-				else {
-					// No user is signed in.
-				}
-			});
-		</script>
 	</head>
 	<!-- End Head -->
 	<!-- Main Body -->
@@ -159,7 +105,7 @@
 							<!-- Link -->
 							<li>
 							
-								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="#about">About</a>
+								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="../#about">About</a>
 								
 
 							</li>
@@ -169,7 +115,7 @@
 							<!-- Link -->
 							<li>
 							
-								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="./#status">Status Quo</a>
+								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="../#status">Status Quo</a>
 								
 
 							</li>
@@ -178,7 +124,7 @@
 							<!-- Link -->
 							<li>
 							
-								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="./#problem">Problem</a>
+								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="../#problem">Problem</a>
 
 							</li>
 							<!-- End Link -->
@@ -187,7 +133,7 @@
 							<!-- Link -->
 							<li>
 							
-								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="./#proposal">Solution</a>
+								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="../#proposal">Solution</a>
 
 							</li>
 							<!-- End Link -->
@@ -198,7 +144,7 @@
 							<!-- Link -->
 							<li>
 							
-								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="./#research-project">Research</a>
+								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="../#research-project">Research</a>
 								
 								
 							</li>
@@ -207,14 +153,14 @@
 							<!-- Link -->
 							<li>
 							
-								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="./#compute">BL-Reservoir</a>
+								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="../#compute">BL-Reservoir</a>
 								
 
 							</li>
 
 							<li>
 							
-								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="./result/none">Results</a>
+								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="../result">Results</a>
 								
 
 							</li>
@@ -403,7 +349,7 @@
 			<div style="padding-left: 5%; padding-right: 5%;">
 				<p>&nbsp;</p>
 				<p>&nbsp;</p>
-				<h2 class="text-weight-800 Raleway text-white login_font">Welcome!👋 </h2>
+				<h2 class="text-weight-800 Raleway text-white">Welcome!👋 </h2>
 				<p class="text-white text-weight-400 no-margin-bottom">Login to access cloud-based platform for scaling SETI algorithms to process Breakthrough Listen data.</p>
 				<p class="text-white text-weight-400 no-margin-bottom"><b>NOTE</b>: If this is your first time loging in in the past few days, this may require 30 sec - 1 min to fully update your account with the data in our storage</p>
 				{% if smessage %}
@@ -416,27 +362,27 @@
 					{{ umessage }}
 					</div>
 				{% endif %}
-				
-				<div id="loginform">
-					
-					<input type="email" placeholder="Email" /><br>
-					<!-- <input type="email" class="form-control" name="name"  > -->
-					
-					<input type="password" placeholder="Password"/><br>
-				
-					
-					<button id="user_login_button" class="btn-orange " style="background-color: #000;" >Login</button>
-					<p>&nbsp;</p>
-				</div>
+				<form action="/login" method="post">
+					<div class="form-group">
+					<label for="exampleInputEmail1">Email address</label>
+					<input type="email" class="form-control" name="name"  placeholder="Enter email">
+					</div>
+					<div class="form-group">
+					<label for="exampleInputPassword1">Password</label>
+					<input type="password" class="form-control" name="password" placeholder="Password">
+					</div>
+					<button type="submit" name="submit" class="btn btn-primary">Submit</button>
+				</form>
 
 				<div class="row">
 					<div class="col-sm">
 					<a href="/forgot_password" class="text-decoration-none">Forgot Password</a>
 					</div>
 					<div class="col-sm">
-					<!-- <a href="/create_account" class="text-decoration-none">Create Account</a> -->
+					
 					</div>
 				</div>
+				<p>&nbsp;</p>
 				<p>&nbsp;</p>
 
 			</div>

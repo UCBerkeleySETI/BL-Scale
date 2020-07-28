@@ -13,7 +13,7 @@
 
 		<!-- description -->
         <meta name="description" content="">
-		<meta id="uid" content="{{ uid }}">
+		
         <!-- keywords -->
         <meta name="keywords" content="">
 
@@ -78,7 +78,7 @@
 					<div class="uk-navbar-left padding-left-four-percent">
 
 						<!-- Logo Image -->
-						<a class="uk-navbar-item uk-logo" href="./index" data-uk-scroll><img class="hamburger" src="../static/images/menu.png"></a>
+						<a class="uk-navbar-item uk-logo" href="./index" data-uk-scroll><img src="../static/images/BL-scale-logo.png" alt="" /></a>
 
 					</div>
 					<!-- End Navigation Left Side -->
@@ -96,7 +96,7 @@
 
 								<div class="uk-navbar-left uk-hidden@l">
 
-									<a class="uk-navbar-toggle" data-uk-navbar-toggle-icon data-uk-toggle="target: #offcanvas-nav"> <img  src="../static/images/menu.png"></a>
+									<a class="uk-navbar-toggle" data-uk-navbar-toggle-icon data-uk-toggle="target: #offcanvas-nav"> <img class="hamburger" src="../static/images/menu.png"></a>
 
 								</div>
 
@@ -104,19 +104,19 @@
 							<!-- End Off-Canvas Navigation Toggle -->
 							<li>
 
-								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="{{ '../home/' + uid }}">Dashboard</a>
+								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="{{ '../home' }}">Dashboard</a>
 
 
 							</li>
 							<li>
 
-								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="{{ '../trigger/' + uid }}">Trigger</a>
+								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="{{ '../trigger'  }}">Trigger</a>
 
 
 							</li>
 							<li>
 
-								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="{{ '../result/' + uid }}">Results</a>
+								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="{{ '../result' }}">Results</a>
 
 
 							</li>
@@ -124,14 +124,14 @@
 							<!-- Link -->
 							<li>
 
-								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="{{ url_for('monitor.base', uid=uid) }}">Monitor</a>
+								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="{{ url_for('monitor.base') }}">Monitor</a>
 
 
 							</li>
 							<!-- Link -->
 							<li>
 							
-									<a class="btn-orange  "  href="{{ url_for('index') }}" >Logout</a>
+									<a class="btn-orange  "  href="{{ url_for('logout') }}" >Logout</a>
 						
 							<!-- End Link -->
 
@@ -171,7 +171,7 @@
 					<!-- Link -->
 					<li class="margin-bottom-10px">
 					
-						<a href="{{ '../home/' + uid }}" class="bottom-border border-1px border-color-white-extra-light"><span class="text-small text-white text-uppercase text-weight-700 padding-bottom-20px">
+						<a href="{{ '../home'  }}" class="bottom-border border-1px border-color-white-extra-light"><span class="text-small text-white text-uppercase text-weight-700 padding-bottom-20px">
 							Dashboard
 							<span class="margin-left-10px" ></span></span></a>
 
@@ -180,7 +180,7 @@
 
 					<!-- Link -->
 					<li class="margin-bottom-10px">
-						<a  href="{{ '../trigger/' + uid }}" class="bottom-border border-1px border-color-gray-extra-light"><span class="text-small text-white text-uppercase text-weight-700 padding-bottom-20px">
+						<a  href="{{ '../trigger' }}" class="bottom-border border-1px border-color-gray-extra-light"><span class="text-small text-white text-uppercase text-weight-700 padding-bottom-20px">
 							Trigger
 							<span class="margin-left-10px" ></span></span></a>
 						
@@ -195,7 +195,7 @@
 					<!-- Link -->
 					<li class=" margin-bottom-10px">
 					
-						<a href="{{ '../result/' + uid }}" class="bottom-border border-1px border-color-gray-extra-light"><span class="text-small text-white text-uppercase text-weight-700 padding-bottom-20px">
+						<a href="{{ '../result' }}" class="bottom-border border-1px border-color-gray-extra-light"><span class="text-small text-white text-uppercase text-weight-700 padding-bottom-20px">
 							Result
 							<span class="margin-left-10px" ></span></span></a>
 						
@@ -209,7 +209,7 @@
 					<!-- Link -->
 					<li class="margin-bottom-10px">
 					
-						<a href="{{ url_for('monitor.base', uid=uid) }}" class="bottom-border border-1px border-color-gray-extra-light"><span class="text-small text-white text-uppercase text-weight-700 padding-bottom-20px">
+						<a href="{{ url_for('monitor.base') }}" class="bottom-border border-1px border-color-gray-extra-light"><span class="text-small text-white text-uppercase text-weight-700 padding-bottom-20px">
 							Monitor
 							<span class="margin-left-10px" ></span></span></a>
 						
@@ -224,8 +224,8 @@
 					<!-- Link -->
 					<li class="margin-bottom-10px">
 					
-						<a href="{{ url_for('index') }}" class="bottom-border border-1px border-color-gray-extra-light"><span class="text-small btn-orange text-uppercase text-weight-700 padding-bottom-20px">
-							Login
+						<a href="{{ url_for('logout') }}" class="bottom-border border-1px border-color-gray-extra-light"><span class="text-small btn-orange text-uppercase text-weight-700 padding-bottom-20px">
+							Logout
 							<span class="margin-left-10px" ></span></span></a>
 					</li>
 					<!-- End Link -->
