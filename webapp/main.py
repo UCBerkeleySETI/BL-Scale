@@ -157,8 +157,8 @@ def login():
     if (request.method == 'POST'):
             email = request.form['name']
             password = request.form['password']
-           
-            
+
+
             try:
                 user = auth.sign_in_with_email_and_password(email, password)
                 session['user'] = user
@@ -233,7 +233,7 @@ def socket_listener():
 @app.route('/result')
 def hits_form():
     global cache
-    session["results_counter"]=0
+    session["results_counter"]=1
     try:
         alert = ""
         if session['token'] !=None:
@@ -377,7 +377,6 @@ def my_form():
 def zmq_push():
     try:
         if session['token']!= None:
-            compute_request = {}
             compute_request = {}
             for key in request.form:
                 compute_request[key] = request.form[key]
