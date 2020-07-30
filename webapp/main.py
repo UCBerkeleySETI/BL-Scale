@@ -123,6 +123,7 @@ app.config.from_object('config.Config')
 
 if __name__ != '__main__':
     gunicorn_logger = logging.getLogger('gunicorn.error')
+
     app.logger.handlers = gunicorn_logger.handlers
     app.logger.setLevel(gunicorn_logger.level)
 
@@ -226,64 +227,138 @@ def socket_listener():
             app.logger.debug(f'Updated database with {message_dict}')
         time.sleep(1)
 
+
+
+
 @app.route('/result')
 def hits_form():
-
+    global cache
+    session["results_counter"]=0
     try:
+        alert = ""
         if session['token'] !=None:
-            return render_template('zmq_sub.html', test_login = True)
+            print("got query")
+            message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("processed_observations").child("Energy-Detection").order_by_child("timestamp").limit_to_last(3).get().val()
+            db_cache_keys = []
+            print("got query")
+            retrieve_cache = db.child("breakthrough-listen-sandbox").child("flask_vars").child("cache").get()
+            for rc in retrieve_cache.each():
+                db_cache_keys += [str(rc.key())]
+            print(db_cache_keys)
+            if not cache:
+                print("Cache empty")
+                for key in message_dict:
+                    cache[key] = get_processed_hist_and_img(message_dict[key]["object_uri"]+"/info_df.pkl")
+                    db.child("breakthrough-listen-sandbox").child("flask_vars").child("cache").child(key).set(cache[key])
+            else:
+                print("cache all updated")
+            return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict,  sample_urls = cache ,test_login = True)
         else:
-            return render_template('zmq_sub.html',test_login = False)
+            message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("processed_observations").child("Energy-Detection").order_by_child("timestamp").limit_to_last(3).get().val()
+            db_cache_keys = []
+            print("got query")
+            retrieve_cache = db.child("breakthrough-listen-sandbox").child("flask_vars").child("cache").get()
+            for rc in retrieve_cache.each():
+                db_cache_keys += [str(rc.key())]
+            print(db_cache_keys)
+
+           
+            if not cache:
+                print("Cache empty")
+                for key in message_dict:
+                    cache[key] = get_processed_hist_and_img(message_dict[key]["object_uri"]+"/info_df.pkl")
+                    db.child("breakthrough-listen-sandbox").child("flask_vars").child("cache").child(key).set(cache[key])
+            else:
+                print("cache all updated")
+            return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict, sample_urls = cache ,test_login = False)
     except:
-    
-        return render_template('zmq_sub.html',test_login = False)
+        test_login = check_if_login()
+        message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("processed_observations").child("Energy-Detection").order_by_child("timestamp").limit_to_last(3).get().val()
+        db_cache_keys = []
+        retrieve_cache = db.child("breakthrough-listen-sandbox").child("flask_vars").child("cache").get()
+        for rc in retrieve_cache.each():
+            db_cache_keys += [str(rc.key())]
+        print(db_cache_keys)
+
+     
+        if not cache:
+            print("Cache empty")
+            for key in message_dict:
+                cache[key] = get_processed_hist_and_img(message_dict[key]["object_uri"]+"/info_df.pkl")
+                db.child("breakthrough-listen-sandbox").child("flask_vars").child("cache").child(key).set(cache[key])
+        else:
+            print("cache all updated")
+        return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict,  sample_urls = cache ,test_login = False)
 
 
 @app.route('/result', methods=['GET', 'POST'])
 def zmq_sub():
+    global cache
     try:
         if session['token'] !=None:
             alert = ""
             message_dict = {}
             try:
-            
-                hits = int(request.form['hits'])
                 test_login = check_if_login()
-                message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("processed_observations").child("Energy-Detection").order_by_child("timestamp").limit_to_last(hits).get().val()
+                session["results_counter"]+=1
+                print(session["results_counter"]*3)
+                message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("processed_observations").child("Energy-Detection").order_by_child("timestamp").limit_to_last(3*session["results_counter"]).get().val()
                 db_cache_keys = []
                 retrieve_cache = db.child("breakthrough-listen-sandbox").child("flask_vars").child("cache").get()
                 for rc in retrieve_cache.each():
                     db_cache_keys += [str(rc.key())]
                 print(db_cache_keys)
-
-                global cache
+             
                 if not cache:
                     print("Cache empty")
-                    # sample_urls = {}
                     for key in message_dict:
-                        # sample_urls[key] = get_processed_hist_and_img(message_dict[key]["object_uri"]+"/info_df.pkl")
                         cache[key] = get_processed_hist_and_img(message_dict[key]["object_uri"]+"/info_df.pkl")
                         db.child("breakthrough-listen-sandbox").child("flask_vars").child("cache").child(key).set(cache[key])
                 else:
                     print("cache all updated")
-                    # if all(db_k in cache.keys() for db_k in db_cache_keys):
-                    #     print("cache all updated")
-                    # else:
-                    #     print("adding additional to cache")
-                    #     for db_k in db_cache_keys:
-                    #         if db_k not in cache.keys():
-                    #            cache[db_k] = get_processed_hist_and_img(message_dict[db_k]["object_uri"]+"/info_df.pkl")
-                    #            db.child("breakthrough-listen-sandbox").child("flask_vars").child("cache").child(db_k).set(cache[db_k])
             except:
                 alert="invalid number"
-            return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict, alert = alert, sample_urls = cache ,test_login = test_login)
+            return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict,  sample_urls = cache ,test_login = True)
         else:
-            return redirect('../login')
+        
+            session["results_counter"]+=1
+            print(session["results_counter"]*3)
+            message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("processed_observations").child("Energy-Detection").order_by_child("timestamp").limit_to_last(3*session["results_counter"]).get().val()
+        
+            db_cache_keys = []
+            retrieve_cache = db.child("breakthrough-listen-sandbox").child("flask_vars").child("cache").get()
+            for rc in retrieve_cache.each():
+                db_cache_keys += [str(rc.key())]
+            print(db_cache_keys)
+            
+            if not cache:
+                print("Cache empty")
+                for key in message_dict:
+                    cache[key] = get_processed_hist_and_img(message_dict[key]["object_uri"]+"/info_df.pkl")
+                    db.child("breakthrough-listen-sandbox").child("flask_vars").child("cache").child(key).set(cache[key])
+            else:
+                print("cache all updated")
+            return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict,  sample_urls = cache ,test_login = False)
     except:
-        print("returning to login")
-        return redirect('../login')
-
-
+        
+        session["results_counter"]+=1
+        print(session["results_counter"]*3)
+        message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("processed_observations").child("Energy-Detection").order_by_child("timestamp").limit_to_last(3*session["results_counter"]).get().val()
+    
+        db_cache_keys = []
+        retrieve_cache = db.child("breakthrough-listen-sandbox").child("flask_vars").child("cache").get()
+        for rc in retrieve_cache.each():
+            db_cache_keys += [str(rc.key())]
+        print(db_cache_keys)
+     
+        if not cache:
+            print("Cache empty")
+            for key in message_dict:
+                cache[key] = get_processed_hist_and_img(message_dict[key]["object_uri"]+"/info_df.pkl")
+                db.child("breakthrough-listen-sandbox").child("flask_vars").child("cache").child(key).set(cache[key])
+        else:
+            print("cache all updated")
+        return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict, sample_urls = cache ,test_login = False)
 
 @app.route('/trigger')
 def my_form():
