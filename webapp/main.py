@@ -228,7 +228,20 @@ def socket_listener():
         time.sleep(1)
 
 
-
+def get_query_firebase(num):
+    print("got query")
+    message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("processed_observations").child("Energy-Detection").order_by_child("timestamp").limit_to_last(3).get().val()
+    db_cache_keys = []
+    print("got query")
+    retrieve_cache = db.child("breakthrough-listen-sandbox").child("flask_vars").child("cache").get()
+    for rc in retrieve_cache.each():
+        db_cache_keys += [str(rc.key())]
+    print(db_cache_keys)
+    print("Cache empty")
+    for key in message_dict:
+        cache[key] = get_processed_hist_and_img(message_dict[key]["object_uri"]+"/info_df.pkl")
+        db.child("breakthrough-listen-sandbox").child("flask_vars").child("cache").child(key).set(cache[key])
+    return message_dict, cache
 
 @app.route('/result')
 def hits_form():
@@ -237,58 +250,15 @@ def hits_form():
     try:
         alert = ""
         if session['token'] !=None:
-            print("got query")
-            message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("processed_observations").child("Energy-Detection").order_by_child("timestamp").limit_to_last(3).get().val()
-            db_cache_keys = []
-            print("got query")
-            retrieve_cache = db.child("breakthrough-listen-sandbox").child("flask_vars").child("cache").get()
-            for rc in retrieve_cache.each():
-                db_cache_keys += [str(rc.key())]
-            print(db_cache_keys)
-            if not cache:
-                print("Cache empty")
-                for key in message_dict:
-                    cache[key] = get_processed_hist_and_img(message_dict[key]["object_uri"]+"/info_df.pkl")
-                    db.child("breakthrough-listen-sandbox").child("flask_vars").child("cache").child(key).set(cache[key])
-            else:
-                print("cache all updated")
+            message_dict, cache =get_query_firebase(3)
             return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict,  sample_urls = cache ,test_login = True)
         else:
-            message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("processed_observations").child("Energy-Detection").order_by_child("timestamp").limit_to_last(3).get().val()
-            db_cache_keys = []
-            print("got query")
-            retrieve_cache = db.child("breakthrough-listen-sandbox").child("flask_vars").child("cache").get()
-            for rc in retrieve_cache.each():
-                db_cache_keys += [str(rc.key())]
-            print(db_cache_keys)
-
-           
-            if not cache:
-                print("Cache empty")
-                for key in message_dict:
-                    cache[key] = get_processed_hist_and_img(message_dict[key]["object_uri"]+"/info_df.pkl")
-                    db.child("breakthrough-listen-sandbox").child("flask_vars").child("cache").child(key).set(cache[key])
-            else:
-                print("cache all updated")
-            return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict, sample_urls = cache ,test_login = False)
+            message_dict, cache =get_query_firebase(3)
+            return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict,  sample_urls = cache ,test_login = False)
     except:
-        test_login = check_if_login()
-        message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("processed_observations").child("Energy-Detection").order_by_child("timestamp").limit_to_last(3).get().val()
-        db_cache_keys = []
-        retrieve_cache = db.child("breakthrough-listen-sandbox").child("flask_vars").child("cache").get()
-        for rc in retrieve_cache.each():
-            db_cache_keys += [str(rc.key())]
-        print(db_cache_keys)
-
-     
-        if not cache:
-            print("Cache empty")
-            for key in message_dict:
-                cache[key] = get_processed_hist_and_img(message_dict[key]["object_uri"]+"/info_df.pkl")
-                db.child("breakthrough-listen-sandbox").child("flask_vars").child("cache").child(key).set(cache[key])
-        else:
-            print("cache all updated")
+        message_dict, cache =get_query_firebase(3)
         return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict,  sample_urls = cache ,test_login = False)
+
 
 
 @app.route('/result', methods=['GET', 'POST'])
@@ -297,62 +267,17 @@ def zmq_sub():
     try:
         if session['token'] !=None:
             alert = ""
-            message_dict = {}
-            try:
-                test_login = check_if_login()
-                session["results_counter"]+=1
-                
-                message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("processed_observations").child("Energy-Detection").order_by_child("timestamp").limit_to_last(3*session["results_counter"]).get().val()
-                print(message_dict)
-                db_cache_keys = []
-                retrieve_cache = db.child("breakthrough-listen-sandbox").child("flask_vars").child("cache").get()
-                for rc in retrieve_cache.each():
-                    db_cache_keys += [str(rc.key())]
-                print(db_cache_keys)
-            
-                for key in message_dict:
-                    cache[key] = get_processed_hist_and_img(message_dict[key]["object_uri"]+"/info_df.pkl")
-                    db.child("breakthrough-listen-sandbox").child("flask_vars").child("cache").child(key).set(cache[key])
-            except:
-                alert="invalid number"
-            print(session["results_counter"]*3)
+            message_dict = {} 
+            session["results_counter"]+=1
+            message_dict, cache =get_query_firebase(3*session["results_counter"])
+        
             return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict,  sample_urls = cache ,test_login = True)
         else:
-        
             session["results_counter"]+=1
-            
-            message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("processed_observations").child("Energy-Detection").order_by_child("timestamp").limit_to_last(3*session["results_counter"]).get().val()
-            print(message_dict)
-            db_cache_keys = []
-            retrieve_cache = db.child("breakthrough-listen-sandbox").child("flask_vars").child("cache").get()
-            for rc in retrieve_cache.each():
-                db_cache_keys += [str(rc.key())]
-            print(db_cache_keys)
-            
-           
-            for key in message_dict:
-                cache[key] = get_processed_hist_and_img(message_dict[key]["object_uri"]+"/info_df.pkl")
-                db.child("breakthrough-listen-sandbox").child("flask_vars").child("cache").child(key).set(cache[key])
-            
-            print(session["results_counter"]*3)
+            message_dict, cache =get_query_firebase(3*session["results_counter"])
             return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict,  sample_urls = cache ,test_login = False)
     except:
-        
-        session["results_counter"]+=1
-        message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("processed_observations").child("Energy-Detection").order_by_child("timestamp").limit_to_last(3*session["results_counter"]).get().val()
-        print(message_dict)
-        db_cache_keys = []
-        retrieve_cache = db.child("breakthrough-listen-sandbox").child("flask_vars").child("cache").get()
-        for rc in retrieve_cache.each():
-            db_cache_keys += [str(rc.key())]
-        print(db_cache_keys)
-     
-       
-        for key in message_dict:
-            cache[key] = get_processed_hist_and_img(message_dict[key]["object_uri"]+"/info_df.pkl")
-            db.child("breakthrough-listen-sandbox").child("flask_vars").child("cache").child(key).set(cache[key])
-        
-        print(session["results_counter"]*3)
+        message_dict, cache =get_query_firebase(3*session["results_counter"])
         return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict, sample_urls = cache ,test_login = False)
 
 @app.route('/trigger')
