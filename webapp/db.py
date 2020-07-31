@@ -9,7 +9,7 @@ import urllib.request, json
 from urllib.parse import urlencode, quote
 from google.oauth2 import service_account
 
-config = {
+firebase_config = {
     "authDomain": "breakthrough-listen-sandbox.firebaseapp.com",
     "databaseURL": "https://breakthrough-listen-sandbox.firebaseio.com",
     "projectId": "breakthrough-listen-sandbox",
@@ -18,7 +18,7 @@ config = {
     "appId": "1:848306815127:web:52de0d53e030cac44029d2",
     "measurementId": "G-STR7QLT26Q"
 }
-config["apiKey"] = os.environ["FIREBASE_API_KEY"]
+firebase_config["apiKey"] = os.environ["FIREBASE_API_KEY"]
 
 def access_token_generator():
     from google.auth.transport.requests import Request
@@ -66,53 +66,18 @@ def build_request_url_plus(self, access_token=None):
     self.build_query = {}
     return request_ref
 
+def check_token_plus(self, database_url, path, access_token=None):
+        if access_token:
+            return '{0}{1}.json?access_token={2}'.format(database_url, path, access_token)
+        else:
+            return '{0}{1}.json?access_token={2}'.format(database_url, path, get_firebase_access_token())
 pyrebase.pyrebase.Database.build_request_url = build_request_url_plus
-firebase = pyrebase.initialize_app(config)
+pyrebase.pyrebase.Database.check_token = check_token_plus
+firebase = pyrebase.initialize_app(firebase_config)
 db = firebase.database()
 
 
 
-
-
-# print(users.val())
-
-
-#updating a specific record
-# db.child("breakthrough-listen-sandbox").child("flask_vars").child("-MBkt_yIVsUfiHB4WF7c").update({"Message": "Mortiest Morty"})
-# Writing data
-
-
-# data = {"done": True, "message": "Energy Detection Done....", "object_uri":"1","processing_time":8000, "timestamp":190}
-
-# db.child("breakthrough-listen-sandbox").child("flask_vars").child('test_sub').child("HIP67287").set(data)
-# data = {"done": True, "message": "Energy Detection Done....", "object_uri":"2","processing_time":8000, "timestamp":90}
-# db.child("breakthrough-listen-sandbox").child("flask_vars").child('test_sub').child("HIP1907").set(data)
-# data = {"done": True, "message": "Energy Detection Done....", "object_uri":"3","processing_time":8000, "timestamp":290}
-# db.child("breakthrough-listen-sandbox").child("flask_vars").child('test_sub').child("HIP6111").set(data)
-# data = {"done": True, "message": "Energy Detection Done....", "object_uri":"4","processing_time":8000, "timestamp":81}
-# db.child("breakthrough-listen-sandbox").child("flask_vars").child('test_sub').child("HIP62227").set(data)
-# data = {"done": True, "message": "Energy Detection Done updated....", "object_uri":"5","processing_time":8000, "timestamp":4000}
-# db.child("breakthrough-listen-sandbox").child("flask_vars").child('test_sub').child("HIP67287").set(data)
-# data = {"done": True, "message": "Energy Detection Done", "object_uri":"5","processing_time":8000, "timestamp":4000}
-# db.child("breakthrough-listen-sandbox").child("flask_vars").child('test_sub').child("HIP2910").set(data)
-# # Posting data
-# firebase = firebase.FirebaseApplication('https://breakthrough-listen-sandbox.firebaseio.com/', None)
-# data =  { 'Message': 'test_send_one'}
-# result = firebase.post('/breakthrough-listen-sandbox/flask_vars',data)
-
-
-# # Reading in data
-# retrieved = firebase.get('/breakthrough-listen-sandbox/flask_vars', '')
-# print(retrieved)
-
-# # Updating Data
-
-# retrieved = firebase.put('/breakthrough-listen-sandbox/flask_vars/-MBkt_yIVsUfiHB4WF7c', 'Message', 'Bob')
-# print('Updated database')
-
-
-# # Delete data
-# retrieved = firebase.delete('/breakthrough-listen-sandbox/flask_vars/', '-MBkt_yIVsUfiHB4WF7c')
-# print('Deleted Record')
-
-# # Full video here https://www.youtube.com/watch?v=rKuGCQda_Qo
+print("sending?")
+db.child("breakthrough-listen-sandbox").child("flask_vars").child("monitor").set({"empty":""})
+print("done")

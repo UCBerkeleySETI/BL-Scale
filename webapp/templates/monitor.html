@@ -254,95 +254,52 @@
 		<p>&nbsp;</p>
 
 		<div class="row">
-			<div class="col-3">
+			<div class="col-4">
 		
 
 			</div>
-			<div class="col-6" style="text-align: center;">
+			<div class="col-4" style="text-align: center;">
 				<h1 class="text-weight-600 Raleway text-white">Monitoring Panel</h1>
 				<p>&nbsp;</p>
-
+				
 			</div>
-			<div class="col-3">
-
+			<div class="col-4">
+				<h5><span class="badge badge-danger" style="background-color: #fc5603; text-align: left;">{{time}}</span></h5>
 			</div>
 
 		</div>
 		
 		
 		
+		
 		<div class="row" style="padding-left: 5%; padding-right: 5%; ">
-			
+			{%for key in encoded%}
 			<div class="col-md-4" style="padding-bottom: 10%; height:90%" >
 				<div style="border: 3px solid #fc5603; border-radius:5%;">
 				
 					
 						<p>&nbsp;</p>
 						<div style="padding-left: 5%; padding-right: 5%;">
-						<h4 class="text-weight-800 Raleway text-white">Pod 1</h4>
+						<h4 class="text-weight-800 Raleway text-white">{{ key }}</h4>
 						<p class="text-white text-weight-400 no-margin-bottom"><b>STATUS</b></p>
 							<p class="text-white text-weight-400 no-margin-bottom">
 								You are currently logged in as {{email}}. This is the admin page where you can control and oversee the
 								scaling and the status of various triggers.
 
 							</p>
-							<img class='img-responsive' src='{{ encoded }}' height="100%" width="100%" style="margin:15px" class="center">
+							<img class='img-responsive' src='{{ encoded[key]["encode"] }}' height="100%" width="100%" style="margin:15px" class="center">
 							
-							<h6 class="text-weight-800 Raleway text-white">CPU {{cpu}}%</h6> 
-							<meter min="0" max="100" low="50" high="75" optimum="100" value={{cpu}} ></meter>
-							<h6 class="text-weight-800 Raleway text-white">RAM {{ram}}%</h6> 
-							<meter min="0" max="100" low="50" high="75" optimum="100" value={{ram}}></meter>
+							<h6 class="text-weight-800 Raleway text-white">CPU {{encoded[key]["cpu"] }}%</h6> 
+							<meter min="0" max="100" low="50" high="75" optimum="100" value={{encoded[key]["cpu"]}} ></meter>
+							<h6 class="text-weight-800 Raleway text-white">RAM {{encoded[key]["ram"]}}%</h6> 
+							<meter min="0" max="100" low="50" high="75" optimum="100" value={{encoded[key]["ram"]}}></meter>
 							<p>&nbsp;</p>
 							
 						</div>
 					</div>
 					
 				</div>
-		
-			
-		
-			<div class="col-md-4" style="padding-bottom: 10%; height:90%" >
-				<div style="border: 3px solid #fc5603; border-radius:5%;">
-					<p>&nbsp;</p>
-					<div style="padding-left: 5%; padding-right: 5%;">
-					<h4 class="text-weight-800 Raleway text-white">Pod 2</h4>
-					<p class="text-white text-weight-400 no-margin-bottom"><b>STATUS</b></p>
-					<p class="text-white text-weight-400 no-margin-bottom">
-						You are currently logged in as {{email}}. This is the admin page where you can control and oversee the
-						scaling and the status of various triggers.
-
-					</p>
-					<p>&nbsp;</p>
-					<h6 class="text-weight-800 Raleway text-white">CPU 45%</h6> 
-					<meter min="0" max="100" low="50" high="75" optimum="100" value="45"></meter>
-					<h6 class="text-weight-800 Raleway text-white">RAM 30%</h6> 
-					<meter min="0" max="100" low="50" high="75" optimum="100" value="30"></meter>
-					<p>&nbsp;</p>
-						
-					</div>
-				</div>
-			</div>
-			<div class="col-md-4" style="padding-bottom: 10%; height:90%" >
-				<div style="border: 3px solid #fc5603; border-radius:5%;">
-					<p>&nbsp;</p>
-					<div style="padding-left: 5%; padding-right: 5%;">
-					<h4 class="text-weight-800 Raleway text-white">Pod 3</h4>
-					<p class="text-white text-weight-400 no-margin-bottom"><b>STATUS</b></p>
-					<p class="text-white text-weight-400 no-margin-bottom">
-						You are currently logged in as {{email}}. This is the admin page where you can control and oversee the
-						scaling and the status of various triggers.
-
-					</p>
-					<p>&nbsp;</p>
-					<h6 class="text-weight-800 Raleway text-white">CPU 45%</h6> 
-					<meter min="0" max="100" low="50" high="75" optimum="100" value="45"></meter>
-					<h6 class="text-weight-800 Raleway text-white">RAM 30%</h6> 
-					<meter min="0" max="100" low="50" high="75" optimum="100" value="30"></meter>
-					<p>&nbsp;</p>
-						
-					</div>
-				</div>
-			</div>
+				{%endfor%}
 			
 		
 		</div>
