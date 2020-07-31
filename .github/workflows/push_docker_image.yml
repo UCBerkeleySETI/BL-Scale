@@ -51,25 +51,25 @@ jobs:
           dockerfile: dockerfiles/zproxy.dockerfile
           tags: zproxy-latest
 
-    - name: Build and push Controller Image to Google Container Registry
+    - name: Build and push Monitoring Image to Google Container Registry
       uses: docker/build-push-action@v1
       with:
           username: _json_key
           password: ${{ secrets.GCP_JSON_KEY }}
           registry: gcr.io
           repository: breakthrough-listen-sandbox/bl-scale
-          dockerfile: dockerfiles/controller.dockerfile
-          tags: controller-latest
+          dockerfile: dockerfiles/monitor.dockerfile
+          tags: monitor-latest
 
     # Runs a single command using the runners shell
-    - name: Build and push Controller Image to dockerhub
+    - name: Build and push Monitoring Image to dockerhub
       uses: docker/build-push-action@v1
       with:
               username: ${{ secrets.DOCKER_USERNAME }}
               password: ${{ secrets.DOCKER_PASSWORD }}
               repository: fx196/bl-scale
-              dockerfile: dockerfiles/controller.dockerfile
-              tags: controller-latest
+              dockerfile: dockerfiles/monitor.dockerfile
+              tags: monitor-latest
 
     # Runs a single command using the runners shell
     - name: Build and push Web App Image to dockerhub
