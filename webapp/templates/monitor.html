@@ -17,7 +17,7 @@
         <!-- keywords -->
         <meta name="keywords" content="">
 
-
+	
 		<!--Start Title -->
 		<title>Breakthrough Listen @ Scale</title>
 		<!--End Title -->
@@ -253,14 +253,14 @@
 		<p>&nbsp;</p>
 		<p>&nbsp;</p>
 
-		<div class="row">
+		<div class="row" style="padding-left: 5%; padding-right: 5%; ">
 			<div class="col-4">
-		
+				<h1 class="text-weight-600 Raleway text-white">Monitoring Panel</h1>
+				<p>&nbsp;</p>
 
 			</div>
 			<div class="col-4" style="text-align: center;">
-				<h1 class="text-weight-600 Raleway text-white">Monitoring Panel</h1>
-				<p>&nbsp;</p>
+				
 				
 			</div>
 			<div class="col-4">
@@ -268,10 +268,7 @@
 			</div>
 
 		</div>
-		
-		
-		
-		
+	
 		<div class="row" style="padding-left: 5%; padding-right: 5%; ">
 			{%for key in encoded%}
 			<div class="col-md-4" style="padding-bottom: 10%; height:90%" >
@@ -283,13 +280,11 @@
 						<h4 class="text-weight-800 Raleway text-white">{{ key }}</h4>
 						<p class="text-white text-weight-400 no-margin-bottom"><b>STATUS</b></p>
 							<p class="text-white text-weight-400 no-margin-bottom">
-								You are currently logged in as {{email}}. This is the admin page where you can control and oversee the
-								scaling and the status of various triggers.
-
+								{{encoded[key]["message"]}}
 							</p>
 							<img class='img-responsive' src='{{ encoded[key]["encode"] }}' height="100%" width="100%" style="margin:15px" class="center">
 							
-							<h6 class="text-weight-800 Raleway text-white">CPU {{encoded[key]["cpu"] }}%</h6> 
+							<h6 class="text-weight-800 Raleway text-white">CPU {{encoded[key]["cpu"]}}%</h6> 
 							<meter min="0" max="100" low="50" high="75" optimum="100" value={{encoded[key]["cpu"]}} ></meter>
 							<h6 class="text-weight-800 Raleway text-white">RAM {{encoded[key]["ram"]}}%</h6> 
 							<meter min="0" max="100" low="50" high="75" optimum="100" value={{encoded[key]["ram"]}}></meter>
@@ -300,9 +295,7 @@
 					
 				</div>
 				{%endfor%}
-			
-		
-		</div>
+			</div>
 		</div>
 
 

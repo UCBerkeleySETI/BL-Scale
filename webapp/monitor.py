@@ -5,6 +5,7 @@ import random
 import os
 import base64
 import io
+from db import pyrebase_cred_wrapper
 import pyrebase
 from firebase_admin import auth
 import firebase_admin
@@ -14,18 +15,7 @@ from flask import (
 )
 TIME =20
 
-firebase_config = {
-    "authDomain": "breakthrough-listen-sandbox.firebaseapp.com",
-    "databaseURL": "https://breakthrough-listen-sandbox.firebaseio.com",
-    "projectId": "breakthrough-listen-sandbox",
-    "storageBucket": "breakthrough-listen-sandbox.appspot.com",
-    "messagingSenderId": "848306815127",
-    "appId": "1:848306815127:web:52de0d53e030cac44029d2",
-    "measurementId": "G-STR7QLT26Q"
-}
-firebase_config["apiKey"] = os.environ["FIREBASE_API_KEY"]
-firebase = pyrebase.initialize_app(firebase_config)
-db = firebase.database()
+firebase, db = pyrebase_cred_wrapper()
 
 def fill_zero(length):
     y =[]
@@ -58,26 +48,32 @@ def base():
     "pod1":{
         "cpu":int(random.random()*100),
         "ram":int(random.random()*100),
+        "message":"This is the status of your pod1. This will contain a message about the status of your pods"
     },
     "pod2":{
         "cpu":int(random.random()*100),
         "ram":int(random.random()*100),
+        "message":"This is the status of your pod1. This will contain a message about the status of your pods"
     },
     "pod3":{
         "cpu":int(random.random()*100),
         "ram":int(random.random()*100),
+        "message":"This is the status of your pod1. This will contain a message about the status of your pods"
     },
     "pod4":{
         "cpu":int(random.random()*100),
         "ram":int(random.random()*100),
+        "message":"This is the status of your pod1. This will contain a message about the status of your pods"
     },
     "pod5":{
         "cpu":int(random.random()*100),
         "ram":int(random.random()*100),
+        "message":"This is the status of your pod1. This will contain a message about the status of your pods"
     },
     "pod6":{
         "cpu":int(random.random()*100),
         "ram":int(random.random()*100),
+        "message":"This is the status of your pod1. This will contain a message about the status of your pods"
     }
     }
     # get data from socket. 
@@ -113,6 +109,5 @@ def base():
             temp_dict["ram"] = update[key]["ram"]
             temp_dict["encode"] = image_encode
             front_end_data[key] = temp_dict
-    print(data)
     db.child("breakthrough-listen-sandbox").child("flask_vars").child("monitor").set(data)
     return render_template("monitor.html", title="Monitor", encoded = front_end_data, time=str(datetime.now())  )
