@@ -211,6 +211,7 @@ def socket_listener():
             # Update the string variable
 
             message_dict = pickle.loads(serialized_message_dict)
+            app.logger.debug(f"Received message: {message_dict}")
             db.child("breakthrough-listen-sandbox").child("flask_vars").child("sub_message").set(message_dict)
             if message_dict["done"] == True:
                 time_stamp = time.time()*1000
