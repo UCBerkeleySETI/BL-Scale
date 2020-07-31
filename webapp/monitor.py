@@ -41,11 +41,7 @@ def get_base64_hist(list_cpu, list_ram, threshold):
     pic_IObytes.seek(0)
     pic_hash = base64.b64encode(pic_IObytes.read())
     base64_img = "data:image/jpeg;base64, " + str(pic_hash.decode("utf8"))
-<<<<<<< HEAD
-    
-=======
->>>>>>> parent of 6ebe33d... automatic refresh div and plt.clf() save memory
-    return base64_img
+
 
 @bp.route('/')
 def base():
