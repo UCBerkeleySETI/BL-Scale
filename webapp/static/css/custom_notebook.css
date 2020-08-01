@@ -1,9 +1,9 @@
 div#notebook {
     color: #F8F8F2;
 }
-.container{
-    width:90% !important;
-}
+/* .container{
+    width:50% !important;
+} */
 body,
 div.body {
     color: #F8F8F2;
@@ -25,15 +25,22 @@ body.notebook_app {
     padding-right: 0px !important;
     overflow-y: hidden;
 }
+
 #notebook-container > div.cell.code_cell.rendered.selected > div.input > div.inner_cell > div.ctb_hideshow.ctb_show > div > div > button,
 #notebook-container > div.input > div.inner_cell > div.ctb_hideshow.ctb_show > div > div > button {
     color: #FFF;
     background-color: #000;
     border: 1px solid #000;
 }
+@media only screen and (max-width: 745) {
+    #notebook-container {
+        background-color: #000;
+        width:100% !important
+    }
+  }
 #notebook-container {
     background-color: #000;
-    width:50% !important;
+    
 }
 .nav-tabs > li > a:active,
 .nav-tabs > li > a:focus,

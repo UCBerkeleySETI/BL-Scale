@@ -11421,7 +11421,7 @@ div#notebook {
 }
 @media print {
   #notebook-container {
-    width: 100%;
+    width: 50%;
   }
 }
 div.ui-widget-content {
