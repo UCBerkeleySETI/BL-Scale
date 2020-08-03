@@ -8,7 +8,7 @@ RUN apt update
 RUN apt install -y git curl python3-pip
 
 RUN curl -sSL https://sdk.cloud.google.com | bash
-ENV PATH $PATH:/usr/local/gcloud/google-cloud-sdk/bin
+ENV PATH $PATH:/root/google-cloud-sdk/bin
 
 RUN mkdir /code
 WORKDIR /code
@@ -16,4 +16,4 @@ COPY . /code/BL-Scale
 WORKDIR /code/BL-Scale/
 RUN pip3 install zmq kubernetes
 
-CMD sleep 1000000
+CMD sh /code/BL-Scale/scripts/start_monitor_pod.sh
