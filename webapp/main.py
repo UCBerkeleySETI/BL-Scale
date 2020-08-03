@@ -320,6 +320,21 @@ listener = threading.Thread(target=socket_listener, args=())
 
 ####################################################################################################
 # _______________________________________END OF ZMQ PIPELINE_______________________________________#
+# ________________________________________START OF Notebook PAGE____________________________________#
+####################################################################################################
+@app.route('/BL-Reservoir', methods=['GET', 'POST'])
+def algo_menu():
+    return render_template('algo_menu.html')
+
+@app.route('/energy_detection_notebook', methods=['GET', 'POST'])
+def energy_detection_notebook():
+    return render_template('energy_detection_wrapper.html')
+
+@app.route('/energydetection_notebook/seti-energy-detection.html')
+def energy_detection_iframe():
+    return render_template('./energydetection_notebook/seti-energy-detection.html')
+####################################################################################################
+# _______________________________________END OF Notebook PAGE_______________________________________#
 # ________________________________________START OF HOME PAGE____________________________________#
 ####################################################################################################
 def get_uri(bucket_name):
