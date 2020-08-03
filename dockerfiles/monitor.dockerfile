@@ -13,4 +13,4 @@ COPY . /code/BL-Scale
 WORKDIR /code/BL-Scale/
 RUN pip3 install zmq kubernetes
 
-CMD while true; do; sleep 10; done
+CMD sleep 1000000
