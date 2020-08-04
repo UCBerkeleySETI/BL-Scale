@@ -199,7 +199,7 @@ def socket_listener():
     context = zmq.Context()
     sub = context.socket(zmq.SUB)
     sub.connect("tcp://10.0.3.141:5560")
-    sub.setsockopt(zmq.SUBSCRIBE, b'')
+    sub.setsockopt(zmq.SUBSCRIBE, b'MESSAGE')
 
     # set up poller
     poller = zmq.Poller()
@@ -207,7 +207,7 @@ def socket_listener():
     while True:
         socks = dict(poller.poll(2))
         if sub in socks and socks[sub] == zmq.POLLIN:
-            serialized_message_dict = sub.recv()
+            serialized_message_dict = sub.recv_multipart()[1]
             app.logger.debug(serialized_message_dict)
             # Update the string variable
 
@@ -268,10 +268,10 @@ def zmq_sub():
     try:
         if session['token'] !=None:
             alert = ""
-            message_dict = {} 
+            message_dict = {}
             session["results_counter"]+=1
             message_dict, cache =get_query_firebase(3*session["results_counter"])
-        
+
             return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict,  sample_urls = cache ,test_login = True)
         else:
             session["results_counter"]+=1
