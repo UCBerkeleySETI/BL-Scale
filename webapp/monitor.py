@@ -37,7 +37,7 @@ def get_base64_hist(list_cpu, list_ram, threshold):
     plt.legend(['CPU', 'MEMORY' ], loc='upper left')
     pic_IObytes = io.BytesIO()
     plt.savefig(pic_IObytes,  format='png')
-    plt.cla()
+    plt.close("all")
     pic_IObytes.seek(0)
     pic_hash = base64.b64encode(pic_IObytes.read())
     base64_img = "data:image/jpeg;base64, " + str(pic_hash.decode("utf8"))
@@ -77,14 +77,14 @@ def base():
         "message":"This is the status of your pod1. This will contain a message about the status of your pods"
     }
     }
-    # get data from socket. 
+    # get data from socket.
     front_end_data = {}
     data = db.child("breakthrough-listen-sandbox").child("flask_vars").child("monitor").get().val()
     for key in update:
         temp_dict = {}
         try:
-            data[key]["cpu"].append(update[key]["cpu"]) 
-            data[key]["ram"].append(update[key]["ram"]) 
+            data[key]["cpu"].append(update[key]["cpu"])
+            data[key]["ram"].append(update[key]["ram"])
             if len( data[key]["cpu"]) >TIME:
                 data[key]["cpu"].pop(0)
             if len( data[key]["ram"]) >TIME:
@@ -99,8 +99,8 @@ def base():
             data[key] = {}
             data[key]["cpu"] = fill_zero(TIME)
             data[key]["ram"] = fill_zero(TIME)
-            data[key]["cpu"].append(update[key]["cpu"]) 
-            data[key]["ram"].append(update[key]["ram"]) 
+            data[key]["cpu"].append(update[key]["cpu"])
+            data[key]["ram"].append(update[key]["ram"])
             if len( data[key]["cpu"]) >TIME:
                 data[key]["cpu"].pop(0)
             if len( data[key]["ram"]) >TIME:
