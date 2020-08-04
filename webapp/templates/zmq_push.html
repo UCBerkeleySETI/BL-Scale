@@ -257,8 +257,6 @@
 
         <div  data-uk-scrollspy="cls:uk-animation-fade" class="row">
           <div class="col-md-6" style="padding-left: 5% ">
-
-
 			<form method="POST" style="padding-left: 5%; padding-right: 5% ">
 				<h2 class="text-weight-800 Raleway text-white">Algorithm Package</h2>
                     <input name="alg_package" type="text">
@@ -274,7 +272,6 @@
 		  <div class="col-md-6" >
 			<div style="padding-left: 5%; padding-right: 5% ">
 				<h2 class="text-weight-800 Raleway text-white">Most Recent Triggers</h2>
-
 				{%for key in message_sub%}
 				<div class="row" style=" padding-left: 5%;">
 					<p>&nbsp;</p>
@@ -286,16 +283,14 @@
 					<div class="row">
 						<div class="col-4">
 							<p class="text-white text-weight-400 no-margin-bottom"><b>Algorithm:</b> {{ message_sub[key]["algo_type"] }}</p>
-
 							</div>
 						<div class="col-4">
-						<p class="text-white text-weight-400 no-margin-bottom"><b>Time Triggered:</b> {{ message_sub[key]["start_timestamp"] }}</p>
-
+						<p class="text-white text-weight-400 no-margin-bottom"><b>Time Triggered:</b> </p>
+						<p class="text-white text-weight-400 no-margin-bottom">{{ message_sub[key]["start_timestamp"] }}</p>
 						</div>
 						<div class="col-4">
 							<p class="text-white text-weight-400 no-margin-bottom"><b>Message:</b> {{ message_sub[key]["message"]}}</p>
 						</div>
-
 					</div>
 				</div>
 				<p>&nbsp;</p>

@@ -32,6 +32,7 @@ from PIL import Image
 import os.path
 from os import path
 import random
+import datetime
 import string
 
 
@@ -157,8 +158,6 @@ def login():
     if (request.method == 'POST'):
             email = request.form['name']
             password = request.form['password']
-
-
             try:
                 user = auth.sign_in_with_email_and_password(email, password)
                 session['user'] = user
@@ -189,7 +188,6 @@ def logout():
     auth.current_user = None
     return render_template('login.html')
 
-
 ####################################################################################################
 # ___________________________________END OF USER AUTHENTICATIONS___________________________________#
 # ________________________________________START OF ZMQ NETWORKING__________________________________#
@@ -210,7 +208,6 @@ def socket_listener():
             serialized_message_dict = sub.recv_multipart()[1]
             app.logger.debug(serialized_message_dict)
             # Update the string variable
-
             message_dict = pickle.loads(serialized_message_dict)
             app.logger.debug(f"Received message: {message_dict}")
             db.child("breakthrough-listen-sandbox").child("flask_vars").child("sub_message").set(message_dict)
@@ -244,6 +241,18 @@ def get_query_firebase(num):
         db.child("breakthrough-listen-sandbox").child("flask_vars").child("cache").child(key).set(cache[key])
     return message_dict, cache
 
+def convert_time_to_datetime(dict, time_stamp_key="start_timestamp" ):
+    for k in dict:
+        for key in dict[k]:
+            if key ==time_stamp_key:
+                print("entered")
+                temp = dict[k][key]
+                temp = temp/1000
+                date_time =  datetime.datetime.fromtimestamp(temp).strftime('%c')
+                dict[k][key] = date_time
+    print(dict)
+    return dict
+
 @app.route('/result')
 def hits_form():
     global cache
@@ -252,12 +261,15 @@ def hits_form():
         alert = ""
         if session['token'] !=None:
             message_dict, cache =get_query_firebase(3)
+            message_dict = convert_time_to_datetime(message_dict, time_stamp_key="timestamp" )
             return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict,  sample_urls = cache ,test_login = True)
         else:
             message_dict, cache =get_query_firebase(3)
+            message_dict = convert_time_to_datetime(message_dict, time_stamp_key="timestamp" )
             return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict,  sample_urls = cache ,test_login = False)
     except:
         message_dict, cache =get_query_firebase(3)
+        message_dict = convert_time_to_datetime(message_dict, time_stamp_key="timestamp" )
         return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict,  sample_urls = cache ,test_login = False)
 
 
@@ -271,14 +283,16 @@ def zmq_sub():
             message_dict = {}
             session["results_counter"]+=1
             message_dict, cache =get_query_firebase(3*session["results_counter"])
-
+            message_dict = convert_time_to_datetime(message_dict, time_stamp_key="timestamp" )
             return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict,  sample_urls = cache ,test_login = True)
         else:
             session["results_counter"]+=1
             message_dict, cache =get_query_firebase(3*session["results_counter"])
+            message_dict = convert_time_to_datetime(message_dict, time_stamp_key="timestamp" )
             return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict,  sample_urls = cache ,test_login = False)
     except:
         message_dict, cache =get_query_firebase(3*session["results_counter"])
+        message_dict = convert_time_to_datetime(message_dict, time_stamp_key="timestamp" )
         return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict, sample_urls = cache ,test_login = False)
 
 @app.route('/trigger')
@@ -286,6 +300,7 @@ def my_form():
     try:
         if session['token'] !=None:
             message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("observation_status").child("Energy-Detection").order_by_child("start_timestamp").limit_to_last(3).get().val()
+            message_dict = convert_time_to_datetime(message_dict)
             return render_template('zmq_push.html', message_sub=message_dict)
         else:
             return redirect('../login')
@@ -308,6 +323,7 @@ def zmq_push():
             socket.send_pyobj(compute_request)
             # keys are "alg_package", "alg_name", and "input_file_url"
             message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("observation_status").child("Energy-Detection").order_by_child("start_timestamp").limit_to_last(3).get().val()
+            message_dict = convert_time_to_datetime(message_dict)
             return render_template('zmq_push.html',  message_sub=message_dict)
         else:
             return redirect('../login')
