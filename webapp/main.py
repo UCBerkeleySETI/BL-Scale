@@ -223,7 +223,6 @@ def update_monitor_data(update, TIME=20):
         try:
             app.logger.debug('appending values')
             app.logger.debug(update[key]["CPU"].replace("n", ""))
-            app.logger.debug(int(update[key]["CPU"].replace("Ki", "")))
             data[key]["CPU"].append(int(update[key]["CPU"].replace("n", "")))
             data[key]["RAM"].append(int(update[key]["RAM"].replace("Ki", "")))
             app.logger.debug('Finished appending values')
@@ -234,7 +233,7 @@ def update_monitor_data(update, TIME=20):
             image_encode = get_base64_hist_monitor( list_cpu =data[key]["RAM"] ,list_ram=data[key]["RAM"] ,  threshold = TIME )
             app.logger.debug('BASE64 DONE')
             temp_dict["CPU"] = data[key]["CPU"]
-            temp_dict["RAM"] = data[key]["ram"]
+            temp_dict["RAM"] = data[key]["RAM"]
             temp_dict["encode"] = image_encode
             front_end_data[key] = temp_dict
         except:
@@ -245,7 +244,6 @@ def update_monitor_data(update, TIME=20):
             data[key]["RAM"] = fill_zero(TIME)
             app.logger.debug('Appending values')
             app.logger.debug(update[key]["CPU"].replace("n", ""))
-            app.logger.debug(int(update[key]["CPU"].replace("Ki", "")))
             data[key]["CPU"].append(int(update[key]["CPU"].replace("n", "")))
             data[key]["RAM"].append(int(update[key]["RAM"].replace("Ki", "")))
             app.logger.debug('Finished appending values')
