@@ -292,6 +292,7 @@ def socket_listener():
             monitoring_serialized = monitor_sub_socket .recv_multipart()[1]
             monitoring_dict = pickle.loads(monitoring_serialized)
             update_monitor_data(monitoring_dict)
+            app.logger.debug("updated monitor data")
         time.sleep(1)
 
 
