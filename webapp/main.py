@@ -221,8 +221,8 @@ def update_monitor_data(update, TIME=20):
     for key in update:
         temp_dict = {}
         try:
-            data[key]["CPU"].append(update[key]["CPU"])
-            data[key]["RAM"].append(update[key]["RAM"])
+            data[key]["CPU"].append(int(update[key]["CPU"].replace("Ki", "")))
+            data[key]["RAM"].append(int(update[key]["RAM"].replace("Ki", "")))
             if len( data[key]["CPU"]) >TIME:
                 data[key]["CPU"].pop(0)
             if len( data[key]["RAM"]) >TIME:
@@ -237,8 +237,8 @@ def update_monitor_data(update, TIME=20):
             data[key] = {}
             data[key]["CPU"] = fill_zero(TIME)
             data[key]["RAM"] = fill_zero(TIME)
-            data[key]["CPU"].append(update[key]["CPU"])
-            data[key]["RAM"].append(update[key]["RAM"])
+            data[key]["CPU"].append(int(update[key]["CPU"].replace("Ki", "")))
+            data[key]["RAM"].append(int(update[key]["RAM"].replace("Ki", "")))
             if len( data[key]["CPU"]) >TIME:
                 data[key]["CPU"].pop(0)
             if len( data[key]["RAM"]) >TIME:
