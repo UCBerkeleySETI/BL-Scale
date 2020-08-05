@@ -221,33 +221,40 @@ def update_monitor_data(update, TIME=20):
     for key in update:
         temp_dict = {}
         try:
+            app.logger.debug('appending values')
             data[key]["CPU"].append(int(update[key]["CPU"].replace("Ki", "")))
             data[key]["RAM"].append(int(update[key]["RAM"].replace("Ki", "")))
+            app.logger.debug('Finished appending values')
             if len( data[key]["CPU"]) >TIME:
                 data[key]["CPU"].pop(0)
             if len( data[key]["RAM"]) >TIME:
                 data[key]["RAM"].pop(0)
             image_encode = get_base64_hist_monitor( list_cpu =data[key]["RAM"] ,list_ram=data[key]["RAM"] ,  threshold = TIME )
+            app.logger.debug('BASE64 DONE')
             temp_dict["CPU"] = update[key]["CPU"]
             temp_dict["RAM"] = update[key]["ram"]
             temp_dict["encode"] = image_encode
             front_end_data[key] = temp_dict
         except:
             print("JUST ONLINE")
+            app.logger.debug('JUST ONLINE')
             data[key] = {}
             data[key]["CPU"] = fill_zero(TIME)
             data[key]["RAM"] = fill_zero(TIME)
             data[key]["CPU"].append(int(update[key]["CPU"].replace("Ki", "")))
             data[key]["RAM"].append(int(update[key]["RAM"].replace("Ki", "")))
+            app.logger.debug('Finished appending values')
             if len( data[key]["CPU"]) >TIME:
                 data[key]["CPU"].pop(0)
             if len( data[key]["RAM"]) >TIME:
                 data[key]["RAM"].pop(0)
             image_encode = get_base64_hist_monitor( list_cpu =data[key]["CPU"] ,list_ram=data[key]["RAM"] ,  threshold = TIME )
+            app.logger.debug('BASE64 DONE')
             temp_dict["CPU"] = update[key]["CPU"]
             temp_dict["RAM"] = update[key]["RAM"]
             temp_dict["encode"] = image_encode
             front_end_data[key] = temp_dict
+    app.logger.debug('Updated database WITH MONITOR')
     db.child("breakthrough-listen-sandbox").child("flask_vars").child("monitor").set(front_end_data)
 
 def socket_listener():
@@ -286,7 +293,7 @@ def socket_listener():
                 db.child("breakthrough-listen-sandbox").child("flask_vars").child('observation_status').child(algo_type).child(url).set(message_dict)
             
             
-            app.logger.debug(f'Updated database with {message_dict}')\
+            app.logger.debug(f'Updated database with {message_dict}')
 
         if monitor_sub_socket in socks and socks[monitor_sub_socket] == zmq.POLLIN:
             monitoring_serialized = monitor_sub_socket .recv_multipart()[1]
