@@ -227,7 +227,6 @@ def socket_listener():
 
 
 def get_query_firebase(num):
-    print("got query")
     message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("processed_observations").child("Energy-Detection").order_by_child("timestamp").limit_to_last(3).get().val()
     db_cache_keys = []
     print("got query")
@@ -235,7 +234,6 @@ def get_query_firebase(num):
     for rc in retrieve_cache.each():
         db_cache_keys += [str(rc.key())]
     print(db_cache_keys)
-    print("Cache empty")
     for key in message_dict:
         cache[key] = get_processed_hist_and_img(message_dict[key]["object_uri"]+"/info_df.pkl")
         db.child("breakthrough-listen-sandbox").child("flask_vars").child("cache").child(key).set(cache[key])
@@ -245,7 +243,6 @@ def convert_time_to_datetime(dict, time_stamp_key="start_timestamp" ):
     for k in dict:
         for key in dict[k]:
             if key ==time_stamp_key:
-                print("entered")
                 temp = dict[k][key]
                 temp = temp/1000
                 date_time =  datetime.datetime.fromtimestamp(temp).strftime('%c')
@@ -257,6 +254,7 @@ def convert_time_to_datetime(dict, time_stamp_key="start_timestamp" ):
 def hits_form():
     global cache
     session["results_counter"]=1
+    
     try:
         alert = ""
         if session['token'] !=None:
@@ -277,6 +275,7 @@ def hits_form():
 @app.route('/result', methods=['GET', 'POST'])
 def zmq_sub():
     global cache
+    print("adding 3 more images")
     try:
         if session['token'] !=None:
             alert = ""
@@ -286,11 +285,13 @@ def zmq_sub():
             message_dict = convert_time_to_datetime(message_dict, time_stamp_key="timestamp" )
             return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict,  sample_urls = cache ,test_login = True)
         else:
+            print("trying to get three")
             session["results_counter"]+=1
             message_dict, cache =get_query_firebase(3*session["results_counter"])
             message_dict = convert_time_to_datetime(message_dict, time_stamp_key="timestamp" )
             return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict,  sample_urls = cache ,test_login = False)
     except:
+        
         message_dict, cache =get_query_firebase(3*session["results_counter"])
         message_dict = convert_time_to_datetime(message_dict, time_stamp_key="timestamp" )
         return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict, sample_urls = cache ,test_login = False)
@@ -299,8 +300,11 @@ def zmq_sub():
 def my_form():
     try:
         if session['token'] !=None:
+            print("get querry")
             message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("observation_status").child("Energy-Detection").order_by_child("start_timestamp").limit_to_last(3).get().val()
+            print("Convert time")
             message_dict = convert_time_to_datetime(message_dict)
+            print("Return")
             return render_template('zmq_push.html', message_sub=message_dict)
         else:
             return redirect('../login')
