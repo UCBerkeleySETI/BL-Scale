@@ -32,6 +32,7 @@ from PIL import Image
 import os.path
 from os import path
 import random
+import datetime
 import string
 
 
@@ -157,8 +158,6 @@ def login():
     if (request.method == 'POST'):
             email = request.form['name']
             password = request.form['password']
-
-
             try:
                 user = auth.sign_in_with_email_and_password(email, password)
                 session['user'] = user
@@ -189,28 +188,88 @@ def logout():
     auth.current_user = None
     return render_template('login.html')
 
-
 ####################################################################################################
 # ___________________________________END OF USER AUTHENTICATIONS___________________________________#
 # ________________________________________START OF ZMQ NETWORKING__________________________________#
 ####################################################################################################
+def get_base64_hist_monitor(list_cpu, list_ram, threshold):
+    x = np.arange(len(list_cpu))
+    plt.style.use("dark_background")
+    plt.figure(figsize=(8,6))
+    plt.plot(x, list_cpu)
+    plt.plot(x, list_ram)
+    plt.title("Health")
+    plt.xlabel("Time")
+    plt.ylabel("Percent % ")
+    plt.legend(['CPU', 'MEMORY' ], loc='upper left')
+    pic_IObytes = io.BytesIO()
+    plt.savefig(pic_IObytes,  format='png')
+    plt.close("all")
+    pic_IObytes.seek(0)
+    pic_hash = base64.b64encode(pic_IObytes.read())
+    base64_img = "data:image/jpeg;base64, " + str(pic_hash.decode("utf8"))
+    return base64_img
+
+def fill_zero(length):
+    y =[]
+    for i in range(length-1):
+        y.append(0)
+    return y
+def update_monitor_data(update, TIME=20):
+    front_end_data = {}
+    data = db.child("breakthrough-listen-sandbox").child("flask_vars").child("monitor").get().val()
+    for key in update:
+        temp_dict = {}
+        try:
+            data[key]["CPU"].append(int(update[key]["CPU"].replace("Ki", "")))
+            data[key]["RAM"].append(int(update[key]["RAM"].replace("Ki", "")))
+            if len( data[key]["CPU"]) >TIME:
+                data[key]["CPU"].pop(0)
+            if len( data[key]["RAM"]) >TIME:
+                data[key]["RAM"].pop(0)
+            image_encode = get_base64_hist_monitor( list_cpu =data[key]["RAM"] ,list_ram=data[key]["RAM"] ,  threshold = TIME )
+            temp_dict["CPU"] = update[key]["CPU"]
+            temp_dict["RAM"] = update[key]["ram"]
+            temp_dict["encode"] = image_encode
+            front_end_data[key] = temp_dict
+        except:
+            print("JUST ONLINE")
+            data[key] = {}
+            data[key]["CPU"] = fill_zero(TIME)
+            data[key]["RAM"] = fill_zero(TIME)
+            data[key]["CPU"].append(int(update[key]["CPU"].replace("Ki", "")))
+            data[key]["RAM"].append(int(update[key]["RAM"].replace("Ki", "")))
+            if len( data[key]["CPU"]) >TIME:
+                data[key]["CPU"].pop(0)
+            if len( data[key]["RAM"]) >TIME:
+                data[key]["RAM"].pop(0)
+            image_encode = get_base64_hist_monitor( list_cpu =data[key]["CPU"] ,list_ram=data[key]["RAM"] ,  threshold = TIME )
+            temp_dict["CPU"] = update[key]["CPU"]
+            temp_dict["RAM"] = update[key]["RAM"]
+            temp_dict["encode"] = image_encode
+            front_end_data[key] = temp_dict
+    db.child("breakthrough-listen-sandbox").child("flask_vars").child("monitor").set(front_end_data)
 
 def socket_listener():
     context = zmq.Context()
-    sub = context.socket(zmq.SUB)
-    sub.connect("tcp://10.0.3.141:5560")
-    sub.setsockopt(zmq.SUBSCRIBE, b'MESSAGE')
+    message_sub_socket  = context.socket(zmq.SUB)
+    message_sub_socket .connect("tcp://10.0.3.141:5560")
+    message_sub_socket .setsockopt(zmq.SUBSCRIBE, b'MESSAGE')
+
+    monitor_sub_socket  = context.socket(zmq.SUB)
+    monitor_sub_socket.connect("tcp://10.0.3.141:5560")
+    monitor_sub_socket.setsockopt(zmq.SUBSCRIBE, b'METRICS')
 
     # set up poller
     poller = zmq.Poller()
-    poller.register(sub, zmq.POLLIN)
+    poller.register(message_sub_socket , zmq.POLLIN)
+    poller.register(monitor_sub_socket , zmq.POLLIN)
     while True:
         socks = dict(poller.poll(2))
-        if sub in socks and socks[sub] == zmq.POLLIN:
-            serialized_message_dict = sub.recv_multipart()[1]
+        if message_sub_socket  in socks and socks[message_sub_socket ] == zmq.POLLIN:
+            serialized_message_dict = message_sub_socket .recv_multipart()[1]
             app.logger.debug(serialized_message_dict)
             # Update the string variable
-
             message_dict = pickle.loads(serialized_message_dict)
             app.logger.debug(f"Received message: {message_dict}")
             db.child("breakthrough-listen-sandbox").child("flask_vars").child("sub_message").set(message_dict)
@@ -225,39 +284,58 @@ def socket_listener():
                 url = message_dict["url"]
 
                 db.child("breakthrough-listen-sandbox").child("flask_vars").child('observation_status').child(algo_type).child(url).set(message_dict)
-            app.logger.debug(f'Updated database with {message_dict}')
+            
+            
+            app.logger.debug(f'Updated database with {message_dict}')\
+
+        if monitor_sub_socket in socks and socks[monitor_sub_socket] == zmq.POLLIN:
+            monitoring_serialized = monitor_sub_socket .recv_multipart()[1]
+            monitoring_dict = pickle.loads(monitoring_serialized)
+            update_monitor_data(monitoring_dict)
         time.sleep(1)
 
 
 def get_query_firebase(num):
-    print("got query")
-    message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("processed_observations").child("Energy-Detection").order_by_child("timestamp").limit_to_last(3).get().val()
+    message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("processed_observations").child("Energy-Detection").order_by_child("timestamp").limit_to_last(num).get().val()
     db_cache_keys = []
     print("got query")
     retrieve_cache = db.child("breakthrough-listen-sandbox").child("flask_vars").child("cache").get()
     for rc in retrieve_cache.each():
         db_cache_keys += [str(rc.key())]
-    print(db_cache_keys)
-    print("Cache empty")
+    # print(db_cache_keys)
     for key in message_dict:
         cache[key] = get_processed_hist_and_img(message_dict[key]["object_uri"]+"/info_df.pkl")
         db.child("breakthrough-listen-sandbox").child("flask_vars").child("cache").child(key).set(cache[key])
     return message_dict, cache
 
+def convert_time_to_datetime(dict, time_stamp_key="start_timestamp" ):
+    for k in dict:
+        for key in dict[k]:
+            if key ==time_stamp_key:
+                temp = dict[k][key]
+                temp = temp/1000
+                date_time =  datetime.datetime.fromtimestamp(temp).strftime('%c')
+                dict[k][key] = date_time
+    return dict
+
 @app.route('/result')
 def hits_form():
     global cache
     session["results_counter"]=1
+    
     try:
         alert = ""
         if session['token'] !=None:
             message_dict, cache =get_query_firebase(3)
+            message_dict = convert_time_to_datetime(message_dict, time_stamp_key="timestamp" )
             return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict,  sample_urls = cache ,test_login = True)
         else:
             message_dict, cache =get_query_firebase(3)
+            message_dict = convert_time_to_datetime(message_dict, time_stamp_key="timestamp" )
             return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict,  sample_urls = cache ,test_login = False)
     except:
         message_dict, cache =get_query_firebase(3)
+        message_dict = convert_time_to_datetime(message_dict, time_stamp_key="timestamp" )
         return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict,  sample_urls = cache ,test_login = False)
 
 
@@ -265,27 +343,37 @@ def hits_form():
 @app.route('/result', methods=['GET', 'POST'])
 def zmq_sub():
     global cache
+    print("adding 3 more images")
     try:
         if session['token'] !=None:
             alert = ""
             message_dict = {}
             session["results_counter"]+=1
-            message_dict, cache =get_query_firebase(3*session["results_counter"])
-
+            message_dict, cache =get_query_firebase(3*session["results_counter"])        
+            message_dict = convert_time_to_datetime(message_dict, time_stamp_key="timestamp" )
             return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict,  sample_urls = cache ,test_login = True)
         else:
+            print("trying to get three")
             session["results_counter"]+=1
             message_dict, cache =get_query_firebase(3*session["results_counter"])
+            print(cache)
+            message_dict = convert_time_to_datetime(message_dict, time_stamp_key="timestamp" )
             return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict,  sample_urls = cache ,test_login = False)
     except:
+        
         message_dict, cache =get_query_firebase(3*session["results_counter"])
+        message_dict = convert_time_to_datetime(message_dict, time_stamp_key="timestamp" )
         return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict, sample_urls = cache ,test_login = False)
 
 @app.route('/trigger')
 def my_form():
     try:
         if session['token'] !=None:
+            print("get querry")
             message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("observation_status").child("Energy-Detection").order_by_child("start_timestamp").limit_to_last(3).get().val()
+            print("Convert time")
+            message_dict = convert_time_to_datetime(message_dict)
+            print("Return")
             return render_template('zmq_push.html', message_sub=message_dict)
         else:
             return redirect('../login')
@@ -308,6 +396,7 @@ def zmq_push():
             socket.send_pyobj(compute_request)
             # keys are "alg_package", "alg_name", and "input_file_url"
             message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("observation_status").child("Energy-Detection").order_by_child("start_timestamp").limit_to_last(3).get().val()
+            message_dict = convert_time_to_datetime(message_dict)
             return render_template('zmq_push.html',  message_sub=message_dict)
         else:
             return redirect('../login')
