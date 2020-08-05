@@ -231,8 +231,8 @@ def update_monitor_data(update, TIME=20):
                 data[key]["RAM"].pop(0)
             image_encode = get_base64_hist_monitor( list_cpu =data[key]["RAM"] ,list_ram=data[key]["RAM"] ,  threshold = TIME )
             app.logger.debug('BASE64 DONE')
-            temp_dict["CPU"] = update[key]["CPU"]
-            temp_dict["RAM"] = update[key]["ram"]
+            temp_dict["CPU"] = data[key]["CPU"]
+            temp_dict["RAM"] = data[key]["ram"]
             temp_dict["encode"] = image_encode
             front_end_data[key] = temp_dict
         except:
@@ -250,12 +250,16 @@ def update_monitor_data(update, TIME=20):
                 data[key]["RAM"].pop(0)
             image_encode = get_base64_hist_monitor( list_cpu =data[key]["CPU"] ,list_ram=data[key]["RAM"] ,  threshold = TIME )
             app.logger.debug('BASE64 DONE')
-            temp_dict["CPU"] = update[key]["CPU"]
-            temp_dict["RAM"] = update[key]["RAM"]
+            temp_dict["CPU"] = data[key]["CPU"]
+            app.logger.debug('CPU UPDATE DONE')
+            temp_dict["RAM"] = data[key]["RAM"]
+            app.logger.debug('RAM UPDATE DONE')
             temp_dict["encode"] = image_encode
+            app.logger.debug('ENCODE UPDATE DONE')
             front_end_data[key] = temp_dict
-    app.logger.debug('Updated database WITH MONITOR')
+            app.logger.debug('BUNDLED UPDATE DONE')
     db.child("breakthrough-listen-sandbox").child("flask_vars").child("monitor").set(front_end_data)
+    app.logger.debug('Updated database WITH MONITOR')
 
 def socket_listener():
     context = zmq.Context()
@@ -289,10 +293,7 @@ def socket_listener():
             else:
                 algo_type = message_dict["algo_type"]
                 url = message_dict["url"]
-
                 db.child("breakthrough-listen-sandbox").child("flask_vars").child('observation_status').child(algo_type).child(url).set(message_dict)
-            
-            
             app.logger.debug(f'Updated database with {message_dict}')
 
         if monitor_sub_socket in socks and socks[monitor_sub_socket] == zmq.POLLIN:
