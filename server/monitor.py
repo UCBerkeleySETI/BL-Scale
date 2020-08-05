@@ -41,9 +41,8 @@ def get_pod_data(api_client):
     return data, ret_specs
 
 def extract_metrics(pod_data, pod_specs):
-    pods = pod_data["items"]
     metrics = defaultdict(dict)
-    for pod in pods:
+    for pod in pod_data.items:
         pod_name = pod["metadata"]["name"]
         if pod["containers"]:
             containers = pod["containers"]
