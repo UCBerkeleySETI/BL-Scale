@@ -192,6 +192,63 @@ def logout():
 # ___________________________________END OF USER AUTHENTICATIONS___________________________________#
 # ________________________________________START OF ZMQ NETWORKING__________________________________#
 ####################################################################################################
+def get_base64_hist_monitor(list_cpu, list_ram, threshold):
+    x = np.arange(len(list_cpu))
+    plt.style.use("dark_background")
+    plt.figure(figsize=(8,6))
+    plt.plot(x, list_cpu)
+    plt.plot(x, list_ram)
+    plt.title("Health")
+    plt.xlabel("Time")
+    plt.ylabel("Percent % ")
+    plt.legend(['CPU', 'MEMORY' ], loc='upper left')
+    pic_IObytes = io.BytesIO()
+    plt.savefig(pic_IObytes,  format='png')
+    plt.close("all")
+    pic_IObytes.seek(0)
+    pic_hash = base64.b64encode(pic_IObytes.read())
+    base64_img = "data:image/jpeg;base64, " + str(pic_hash.decode("utf8"))
+    return base64_img
+
+def fill_zero(length):
+    y =[]
+    for i in range(length-1):
+        y.append(0)
+    return y
+def update_monitor_data(update, TIME=20):
+    front_end_data = {}
+    data = db.child("breakthrough-listen-sandbox").child("flask_vars").child("monitor").get().val()
+    for key in update:
+        temp_dict = {}
+        try:
+            data[key]["CPU"].append(update[key]["CPU"])
+            data[key]["RAM"].append(update[key]["RAM"])
+            if len( data[key]["CPU"]) >TIME:
+                data[key]["CPU"].pop(0)
+            if len( data[key]["RAM"]) >TIME:
+                data[key]["RAM"].pop(0)
+            image_encode = get_base64_hist_monitor( list_cpu =data[key]["RAM"] ,list_ram=data[key]["RAM"] ,  threshold = TIME )
+            temp_dict["CPU"] = update[key]["CPU"]
+            temp_dict["RAM"] = update[key]["ram"]
+            temp_dict["encode"] = image_encode
+            front_end_data[key] = temp_dict
+        except:
+            print("JUST ONLINE")
+            data[key] = {}
+            data[key]["CPU"] = fill_zero(TIME)
+            data[key]["RAM"] = fill_zero(TIME)
+            data[key]["CPU"].append(update[key]["CPU"])
+            data[key]["RAM"].append(update[key]["RAM"])
+            if len( data[key]["CPU"]) >TIME:
+                data[key]["CPU"].pop(0)
+            if len( data[key]["RAM"]) >TIME:
+                data[key]["RAM"].pop(0)
+            image_encode = get_base64_hist_monitor( list_cpu =data[key]["CPU"] ,list_ram=data[key]["RAM"] ,  threshold = TIME )
+            temp_dict["CPU"] = update[key]["CPU"]
+            temp_dict["RAM"] = update[key]["RAM"]
+            temp_dict["encode"] = image_encode
+            front_end_data[key] = temp_dict
+    db.child("breakthrough-listen-sandbox").child("flask_vars").child("monitor").set(front_end_data)
 
 def socket_listener():
     context = zmq.Context()
@@ -206,9 +263,13 @@ def socket_listener():
         socks = dict(poller.poll(2))
         if sub in socks and socks[sub] == zmq.POLLIN:
             serialized_message_dict = sub.recv_multipart()[1]
+            monitoring_serialized = sub.recv_multipart()[0]
+
             app.logger.debug(serialized_message_dict)
             # Update the string variable
             message_dict = pickle.loads(serialized_message_dict)
+            monitoring_dict = pickle.loads(monitoring_serialized)
+
             app.logger.debug(f"Received message: {message_dict}")
             db.child("breakthrough-listen-sandbox").child("flask_vars").child("sub_message").set(message_dict)
             if message_dict["done"] == True:
@@ -222,6 +283,8 @@ def socket_listener():
                 url = message_dict["url"]
 
                 db.child("breakthrough-listen-sandbox").child("flask_vars").child('observation_status').child(algo_type).child(url).set(message_dict)
+            
+            update_monitor_data(monitoring_dict)
             app.logger.debug(f'Updated database with {message_dict}')
         time.sleep(1)
 
