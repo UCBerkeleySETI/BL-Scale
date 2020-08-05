@@ -5,6 +5,7 @@ import logging
 import sys
 import pickle
 import json
+from collections import defaultdict
 
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 
@@ -39,7 +40,7 @@ def get_pod_data(api_client):
 
 def extract_metrics(pod_data):
     pods = pod_data["items"]
-    metrics = {}
+    metrics = defaultdict(dict)
     for pod in pods:
         pod_name = pod["metadata"]["name"]
         metrics[pod_name]["CPU"] = pod["containers"][0]["usage"]["cpu"]
