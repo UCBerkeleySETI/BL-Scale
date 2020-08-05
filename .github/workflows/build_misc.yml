@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: Build Docker
+name: Build Monitor and Proxy
 
 # Controls when the action will run. Triggers the workflow on push or pull request
 # events but only for the master branch
@@ -21,15 +21,15 @@ jobs:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v2
 
-    - name: Build and push Web App Image to Google Container Registry
-      uses: docker/build-push-action@v1
-      with:
-          username: _json_key
-          password: ${{ secrets.GCP_JSON_KEY }}
-          registry: gcr.io
-          repository: breakthrough-listen-sandbox/bl-scale
-          dockerfile: dockerfiles/webapp.dockerfile
-          tags: webapp-latest
+    # - name: Build and push Web App Image to Google Container Registry
+    #   uses: docker/build-push-action@v1
+    #   with:
+    #       username: _json_key
+    #       password: ${{ secrets.GCP_JSON_KEY }}
+    #       registry: gcr.io
+    #       repository: breakthrough-listen-sandbox/bl-scale
+    #       dockerfile: dockerfiles/webapp.dockerfile
+    #       tags: webapp-latest
 
     # - name: Build and push Web App Test Image to Google Container Registry
     #   uses: docker/build-push-action@v1
@@ -40,16 +40,6 @@ jobs:
     #       repository: breakthrough-listen-sandbox/bl-scale
     #       dockerfile: dockerfiles/webapp-test.dockerfile
     #       tags: webapp-test-latest
-
-    - name: Build and push Proxy Image to Google Container Registry
-      uses: docker/build-push-action@v1
-      with:
-          username: _json_key
-          password: ${{ secrets.GCP_JSON_KEY }}
-          registry: gcr.io
-          repository: breakthrough-listen-sandbox/bl-scale
-          dockerfile: dockerfiles/zproxy.dockerfile
-          tags: zproxy-latest
 
     - name: Build and push Monitoring Image to Google Container Registry
       uses: docker/build-push-action@v1
@@ -71,22 +61,32 @@ jobs:
               dockerfile: dockerfiles/monitor.dockerfile
               tags: monitor-latest
 
-    # Runs a single command using the runners shell
-    - name: Build and push Web App Image to dockerhub
+    - name: Build and push Proxy Image to Google Container Registry
       uses: docker/build-push-action@v1
       with:
-              username: ${{ secrets.DOCKER_USERNAME }}
-              password: ${{ secrets.DOCKER_PASSWORD }}
-              repository: fx196/bl-scale
-              dockerfile: dockerfiles/webapp.dockerfile
-              tags: webapp-latest
+          username: _json_key
+          password: ${{ secrets.GCP_JSON_KEY }}
+          registry: gcr.io
+          repository: breakthrough-listen-sandbox/bl-scale
+          dockerfile: dockerfiles/zproxy.dockerfile
+          tags: zproxy-latest
 
-    # Runs a single command using the runners shell
-    - name: Build and push Web App Test Image to dockerhub
-      uses: docker/build-push-action@v1
-      with:
-              username: ${{ secrets.DOCKER_USERNAME }}
-              password: ${{ secrets.DOCKER_PASSWORD }}
-              repository: fx196/bl-scale
-              dockerfile: dockerfiles/webapp-test.dockerfile
-              tags: webapp-test-latest
+    # # Runs a single command using the runners shell
+    # - name: Build and push Web App Image to dockerhub
+    #   uses: docker/build-push-action@v1
+    #   with:
+    #           username: ${{ secrets.DOCKER_USERNAME }}
+    #           password: ${{ secrets.DOCKER_PASSWORD }}
+    #           repository: fx196/bl-scale
+    #           dockerfile: dockerfiles/webapp.dockerfile
+    #           tags: webapp-latest
+
+    # # Runs a single command using the runners shell
+    # - name: Build and push Web App Test Image to dockerhub
+    #   uses: docker/build-push-action@v1
+    #   with:
+    #           username: ${{ secrets.DOCKER_USERNAME }}
+    #           password: ${{ secrets.DOCKER_PASSWORD }}
+    #           repository: fx196/bl-scale
+    #           dockerfile: dockerfiles/webapp-test.dockerfile
+    #           tags: webapp-test-latest
