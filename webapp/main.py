@@ -222,6 +222,8 @@ def update_monitor_data(update, TIME=20):
         temp_dict = {}
         try:
             app.logger.debug('appending values')
+            app.logger.debug(update[key]["CPU"].replace("Ki", ""))
+            app.logger.debug(int(update[key]["CPU"].replace("Ki", "")))
             data[key]["CPU"].append(int(update[key]["CPU"].replace("Ki", "")))
             data[key]["RAM"].append(int(update[key]["RAM"].replace("Ki", "")))
             app.logger.debug('Finished appending values')
@@ -241,6 +243,9 @@ def update_monitor_data(update, TIME=20):
             data[key] = {}
             data[key]["CPU"] = fill_zero(TIME)
             data[key]["RAM"] = fill_zero(TIME)
+            app.logger.debug('Appending values')
+            app.logger.debug(update[key]["CPU"].replace("Ki", ""))
+            app.logger.debug(int(update[key]["CPU"].replace("Ki", "")))
             data[key]["CPU"].append(int(update[key]["CPU"].replace("Ki", "")))
             data[key]["RAM"].append(int(update[key]["RAM"].replace("Ki", "")))
             app.logger.debug('Finished appending values')
