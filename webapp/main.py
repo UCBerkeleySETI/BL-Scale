@@ -252,24 +252,25 @@ def update_monitor_data(update, TIME=20):
 
 def socket_listener():
     context = zmq.Context()
-    sub = context.socket(zmq.SUB)
-    sub.connect("tcp://10.0.3.141:5560")
-    sub.setsockopt(zmq.SUBSCRIBE, b'MESSAGE')
+    message_sub_socket  = context.socket(zmq.SUB)
+    message_sub_socket .connect("tcp://10.0.3.141:5560")
+    message_sub_socket .setsockopt(zmq.SUBSCRIBE, b'MESSAGE')
+
+    monitor_sub_socket  = context.socket(zmq.SUB)
+    monitor_sub_socket.connect("tcp://10.0.3.141:5560")
+    monitor_sub_socket.setsockopt(zmq.SUBSCRIBE, b'METRICS')
 
     # set up poller
     poller = zmq.Poller()
-    poller.register(sub, zmq.POLLIN)
+    poller.register(message_sub_socket , zmq.POLLIN)
+    poller.register(monitor_sub_socket , zmq.POLLIN)
     while True:
         socks = dict(poller.poll(2))
-        if sub in socks and socks[sub] == zmq.POLLIN:
-            serialized_message_dict = sub.recv_multipart()[1]
-            monitoring_serialized = sub.recv_multipart()[0]
-
+        if message_sub_socket  in socks and socks[message_sub_socket ] == zmq.POLLIN:
+            serialized_message_dict = message_sub_socket .recv_multipart()[1]
             app.logger.debug(serialized_message_dict)
             # Update the string variable
             message_dict = pickle.loads(serialized_message_dict)
-            monitoring_dict = pickle.loads(monitoring_serialized)
-
             app.logger.debug(f"Received message: {message_dict}")
             db.child("breakthrough-listen-sandbox").child("flask_vars").child("sub_message").set(message_dict)
             if message_dict["done"] == True:
@@ -284,8 +285,13 @@ def socket_listener():
 
                 db.child("breakthrough-listen-sandbox").child("flask_vars").child('observation_status').child(algo_type).child(url).set(message_dict)
             
+            
+            app.logger.debug(f'Updated database with {message_dict}')\
+
+        if monitor_sub_socket in socks and socks[monitor_sub_socket] == zmq.POLLIN:
+            monitoring_serialized = monitor_sub_socket .recv_multipart()[1]
+            monitoring_dict = pickle.loads(monitoring_serialized)
             update_monitor_data(monitoring_dict)
-            app.logger.debug(f'Updated database with {message_dict}')
         time.sleep(1)
 
 
