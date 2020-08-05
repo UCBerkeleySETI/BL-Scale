@@ -53,7 +53,8 @@ def extract_metrics(pod_data, pod_specs):
         if i.metadata.name in metrics:
             requested = i.spec.containers[0].resources.requests
             metrics[i.metadata.name]["CPU_REQUESTED"] = requested["cpu"]
-            metrics[i.metadata.name]["RAM_REQUESTED"] = requested["memory"]
+            if "memory" in requested:
+                metrics[i.metadata.name]["RAM_REQUESTED"] = requested["memory"]
     return metrics
 
 pod_data, pod_specs = get_pod_data(api_client)
