@@ -1,13 +1,13 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-    name: bl-scale
+    name: bl-scale-algo
     labels:
-        app: bl-scale
+        app: bl-scale-algo
 spec:
     selector:
         matchLabels:
-            app: bl-scale
+            app: bl-scale-algo
     strategy:
         rollingUpdate:
           maxSurge: 25%
@@ -16,7 +16,7 @@ spec:
     template:
         metadata:
             labels:
-                app: bl-scale
+                app: bl-scale-algo
         spec:
             containers:
                 - name: bl-scale-energy-detection

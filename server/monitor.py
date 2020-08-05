@@ -36,9 +36,11 @@ def get_pod_data(api_client):
                 auth_settings=['BearerToken'], response_type='json', _preload_content=False)
     response = ret_metrics[0].data.decode('utf-8')
     data = json.loads(response)
-    return data
 
-def extract_metrics(pod_data):
+    ret_specs = v1.list_pod_for_all_namespaces(watch=False)
+    return data, ret_specs
+
+def extract_metrics(pod_data, pod_specs):
     pods = pod_data["items"]
     metrics = defaultdict(dict)
     for pod in pods:
@@ -47,6 +49,11 @@ def extract_metrics(pod_data):
             containers = pod["containers"]
             metrics[pod_name]["CPU"] = containers[0]["usage"]["cpu"]
             metrics[pod_name]["RAM"] = containers[0]["usage"]["memory"]
+    for i in pod_specs.items:
+        if i.metadata.name in metrics:
+            requested = i.spec.containers[0].resources.requests
+            metrics[i.metadata.name]["CPU_REQUESTED"] = requested["cpu"]
+            metrics[i.metadata.name]["RAM_REQUESTED"] = requested["memory"]
     return metrics
 
 pod_data = get_pod_data(api_client)
@@ -57,8 +64,8 @@ logging.info(json.dumps(metrics, indent=2))
 
 while True:
     # get metrics from cluster
-    pod_data = get_pod_data(api_client)
-    metrics = extract_metrics(pod_data)
+    pod_data, pod_specs = get_pod_data(api_client)
+    metrics = extract_metrics(pod_data, pod_specs)
 
     # broadcast from socket
     broadcast_socket.send_multipart([b"METRICS", pickle.dumps(metrics)])
