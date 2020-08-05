@@ -56,8 +56,7 @@ def extract_metrics(pod_data, pod_specs):
             metrics[i.metadata.name]["RAM_REQUESTED"] = requested["memory"]
     return metrics
 
-pod_data = get_pod_data(api_client)
-pod_specs = v1.list_pod_for_all_namespaces(watch=False)
+pod_data, pod_specs = get_pod_data(api_client)
 metrics = extract_metrics(pod_data, pod_specs)
 logging.info(json.dumps(metrics, indent=2))
 
