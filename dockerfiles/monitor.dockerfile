@@ -14,6 +14,6 @@ RUN mkdir /code
 WORKDIR /code
 COPY . /code/BL-Scale
 WORKDIR /code/BL-Scale/
-RUN pip3 install zmq kubernetes
+RUN pip3 install zmq kubernetes tqdm
 
 CMD sh /code/BL-Scale/scripts/start_monitor_pod.sh
