@@ -43,8 +43,10 @@ def extract_metrics(pod_data):
     metrics = defaultdict(dict)
     for pod in pods:
         pod_name = pod["metadata"]["name"]
-        metrics[pod_name]["CPU"] = pod["containers"][0]["usage"]["cpu"]
-        metrics[pod_name]["RAM"] = pod["containers"][0]["usage"]["memory"]
+        if pod["containers"]:
+            containers = pod["containers"]
+            metrics[pod_name]["CPU"] = containers[0]["usage"]["cpu"]
+            metrics[pod_name]["RAM"] = containers[0]["usage"]["memory"]
     return metrics
 
 pod_data = get_pod_data(api_client)
