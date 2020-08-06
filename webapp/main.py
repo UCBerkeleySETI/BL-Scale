@@ -306,6 +306,7 @@ def socket_listener():
         if monitor_sub_socket in socks and socks[monitor_sub_socket] == zmq.POLLIN:
             monitoring_serialized = monitor_sub_socket .recv_multipart()[1]
             monitoring_dict = pickle.loads(monitoring_serialized)
+            all.logger.debug(monitoring_dict)
             update_monitor_data(monitoring_dict)
             app.logger.debug("updated monitor data")
         time.sleep(1)
@@ -351,7 +352,7 @@ def hits_form():
 
     try:
         alert = ""
-        if session['token'] !=None:
+        if session['token'] != None:
             message_dict, cache = get_query_firebase(3)
             message_dict = process_message_dict(message_dict, time_stamp_key="timestamp")
             return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict,  sample_urls = cache ,test_login = True)
