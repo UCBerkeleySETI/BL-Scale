@@ -228,8 +228,8 @@ def update_monitor_data(update, TIME=20):
             if len(data[key]["CPU"]) < TIME or len(data[key]["CPU"]) < TIME:
                 data[key]["CPU"] = fill_zeros(data[key]["CPU"], TIME)
                 data[key]["RAM"] = fill_zeros(data[key]["RAM"], TIME)
-            data[key]["CPU"].append(np.round(update[key]["CPU"]/total_CPU), decimals=2)
-            data[key]["RAM"].append(np.round(update[key]["RAM"]/total_RAM), decimals=2)
+            data[key]["CPU"].append(np.round((update[key]["CPU"]/total_CPU)*100), decimals=2)
+            data[key]["RAM"].append(np.round((update[key]["RAM"]/total_RAM)*100), decimals=2)
             app.logger.debug('Finished appending values')
             while len(data[key]["CPU"]) > TIME:
                 data[key]["CPU"].pop(0)

@@ -13,11 +13,11 @@
 
 		<!-- description -->
         <meta name="description" content="">
-		
+
         <!-- keywords -->
         <meta name="keywords" content="">
 
-	
+
 		<!--Start Title -->
 		<title>Breakthrough Listen @ Scale</title>
 		<!--End Title -->
@@ -130,9 +130,9 @@
 							</li>
 							<!-- Link -->
 							<li>
-							
+
 									<a class="btn-orange  "  href="{{ url_for('logout') }}" >Logout</a>
-						
+
 							<!-- End Link -->
 
 
@@ -158,19 +158,19 @@
 		</div>
 		<!-- End Header Transparent -->
 		<div id="offcanvas-nav" data-uk-offcanvas="mode: reveal; overlay: true; esc-close: true;">
-		
+
 			<!-- Off-Canvas Bar -->
 			<div class="uk-offcanvas-bar menu-white bg-black">
 
 				<!-- Off-Canvas Links-->
 				<ul class="uk-nav-sub text-left" data-uk-nav>
-				
-					
+
+
 					<li><a class="uk-navbar-item uk-logo" href="index.html" data-uk-scroll><img src="../static/images/BL-scale-logo.png" alt="" /></a></li>
 
 					<!-- Link -->
 					<li class="margin-bottom-10px">
-					
+
 						<a href="{{ '../home'  }}" class="bottom-border border-1px border-color-white-extra-light"><span class="text-small text-white text-uppercase text-weight-700 padding-bottom-20px">
 							Dashboard
 							<span class="margin-left-10px" ></span></span></a>
@@ -183,47 +183,47 @@
 						<a  href="{{ '../trigger' }}" class="bottom-border border-1px border-color-gray-extra-light"><span class="text-small text-white text-uppercase text-weight-700 padding-bottom-20px">
 							Trigger
 							<span class="margin-left-10px" ></span></span></a>
-						
-						
+
+
 					</li>
 					<!-- End Link -->
-					
-					
-					
-					
-					
+
+
+
+
+
 					<!-- Link -->
 					<li class=" margin-bottom-10px">
-					
+
 						<a href="{{ '../result' }}" class="bottom-border border-1px border-color-gray-extra-light"><span class="text-small text-white text-uppercase text-weight-700 padding-bottom-20px">
 							Result
 							<span class="margin-left-10px" ></span></span></a>
-						
+
 					</li>
 					<!-- End Link -->
-					
-					
-					
-					
-					
-					<!-- Link -->
-					<li class="margin-bottom-10px">
-					
-						<a href="{{ url_for('monitor.base') }}" class="bottom-border border-1px border-color-gray-extra-light"><span class="text-small text-white text-uppercase text-weight-700 padding-bottom-20px">
-							Monitor
-							<span class="margin-left-10px" ></span></span></a>
-						
-					</li>
-					<!-- End Link -->
-					
-					
-					
-				
-					
+
+
+
+
 
 					<!-- Link -->
 					<li class="margin-bottom-10px">
-					
+
+						<a href="{{ url_for('monitor.base') }}" class="bottom-border border-1px border-color-gray-extra-light"><span class="text-small text-white text-uppercase text-weight-700 padding-bottom-20px">
+							Monitor
+							<span class="margin-left-10px" ></span></span></a>
+
+					</li>
+					<!-- End Link -->
+
+
+
+
+
+
+					<!-- Link -->
+					<li class="margin-bottom-10px">
+
 						<a href="{{ url_for('logout') }}" class="bottom-border border-1px border-color-gray-extra-light"><span class="text-small btn-orange text-uppercase text-weight-700 padding-bottom-20px">
 							Logout
 							<span class="margin-left-10px" ></span></span></a>
@@ -232,9 +232,9 @@
 
 				</ul>
 				<!-- End Off-Canvas Links -->
-				
-				
-				
+
+
+
 				<!-- Navigation Footer -->
 				<div class="nav-footer margin-top-100px">
 					<!-- Copyright Information -->
@@ -246,7 +246,7 @@
 
 			</div>
 			<!-- End Off-Canvas Bar -->
-			
+
 		</div>
 		<!-- End Off-Canvas Navigation -->
 		<p>&nbsp;</p>
@@ -260,8 +260,8 @@
 
 			</div>
 			<div class="col-4" style="text-align: center;">
-				
-				
+
+
 			</div>
 			<div class="col-4">
 				<h5><span class="badge badge-danger" style="background-color: #fc5603; text-align: left;">{{time}}</span></h5>
@@ -269,7 +269,7 @@
 
 		</div>
 
-		<script> 
+		<script>
 			$(document).ready(function(){
 			setInterval(function(){
 				  $("#here").load(window.location.href + " #here" );
@@ -278,15 +278,15 @@
 		</script>
 		<div id="here" class="row" style="padding-left: 5%; padding-right: 5%; ">
 
-	
+
 		<div class="row" style="padding-left: 5%; padding-right: 5%; ">
 
 
 			{%for key in encoded%}
 			<div class="col-md-4" style="padding-bottom: 10%; height:90%" >
 				<div style="border: 3px solid #fc5603; border-radius:5%;">
-				
-					
+
+
 						<p>&nbsp;</p>
 						<div style="padding-left: 5%; padding-right: 5%;">
 						<h4 class="text-weight-800 Raleway text-white">{{ key }}</h4>
@@ -295,16 +295,16 @@
 								{{encoded[key]["message"]}}
 							</p>
 							<img class='img-responsive' src='{{ encoded[key]["encode"] }}' height="100%" width="100%" style="margin:15px" class="center">
-							
-							<h6 class="text-weight-800 Raleway text-white">CPU {{encoded[key]['CPU'][19]}}%</h6> 
-							<meter min="0" max="100" low="50" high="75" optimum="100" value="{{encoded[key]['CPU'][19]}}" ></meter>
-							<h6 class="text-weight-800 Raleway text-white">RAM {{encoded[key]['RAM'][19]}}%</h6> 
-							<meter min="0" max="100" low="50" high="75" optimum="100" value="{{encoded[key]['RAM'][19]}}"></meter>
+
+							<h6 class="text-weight-800 Raleway text-white">CPU {{ encoded[key]['CPU'][19] }}%</h6>
+							<meter min="0" max="100" low="50" high="75" optimum="100" value="{{ encoded[key]['CPU'][19] }}" ></meter>
+							<h6 class="text-weight-800 Raleway text-white">RAM {{ encoded[key]['RAM'][19] }}%</h6>
+							<meter min="0" max="100" low="50" high="75" optimum="100" value="{{ encoded[key]['RAM'][19] }}"></meter>
 							<p>&nbsp;</p>
-							
+
 						</div>
 					</div>
-					
+
 				</div>
 				{%endfor%}
 			</div>
