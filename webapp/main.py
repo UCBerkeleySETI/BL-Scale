@@ -219,7 +219,7 @@ def update_monitor_data(update, TIME=20):
     front_end_data = {}
     data = db.child("breakthrough-listen-sandbox").child("flask_vars").child("monitor").get().val()
     for key in update:
-        if "algo" in key:
+        if key.startswith("bl-scale-algo"):
             temp_dict = {}
             try:
                 app.logger.debug('appending values')
@@ -306,7 +306,7 @@ def socket_listener():
             app.logger.debug(f'Updated database with {message_dict}')
 
         if monitor_sub_socket in socks and socks[monitor_sub_socket] == zmq.POLLIN:
-            monitoring_serialized = monitor_sub_socket .recv_multipart()[1]
+            monitoring_serialized = monitor_sub_socket.recv_multipart()[1]
             monitoring_dict = pickle.loads(monitoring_serialized)
             app.logger.debug(monitoring_dict)
             update_monitor_data(monitoring_dict)
