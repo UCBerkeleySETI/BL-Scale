@@ -324,15 +324,25 @@ def get_query_firebase(num):
         db.child("breakthrough-listen-sandbox").child("flask_vars").child("cache").child(key).set(cache[key])
     return message_dict, cache
 
-def convert_time_to_datetime(dict, time_stamp_key="start_timestamp" ):
+def convert_time_to_datetime(dict, time_stamp_key="start_timestamp"):
     for k in dict:
-        for key in dict[k]:
-            if key ==time_stamp_key:
-                temp = dict[k][key]
+        if time_stamp_key in dict[k]:
+                temp = dict[k][time_stamp_key]
                 temp = temp/1000
                 date_time =  datetime.datetime.fromtimestamp(temp).strftime('%c')
-                dict[k][key] = date_time
+                dict[k][time_stamp_key] = date_time
     return dict
+
+def round_processing_time(dict):
+    for obs in dict:
+        if "processing_time" in dict[obs]:
+            dict[obs]["processing_time"] = np.round(dict[obs]["processing_time"] / 60, decimals=2)
+    return dict
+
+def process_message_dict(message_dict, time_stamp_key="start_timestamp"):
+    message_dict = convert_time_to_datetime(message_dict, time_stamp_key=time_stamp_key)
+    message_dict = round_processing_time(message_dict)
+    return message_dict
 
 @app.route('/result')
 def hits_form():
@@ -342,16 +352,16 @@ def hits_form():
     try:
         alert = ""
         if session['token'] !=None:
-            message_dict, cache =get_query_firebase(3)
-            message_dict = convert_time_to_datetime(message_dict, time_stamp_key="timestamp" )
+            message_dict, cache = get_query_firebase(3)
+            message_dict = process_message_dict(message_dict, time_stamp_key="timestamp")
             return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict,  sample_urls = cache ,test_login = True)
         else:
-            message_dict, cache =get_query_firebase(3)
-            message_dict = convert_time_to_datetime(message_dict, time_stamp_key="timestamp" )
+            message_dict, cache = get_query_firebase(3)
+            message_dict = process_message_dict(message_dict, time_stamp_key="timestamp")
             return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict,  sample_urls = cache ,test_login = False)
     except:
-        message_dict, cache =get_query_firebase(3)
-        message_dict = convert_time_to_datetime(message_dict, time_stamp_key="timestamp" )
+        message_dict, cache = get_query_firebase(3)
+        message_dict = process_message_dict(message_dict, time_stamp_key="timestamp")
         return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict,  sample_urls = cache ,test_login = False)
 
 
@@ -366,19 +376,19 @@ def zmq_sub():
             message_dict = {}
             session["results_counter"]+=1
             message_dict, cache =get_query_firebase(3*session["results_counter"])
-            message_dict = convert_time_to_datetime(message_dict, time_stamp_key="timestamp" )
+            message_dict = process_message_dict(message_dict, time_stamp_key="timestamp" )
             return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict,  sample_urls = cache ,test_login = True)
         else:
             print("trying to get three")
             session["results_counter"]+=1
             message_dict, cache =get_query_firebase(3*session["results_counter"])
             print(cache)
-            message_dict = convert_time_to_datetime(message_dict, time_stamp_key="timestamp" )
+            message_dict = process_message_dict(message_dict, time_stamp_key="timestamp" )
             return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict,  sample_urls = cache ,test_login = False)
     except:
 
         message_dict, cache =get_query_firebase(3*session["results_counter"])
-        message_dict = convert_time_to_datetime(message_dict, time_stamp_key="timestamp" )
+        message_dict = process_message_dict(message_dict, time_stamp_key="timestamp" )
         return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict, sample_urls = cache ,test_login = False)
 
 @app.route('/trigger')
@@ -388,7 +398,7 @@ def my_form():
             print("get querry")
             message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("observation_status").child("Energy-Detection").order_by_child("start_timestamp").limit_to_last(3).get().val()
             print("Convert time")
-            message_dict = convert_time_to_datetime(message_dict)
+            message_dict = process_message_dict(message_dict)
             print("Return")
             return render_template('zmq_push.html', message_sub=message_dict)
         else:
@@ -412,7 +422,7 @@ def zmq_push():
             socket.send_pyobj(compute_request)
             # keys are "alg_package", "alg_name", and "input_file_url"
             message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("observation_status").child("Energy-Detection").order_by_child("start_timestamp").limit_to_last(3).get().val()
-            message_dict = convert_time_to_datetime(message_dict)
+            message_dict = process_message_dict(message_dict)
             return render_template('zmq_push.html',  message_sub=message_dict)
         else:
             return redirect('../login')
