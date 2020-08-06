@@ -55,6 +55,29 @@ def extract_metrics(pod_data, pod_specs):
             metrics[i.metadata.name]["CPU_REQUESTED"] = requested["cpu"]
             if "memory" in requested:
                 metrics[i.metadata.name]["RAM_REQUESTED"] = requested["memory"]
+    metrics = clean_metrics(metrics) # convert metrics to standard units (CPU for cpu, KiB for memory)
+    return metrics
+
+def clean_metrics(metrics):
+    for name in metrics.keys():
+        if name.startswith("CPU"):
+            if metrics[name].endswith("m"):
+                metrics[name] = int(metrics[name][:-1]) / 1000.0
+            elif metrics[name].endswith("n"):
+                metrics[name] = int(metrics[name][:-1]) / 1000000000.0
+            else:
+                metrics[name] = int(metrics[name])
+        elif name.startswith("RAM"):
+            if metrics[name].endswith("G"):
+                metrics[name] = int(metrics[name][:-1]) * 1000000000 / 1024.0
+            elif metrics[name].endswith("Gi"):
+                metrics[name] = int(metrics[name][:-2]) * 1024*1024
+            elif metrics[name].endswith("M"):
+                metrics[name] = int(metrics[name][:-1]) * 1000000 / 1024.0
+            elif metrics[name].endswith("Mi"):
+                metrics[name] = int(metrics[name][:-2]) * 1024
+            elif metrics[name].endswith("K"):
+                metrics[name] = int(metrics[name][:-1]) * 1000 / 1024.0
     return metrics
 
 pod_data, pod_specs = get_pod_data(api_client)
