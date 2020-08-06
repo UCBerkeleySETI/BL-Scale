@@ -200,7 +200,7 @@ def get_base64_hist_monitor(list_cpu, list_ram, threshold):
     plt.plot(x, list_ram)
     plt.title("Health")
     plt.xlabel("Time")
-    plt.ylabel("Percent % ")
+    plt.ylabel("Percent Usage % ")
     plt.legend(['CPU', 'MEMORY' ], loc='upper left')
     pic_IObytes = io.BytesIO()
     plt.savefig(pic_IObytes,  format='png')
@@ -223,9 +223,11 @@ def update_monitor_data(update, TIME=20):
             temp_dict = {}
             try:
                 app.logger.debug('appending values')
-                app.logger.debug(update[key]["CPU"].replace("n", ""))
-                data[key]["CPU"].append(int(update[key]["CPU"].replace("n", "")))
-                data[key]["RAM"].append(int(update[key]["RAM"].replace("Ki", "")))
+               
+                total_CPU = update[key]["CPU_REQUESTED"]
+                total_RAM = update[key]["RAM_REQUESTED"]
+                data[key]["CPU"].append(int(update[key]["CPU"]))
+                data[key]["RAM"].append(int(update[key]["RAM"])/total_RAM)
                 app.logger.debug('Finished appending values')
                 if len( data[key]["CPU"]) >TIME:
                     data[key]["CPU"].pop(0)
@@ -244,9 +246,10 @@ def update_monitor_data(update, TIME=20):
                 data[key]["CPU"] = fill_zero(TIME)
                 data[key]["RAM"] = fill_zero(TIME)
                 app.logger.debug('Appending values')
-                app.logger.debug(update[key]["CPU"].replace("n", ""))
-                data[key]["CPU"].append(int(update[key]["CPU"].replace("n", "")))
-                data[key]["RAM"].append(int(update[key]["RAM"].replace("Ki", "")))
+                 total_CPU = update[key]["CPU_REQUESTED"]
+                total_RAM = update[key]["RAM_REQUESTED"]
+                data[key]["CPU"].append(int(update[key]["CPU"]))
+                data[key]["RAM"].append(int(update[key]["RAM"])/total_RAM)
                 app.logger.debug('Finished appending values')
                 if len( data[key]["CPU"]) >TIME:
                     data[key]["CPU"].pop(0)
