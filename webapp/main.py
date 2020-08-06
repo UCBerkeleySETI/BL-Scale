@@ -227,7 +227,7 @@ def update_monitor_data(update, TIME=20):
                 total_CPU = update[key]["CPU_REQUESTED"]
                 total_RAM = update[key]["RAM_REQUESTED"]
                 data[key]["CPU"].append(int(update[key]["CPU"]))
-                data[key]["RAM"].append(int(update[key]["RAM"])/total_RAM)
+                data[key]["RAM"].append(int(int(update[key]["RAM"])/total_RAM))
                 app.logger.debug('Finished appending values')
                 if len( data[key]["CPU"]) >TIME:
                     data[key]["CPU"].pop(0)
@@ -249,7 +249,7 @@ def update_monitor_data(update, TIME=20):
                 total_CPU = update[key]["CPU_REQUESTED"]
                 total_RAM = update[key]["RAM_REQUESTED"]
                 data[key]["CPU"].append(int(update[key]["CPU"]))
-                data[key]["RAM"].append(int(update[key]["RAM"])/total_RAM)
+                data[key]["RAM"].append(int(int(update[key]["RAM"])/total_RAM))
                 app.logger.debug('Finished appending values')
                 if len( data[key]["CPU"]) >TIME:
                     data[key]["CPU"].pop(0)
