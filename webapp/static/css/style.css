@@ -1,16 +1,19 @@
 @charset "utf-8";
 
 
-/* ----------------------------------
-
-Name: style.css
-Author: Fourtabs
-Website: https://www.fourtabs.com
-Exclusively available here: https://themeforest.net/user/fourtabsthemes
-
-------------------------------------- */
 
 
+.zoom {
+    transition: transform .2s; /* Animation */
+    z-index: 100;
+  }
+  
+.zoom:hover {
+    -ms-transform: scale(5); /* IE 9 */
+    -webkit-transform: scale(5); /* Safari 3-8 */
+    transform: scale(5); 
+    z-index: 9999;
+  }
 meter,
 progress {
   width: 100%;

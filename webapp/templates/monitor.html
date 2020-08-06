@@ -260,35 +260,21 @@
 
 			</div>
 			<div class="col-4" style="text-align: center;">
-				
-				
 			</div>
 			<div class="col-4">
 				<h5><span class="badge badge-danger" style="background-color: #fc5603; text-align: left;">{{time}}</span></h5>
 			</div>
-
 		</div>
 
-		<script> 
-			$(document).ready(function(){
-			setInterval(function(){
-				  $("#here").load(window.location.href + " #here" );
-			}, 3000);
-			});
-		</script>
-		<div id="here" class="row" style="padding-left: 5%; padding-right: 5%; ">
-
 	
-		<div class="row" style="padding-left: 5%; padding-right: 5%; ">
-
-
+		
+	
+		<div id ="here" class="row" style="padding-left: 5%; padding-right: 5%; ">
 			{%for key in encoded%}
 			<div class="col-md-4" style="padding-bottom: 10%; height:90%" >
 				<div style="border: 3px solid #fc5603; border-radius:5%;">
-				
-					
-						<p>&nbsp;</p>
-						<div style="padding-left: 5%; padding-right: 5%;">
+					<p>&nbsp;</p>
+					<div style="padding-left: 5%; padding-right: 5%;">
 						<h4 class="text-weight-800 Raleway text-white">{{ key }}</h4>
 						<p class="text-white text-weight-400 no-margin-bottom"><b>STATUS</b></p>
 							<p class="text-white text-weight-400 no-margin-bottom">
@@ -296,20 +282,25 @@
 							</p>
 							<img class='img-responsive' src='{{ encoded[key]["encode"] }}' height="100%" width="100%" style="margin:15px" class="center">
 							
-							<h6 class="text-weight-800 Raleway text-white">CPU {{encoded[key]["cpu"]}}%</h6> 
-							<meter min="0" max="100" low="50" high="75" optimum="100" value={{encoded[key]["cpu"]}} ></meter>
-							<h6 class="text-weight-800 Raleway text-white">RAM {{encoded[key]["ram"]}}%</h6> 
-							<meter min="0" max="100" low="50" high="75" optimum="100" value={{encoded[key]["ram"]}}></meter>
+							<h6 class="text-weight-800 Raleway text-white">CPU {{encoded[key]['CPU'][19]}}%</h6> 
+							<meter min="0" max="100" low="50" high="75" optimum="100" value="{{encoded[key]['CPU'][19]}}" ></meter>
+							<h6 class="text-weight-800 Raleway text-white">RAM {{encoded[key]['RAM'][19]}}%</h6> 
+							<meter min="0" max="100" low="50" high="75" optimum="100" value="{{encoded[key]['RAM'][19]}}"></meter>
 							<p>&nbsp;</p>
 							
 						</div>
 					</div>
 					
 				</div>
-				{%endfor%}
-			</div>
+			{%endfor%}
 		</div>
-
+	<script> 
+		$(document).ready(function(){
+		setInterval(function(){
+				$("#here").load(window.location.href + " #here" );
+		}, 3000);
+		});
+	</script>
 
 		<p>&nbsp;</p>
 		<p>&nbsp;</p>
