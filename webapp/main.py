@@ -246,7 +246,7 @@ def update_monitor_data(update, TIME=20):
                 data[key]["CPU"] = fill_zero(TIME)
                 data[key]["RAM"] = fill_zero(TIME)
                 app.logger.debug('Appending values')
-                 total_CPU = update[key]["CPU_REQUESTED"]
+                total_CPU = update[key]["CPU_REQUESTED"]
                 total_RAM = update[key]["RAM_REQUESTED"]
                 data[key]["CPU"].append(int(update[key]["CPU"]))
                 data[key]["RAM"].append(int(update[key]["RAM"])/total_RAM)
