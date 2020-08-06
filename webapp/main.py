@@ -284,6 +284,7 @@ def socket_listener():
     poller.register(monitor_sub_socket , zmq.POLLIN)
     while True:
         socks = dict(poller.poll(2))
+        app.logger.debug("Polling")
         if message_sub_socket  in socks and socks[message_sub_socket ] == zmq.POLLIN:
             serialized_message_dict = message_sub_socket .recv_multipart()[1]
             app.logger.debug(serialized_message_dict)
