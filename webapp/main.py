@@ -284,7 +284,8 @@ def socket_listener():
     poller.register(monitor_sub_socket , zmq.POLLIN)
     while True:
         socks = dict(poller.poll(2))
-        app.logger.debug("Polling")
+        if int(time.time()) % 60 == 0:
+            app.logger.debug("Polling")
         if message_sub_socket  in socks and socks[message_sub_socket ] == zmq.POLLIN:
             serialized_message_dict = message_sub_socket .recv_multipart()[1]
             app.logger.debug(serialized_message_dict)
@@ -307,6 +308,7 @@ def socket_listener():
         if monitor_sub_socket in socks and socks[monitor_sub_socket] == zmq.POLLIN:
             monitoring_serialized = monitor_sub_socket .recv_multipart()[1]
             monitoring_dict = pickle.loads(monitoring_serialized)
+            app.logger.debug(monitoring_dict)
             update_monitor_data(monitoring_dict)
             app.logger.debug("updated monitor data")
         time.sleep(1)
