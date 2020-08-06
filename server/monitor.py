@@ -55,7 +55,7 @@ def extract_metrics(pod_data, pod_specs):
             metrics[i.metadata.name]["CPU_REQUESTED"] = requested["cpu"]
             if "memory" in requested:
                 metrics[i.metadata.name]["RAM_REQUESTED"] = requested["memory"]
-    metrics = clean_metrics(metrics) # convert metrics to standard units (CPU for cpu, KiB for memory)
+    metrics = {pod_name: clean_metrics(pod_metrics) for pod_name, pod_metrics in metrics.items()} # convert metrics to standard units (CPU for cpu, KiB for memory)
     return metrics
 
 def clean_metrics(metrics):
