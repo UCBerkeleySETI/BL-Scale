@@ -225,6 +225,8 @@ def update_monitor_data(update, TIME=20):
             total_RAM = update[key]["RAM_REQUESTED"]
             if key not in data:
                 data[key] = collections.defaultdict(dict)
+                data[key]["CPU"] = []
+                data[key]["RAM"] = []
             if len(data[key]["CPU"]) < TIME or len(data[key]["CPU"]) < TIME:
                 data[key]["CPU"] = fill_zeros(data[key]["CPU"], TIME)
                 data[key]["RAM"] = fill_zeros(data[key]["RAM"], TIME)
