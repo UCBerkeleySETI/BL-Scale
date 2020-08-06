@@ -223,7 +223,7 @@ def update_monitor_data(update, TIME=20):
             temp_dict = {}
             try:
                 app.logger.debug('appending values')
-               
+
                 total_CPU = update[key]["CPU_REQUESTED"]
                 total_RAM = update[key]["RAM_REQUESTED"]
                 data[key]["CPU"].append(int(update[key]["CPU"]))
@@ -246,7 +246,7 @@ def update_monitor_data(update, TIME=20):
                 data[key]["CPU"] = fill_zero(TIME)
                 data[key]["RAM"] = fill_zero(TIME)
                 app.logger.debug('Appending values')
-                 total_CPU = update[key]["CPU_REQUESTED"]
+                total_CPU = update[key]["CPU_REQUESTED"]
                 total_RAM = update[key]["RAM_REQUESTED"]
                 data[key]["CPU"].append(int(update[key]["CPU"]))
                 data[key]["RAM"].append(int(update[key]["RAM"])/total_RAM)
@@ -338,7 +338,7 @@ def convert_time_to_datetime(dict, time_stamp_key="start_timestamp" ):
 def hits_form():
     global cache
     session["results_counter"]=1
-    
+
     try:
         alert = ""
         if session['token'] !=None:
@@ -365,7 +365,7 @@ def zmq_sub():
             alert = ""
             message_dict = {}
             session["results_counter"]+=1
-            message_dict, cache =get_query_firebase(3*session["results_counter"])        
+            message_dict, cache =get_query_firebase(3*session["results_counter"])
             message_dict = convert_time_to_datetime(message_dict, time_stamp_key="timestamp" )
             return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict,  sample_urls = cache ,test_login = True)
         else:
@@ -376,7 +376,7 @@ def zmq_sub():
             message_dict = convert_time_to_datetime(message_dict, time_stamp_key="timestamp" )
             return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict,  sample_urls = cache ,test_login = False)
     except:
-        
+
         message_dict, cache =get_query_firebase(3*session["results_counter"])
         message_dict = convert_time_to_datetime(message_dict, time_stamp_key="timestamp" )
         return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict, sample_urls = cache ,test_login = False)
