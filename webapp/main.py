@@ -219,48 +219,49 @@ def update_monitor_data(update, TIME=20):
     front_end_data = {}
     data = db.child("breakthrough-listen-sandbox").child("flask_vars").child("monitor").get().val()
     for key in update:
-        temp_dict = {}
-        try:
-            app.logger.debug('appending values')
-            app.logger.debug(update[key]["CPU"].replace("n", ""))
-            data[key]["CPU"].append(int(update[key]["CPU"].replace("n", "")))
-            data[key]["RAM"].append(int(update[key]["RAM"].replace("Ki", "")))
-            app.logger.debug('Finished appending values')
-            if len( data[key]["CPU"]) >TIME:
-                data[key]["CPU"].pop(0)
-            if len( data[key]["RAM"]) >TIME:
-                data[key]["RAM"].pop(0)
-            image_encode = get_base64_hist_monitor( list_cpu =data[key]["RAM"] ,list_ram=data[key]["RAM"] ,  threshold = TIME )
-            app.logger.debug('BASE64 DONE')
-            temp_dict["CPU"] = data[key]["CPU"]
-            temp_dict["RAM"] = data[key]["RAM"]
-            temp_dict["encode"] = image_encode
-            front_end_data[key] = temp_dict
-        except:
-            print("JUST ONLINE")
-            app.logger.debug('JUST ONLINE')
-            data[key] = {}
-            data[key]["CPU"] = fill_zero(TIME)
-            data[key]["RAM"] = fill_zero(TIME)
-            app.logger.debug('Appending values')
-            app.logger.debug(update[key]["CPU"].replace("n", ""))
-            data[key]["CPU"].append(int(update[key]["CPU"].replace("n", "")))
-            data[key]["RAM"].append(int(update[key]["RAM"].replace("Ki", "")))
-            app.logger.debug('Finished appending values')
-            if len( data[key]["CPU"]) >TIME:
-                data[key]["CPU"].pop(0)
-            if len( data[key]["RAM"]) >TIME:
-                data[key]["RAM"].pop(0)
-            image_encode = get_base64_hist_monitor( list_cpu =data[key]["CPU"] ,list_ram=data[key]["RAM"] ,  threshold = TIME )
-            app.logger.debug('BASE64 DONE')
-            temp_dict["CPU"] = data[key]["CPU"]
-            app.logger.debug('CPU UPDATE DONE')
-            temp_dict["RAM"] = data[key]["RAM"]
-            app.logger.debug('RAM UPDATE DONE')
-            temp_dict["encode"] = image_encode
-            app.logger.debug('ENCODE UPDATE DONE')
-            front_end_data[key] = temp_dict
-            app.logger.debug('BUNDLED UPDATE DONE')
+        if "algo" in key:
+            temp_dict = {}
+            try:
+                app.logger.debug('appending values')
+                app.logger.debug(update[key]["CPU"].replace("n", ""))
+                data[key]["CPU"].append(int(update[key]["CPU"].replace("n", "")))
+                data[key]["RAM"].append(int(update[key]["RAM"].replace("Ki", "")))
+                app.logger.debug('Finished appending values')
+                if len( data[key]["CPU"]) >TIME:
+                    data[key]["CPU"].pop(0)
+                if len( data[key]["RAM"]) >TIME:
+                    data[key]["RAM"].pop(0)
+                image_encode = get_base64_hist_monitor( list_cpu =data[key]["RAM"] ,list_ram=data[key]["RAM"] ,  threshold = TIME )
+                app.logger.debug('BASE64 DONE')
+                temp_dict["CPU"] = data[key]["CPU"]
+                temp_dict["RAM"] = data[key]["RAM"]
+                temp_dict["encode"] = image_encode
+                front_end_data[key] = temp_dict
+            except:
+                print("JUST ONLINE")
+                app.logger.debug('JUST ONLINE')
+                data[key] = {}
+                data[key]["CPU"] = fill_zero(TIME)
+                data[key]["RAM"] = fill_zero(TIME)
+                app.logger.debug('Appending values')
+                app.logger.debug(update[key]["CPU"].replace("n", ""))
+                data[key]["CPU"].append(int(update[key]["CPU"].replace("n", "")))
+                data[key]["RAM"].append(int(update[key]["RAM"].replace("Ki", "")))
+                app.logger.debug('Finished appending values')
+                if len( data[key]["CPU"]) >TIME:
+                    data[key]["CPU"].pop(0)
+                if len( data[key]["RAM"]) >TIME:
+                    data[key]["RAM"].pop(0)
+                image_encode = get_base64_hist_monitor( list_cpu =data[key]["CPU"] ,list_ram=data[key]["RAM"] ,  threshold = TIME )
+                app.logger.debug('BASE64 DONE')
+                temp_dict["CPU"] = data[key]["CPU"]
+                app.logger.debug('CPU UPDATE DONE')
+                temp_dict["RAM"] = data[key]["RAM"]
+                app.logger.debug('RAM UPDATE DONE')
+                temp_dict["encode"] = image_encode
+                app.logger.debug('ENCODE UPDATE DONE')
+                front_end_data[key] = temp_dict
+                app.logger.debug('BUNDLED UPDATE DONE')
     db.child("breakthrough-listen-sandbox").child("flask_vars").child("monitor").set(front_end_data)
     app.logger.debug('Updated database WITH MONITOR')
 
