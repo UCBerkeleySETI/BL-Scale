@@ -7,7 +7,7 @@ import pickle
 import json
 from collections import defaultdict
 
-logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
+logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
 logging.info("Running")
 
@@ -78,6 +78,8 @@ def clean_metrics(metrics):
                 metrics[name] = int(metrics[name][:-2]) * 1024
             elif metrics[name].endswith("K"):
                 metrics[name] = int(metrics[name][:-1]) * 1000 / 1024.0
+            elif metrics[name].endswith("Ki"):
+                metrics[name] = int(metrics[name][:-2]) * 1024
     return metrics
 
 pod_data, pod_specs = get_pod_data(api_client)
