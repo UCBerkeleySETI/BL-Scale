@@ -212,7 +212,8 @@ def get_base64_hist_monitor(list_cpu, list_ram, threshold):
     return base64_img
 
 def fill_zeros(array, length):
-    return ([0] * (length - len(array))).extend(array)
+    array = ([0] * (length - len(array))).extend(array)
+    return array
 
 def update_monitor_data(update, TIME=20):
     front_end_data = {}
