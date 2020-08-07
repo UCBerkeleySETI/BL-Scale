@@ -79,7 +79,7 @@ def clean_metrics(metrics):
             elif metrics[name].endswith("K"):
                 metrics[name] = int(metrics[name][:-1]) * 1000 / 1024.0
             elif metrics[name].endswith("Ki"):
-                metrics[name] = int(metrics[name][:-2]) * 1024
+                metrics[name] = int(metrics[name][:-2])
     return metrics
 
 pod_data, pod_specs = get_pod_data(api_client)

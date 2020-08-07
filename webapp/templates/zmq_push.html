@@ -130,9 +130,9 @@
 							</li>
 							<!-- Link -->
 							<li>
-							
+
 									<a class="btn-orange  "  href="{{ url_for('logout') }}" >Logout</a>
-						
+
 							<!-- End Link -->
 
 
@@ -170,7 +170,7 @@
 
 					<!-- Link -->
 					<li class="margin-bottom-10px">
-					
+
 						<a href="{{ '../home'  }}" class="bottom-border border-1px border-color-white-extra-light"><span class="text-small text-white text-uppercase text-weight-700 padding-bottom-20px">
 							Dashboard
 							<span class="margin-left-10px" ></span></span></a>
@@ -194,7 +194,7 @@
 
 					<!-- Link -->
 					<li class=" margin-bottom-10px">
-					
+
 						<a href="{{ '../result' }}" class="bottom-border border-1px border-color-gray-extra-light"><span class="text-small text-white text-uppercase text-weight-700 padding-bottom-20px">
 							Result
 							<span class="margin-left-10px" ></span></span></a>
@@ -208,7 +208,7 @@
 
 					<!-- Link -->
 					<li class="margin-bottom-10px">
-					
+
 						<a href="{{ url_for('monitor.base') }}" class="bottom-border border-1px border-color-gray-extra-light"><span class="text-small text-white text-uppercase text-weight-700 padding-bottom-20px">
 							Monitor
 							<span class="margin-left-10px" ></span></span></a>
@@ -223,7 +223,7 @@
 
 					<!-- Link -->
 					<li class="margin-bottom-10px">
-					
+
 						<a href="{{ url_for('logout') }}" class="bottom-border border-1px border-color-gray-extra-light"><span class="text-small btn-orange text-uppercase text-weight-700 padding-bottom-20px">
 							Logout
 							<span class="margin-left-10px" ></span></span></a>
@@ -275,30 +275,30 @@
 				{%for key in message_sub%}
 				<div class="row">
 					<div class="col-12">
-						<h4 class="text-weight-800 Raleway text-white">{{ message_sub[key]["url"].split('_')[3] }}</h4>
+						<h4 class="text-weight-800 Raleway text-white">{{ message_sub[key]["filename"].split('_')[3] }}</h4>
 					</div>
-					
+
 					<p>&nbsp;</p>
 				</div>
 				<div class="row">
-						
+
 					<div class="col-4">
-						<h6 class="text-white text-weight-400 no-margin-bottom"><b>Telescope:</b>{{ message_sub[key]["url"].split('_')[0] }}</h6>
+						<h6 class="text-white text-weight-400 no-margin-bottom"><b>Telescope:</b>{{ message_sub[key]["filename"].split('_')[0] }}</h6>
 					</div>
 					<div class="col-4">
-						<h6 class="text-white text-weight-400 no-margin-bottom"><b>MJD:</b>{{ message_sub[key]["url"].split('_')[1] }}.{{ message_sub[key]["url"].split('_')[2] }}</h6>
+						<h6 class="text-white text-weight-400 no-margin-bottom"><b>MJD:</b>{{ message_sub[key]["filename"].split('_')[1] }}.{{ message_sub[key]["filename"].split('_')[2] }}</h6>
 					</div>
-					
+
 					<div class="col-4">
-						<h6 class="text-white text-weight-400 no-margin-bottom"><b>Resolution:</b>{{ message_sub[key]["url"].split('_')[4] }}</h6>
+						<h6 class="text-white text-weight-400 no-margin-bottom"><b>Resolution:</b>{{ message_sub[key]["filename"].split('_')[4] }}</h6>
 					</div>
-					
+
 				</div>
-			
-					
-					
-					
-					
+
+
+
+
+
 					<div class="row">
 						<div class="col-4">
 							<p class="text-white text-weight-400 no-margin-bottom"><b>Algorithm:</b> {{ message_sub[key]["algo_type"] }}</p>
@@ -311,7 +311,7 @@
 							<p class="text-white text-weight-400 no-margin-bottom"><b>Message:</b> {{ message_sub[key]["message"]}}</p>
 						</div>
 					</div>
-			
+
 				<p>&nbsp;</p>
 				<p>&nbsp;</p>
 				{%endfor%}

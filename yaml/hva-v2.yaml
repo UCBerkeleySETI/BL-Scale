@@ -1,14 +1,14 @@
 apiVersion: autoscaling/v2beta2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: bl-scale
+  name: bl-scale-algo
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: bl-scale
+    name: bl-scale-algo
   minReplicas: 1
-  maxReplicas: 10
+  maxReplicas: 20
   metrics:
   - type: Resource
     resource:
