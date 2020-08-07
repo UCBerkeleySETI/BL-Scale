@@ -313,15 +313,22 @@ def socket_listener():
 
 def get_query_firebase(num):
     message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("processed_observations").child("Energy-Detection").order_by_child("timestamp").limit_to_last(num).get().val()
+    for index in  message_dict.items():
+        if "mid" in index:
+            message_dict.pop(index)
     db_cache_keys = []
     print("got query")
     retrieve_cache = db.child("breakthrough-listen-sandbox").child("flask_vars").child("cache").get()
     for rc in retrieve_cache.each():
         db_cache_keys += [str(rc.key())]
-    # print(db_cache_keys)
+    # getting rid of mid resolution files 
+    
+    print(db_cache_keys)
+    
     for key in message_dict:
         cache[key] = get_processed_hist_and_img(message_dict[key]["object_uri"]+"/info_df.pkl")
         db.child("breakthrough-listen-sandbox").child("flask_vars").child("cache").child(key).set(cache[key])
+    print(message_dict)
     return message_dict, cache
 
 def convert_time_to_datetime(dict, time_stamp_key="start_timestamp"):
@@ -344,11 +351,14 @@ def process_message_dict(message_dict, time_stamp_key="start_timestamp"):
     message_dict = round_processing_time(message_dict)
     return message_dict
 
+@app.route('/image_page.html')
+def image_display():
+    return render_template("image_page.html")
+
 @app.route('/result')
 def hits_form():
     global cache
     session["results_counter"]=1
-
     try:
         alert = ""
         if session['token'] !=None:
@@ -363,6 +373,7 @@ def hits_form():
         message_dict, cache = get_query_firebase(3)
         message_dict = process_message_dict(message_dict, time_stamp_key="timestamp")
         return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict,  sample_urls = cache ,test_login = False)
+
 
 
 
@@ -386,7 +397,6 @@ def zmq_sub():
             message_dict = process_message_dict(message_dict, time_stamp_key="timestamp" )
             return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict,  sample_urls = cache ,test_login = False)
     except:
-
         message_dict, cache =get_query_firebase(3*session["results_counter"])
         message_dict = process_message_dict(message_dict, time_stamp_key="timestamp" )
         return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict, sample_urls = cache ,test_login = False)
