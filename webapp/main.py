@@ -213,7 +213,7 @@ def get_base64_hist_monitor(list_cpu, list_ram, threshold):
 
 
 def fill_zeros(array, length):
-    array = ([0] * (length - len(array))).extend(array)
+    array = [0] * (length - len(array)) + array
     return array
 
 
