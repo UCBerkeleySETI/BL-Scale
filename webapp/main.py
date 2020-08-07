@@ -213,7 +213,7 @@ def get_base64_hist_monitor(list_cpu, list_ram, threshold):
 
 
 def fill_zeros(array, length):
-    array = [0] * (length - len(array)) + array
+    array = ([0] * (length - len(array))) + array
     return array
 
 
@@ -236,6 +236,7 @@ def update_monitor_data(update, TIME=20):
                 app.logger.debug("padding zeroes")
                 data[key]["CPU"] = fill_zeros(data[key]["CPU"], TIME)
                 data[key]["RAM"] = fill_zeros(data[key]["RAM"], TIME)
+                app.logger.debug(data[key])
             data[key]["CPU"].append(np.round((update[key]["CPU"]/total_CPU)*100), decimals=2)
             data[key]["RAM"].append(np.round((update[key]["RAM"]/total_RAM)*100), decimals=2)
             app.logger.debug('Finished appending values')
