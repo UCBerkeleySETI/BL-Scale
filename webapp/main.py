@@ -230,7 +230,7 @@ def update_monitor_data(update, TIME=20):
             total_CPU = update[key]["CPU_REQUESTED"]
             total_RAM = update[key]["RAM_REQUESTED"]
             if key not in data:
-                app.logger.debug(f"{key} not in data, adding key")
+                # app.logger.debug(f"{key} not in data, adding key")
                 data[key] = collections.defaultdict(dict)
                 data[key]["CPU"] = []
                 data[key]["RAM"] = []
@@ -238,7 +238,7 @@ def update_monitor_data(update, TIME=20):
                 app.logger.debug("padding zeroes")
                 data[key]["CPU"] = fill_zeros(data[key]["CPU"], TIME)
                 data[key]["RAM"] = fill_zeros(data[key]["RAM"], TIME)
-                app.logger.debug(data[key])
+                # app.logger.debug(data[key])
             data[key]["CPU"].append(np.round((update[key]["CPU"]/total_CPU)*100, decimals=2))
             data[key]["RAM"].append(np.round((update[key]["RAM"]/total_RAM)*100, decimals=2))
             app.logger.debug('Finished appending values')
