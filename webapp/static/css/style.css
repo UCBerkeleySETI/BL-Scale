@@ -5,12 +5,14 @@
 
 .zoom {
     transition: transform .2s; /* Animation */
+    z-index: 100;
   }
   
-  .zoom:hover {
+.zoom:hover {
     -ms-transform: scale(5); /* IE 9 */
     -webkit-transform: scale(5); /* Safari 3-8 */
     transform: scale(5); 
+    z-index: 9999;
   }
 meter,
 progress {
