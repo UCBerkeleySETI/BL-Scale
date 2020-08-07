@@ -368,6 +368,9 @@ def round_processing_time(dict):
 def process_message_dict(message_dict, time_stamp_key="start_timestamp"):
     message_dict = convert_time_to_datetime(message_dict, time_stamp_key=time_stamp_key)
     message_dict = round_processing_time(message_dict)
+    for obs in message_dict:
+        if "filename" not in message_dict[obs]:
+            message_dict[obs]["filename"] = message_dict[obs]["url"]
     return message_dict
 
 
