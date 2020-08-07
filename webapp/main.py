@@ -228,10 +228,12 @@ def update_monitor_data(update, TIME=20):
             total_CPU = update[key]["CPU_REQUESTED"]
             total_RAM = update[key]["RAM_REQUESTED"]
             if key not in data:
+                app.logger.debug(f"{key} not in data, adding key")
                 data[key] = collections.defaultdict(dict)
                 data[key]["CPU"] = []
                 data[key]["RAM"] = []
             if len(data[key]["CPU"]) < TIME or len(data[key]["CPU"]) < TIME:
+                app.logger.debug("padding zeroes")
                 data[key]["CPU"] = fill_zeros(data[key]["CPU"], TIME)
                 data[key]["RAM"] = fill_zeros(data[key]["RAM"], TIME)
             data[key]["CPU"].append(np.round((update[key]["CPU"]/total_CPU)*100), decimals=2)
