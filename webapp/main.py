@@ -226,7 +226,7 @@ def update_monitor_data(update, TIME=20):
         if key.startswith("bl-scale-algo"):
             temp_dict = {}
             app.logger.debug('appending values')
-            app.logger.debug(data)
+            # app.logger.debug(data)
             total_CPU = update[key]["CPU_REQUESTED"]
             total_RAM = update[key]["RAM_REQUESTED"]
             if key not in data:
