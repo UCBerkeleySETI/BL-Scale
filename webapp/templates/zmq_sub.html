@@ -519,7 +519,7 @@
 							
 							<!-- <img id="myImg" src='{{ sample }}' alt="This zooms-in really well and smooth">
 							The Modal -->
-							<img  id='{{ sample.replace("data:image/jpeg;base64,","") }}' src="{{ sample }}" onclick="newTabImage('{{ sample.replace("data:image/jpeg;base64,","")}}')"/>
+							<img  id='{{ sample }}' src="{{ sample_urls[key][1][sample] }}" onclick="newTabImage('{{ sample }}')"/>
 							<script>
 								function newTabImage(sample) {
 									console.log("#"+sample);

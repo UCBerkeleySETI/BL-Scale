@@ -24,6 +24,8 @@ import pickle
 import logging
 from google.cloud import storage
 import threading
+import random
+import string
 global cache
 
 
@@ -526,6 +528,12 @@ def get_img_url(df, observation):
     return samples_url
 
 
+
+def get_random_string(length):
+    letters = string.ascii_lowercase
+    result_str = ''.join(random.choice(letters) for i in range(length))
+    return result_str
+
 def get_base64_images(observation_name):
     # checks to see if you already have the file, else
     # downloads the best_hits.npy file from the observation bucket
@@ -535,14 +543,15 @@ def get_base64_images(observation_name):
         utils.download_blob("bl-scale", observation_name + "/best_hits.npy",
                             observation_name + "_best_hits.npy")
     img_array = np.load(observation_name + "_best_hits.npy")
-    base64_images = []
+    base64_images = {}
     for i in np.arange(0, img_array.shape[0]):
+        key= get_random_string(6)
         rawBytes = io.BytesIO()
         plt.imsave(rawBytes, arr=img_array[i], cmap="viridis")
         rawBytes.seek(0)  # return to the start of the file
         pic_hash = base64.b64encode(rawBytes.read())
         img = "data:image/jpeg;base64, " + str(pic_hash.decode("utf8"))
-        base64_images += [img]
+        base64_images[key] = img
     return base64_images
 
 
