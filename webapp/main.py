@@ -220,6 +220,8 @@ def fill_zeros(array, length):
 def update_monitor_data(update, TIME=20):
     front_end_data = {}
     data = db.child("breakthrough-listen-sandbox").child("flask_vars").child("monitor").get().val()
+    if not data:
+        data = {}
     for key in update:
         if key.startswith("bl-scale-algo"):
             temp_dict = {}
