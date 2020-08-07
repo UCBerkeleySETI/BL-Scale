@@ -224,6 +224,7 @@ def update_monitor_data(update, TIME=20):
         if key.startswith("bl-scale-algo"):
             temp_dict = {}
             app.logger.debug('appending values')
+            app.logger.debug(data)
             total_CPU = update[key]["CPU_REQUESTED"]
             total_RAM = update[key]["RAM_REQUESTED"]
             if key not in data:
@@ -302,7 +303,7 @@ def socket_listener():
             message_dict = pickle.loads(serialized_message_dict)
             app.logger.debug(f"Received message: {message_dict}")
             db.child("breakthrough-listen-sandbox").child("flask_vars").child("sub_message").set(message_dict)
-            if message_dict["done"] == True:
+            if message_dict["done"]:
                 time_stamp = time.time()*1000
                 algo_type = message_dict["algo_type"]
                 message_dict["timestamp"] = time_stamp
@@ -371,8 +372,7 @@ def hits_form():
     session["results_counter"] = 1
 
     try:
-        alert = ""
-        if session['token'] != None:
+        if session['token'] is not None:
             message_dict, cache = get_query_firebase(3)
             message_dict = process_message_dict(message_dict, time_stamp_key="timestamp")
             return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict, sample_urls=cache, test_login=True)
@@ -391,8 +391,7 @@ def zmq_sub():
     global cache
     print("adding 3 more images")
     try:
-        if session['token'] != None:
-            alert = ""
+        if session['token'] is not None:
             message_dict = {}
             session["results_counter"] += 1
             message_dict, cache = get_query_firebase(3*session["results_counter"])
@@ -415,7 +414,7 @@ def zmq_sub():
 @app.route('/trigger')
 def my_form():
     try:
-        if session['token'] != None:
+        if session['token'] is not None:
             print("get querry")
             message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("observation_status").child(
                 "Energy-Detection").order_by_child("start_timestamp").limit_to_last(3).get().val()
@@ -433,7 +432,7 @@ def my_form():
 @app.route('/trigger', methods=['GET', 'POST'])
 def zmq_push():
     try:
-        if session['token'] != None:
+        if session['token'] is not None:
             compute_request = {}
             for key in request.form:
                 compute_request[key] = request.form[key]
