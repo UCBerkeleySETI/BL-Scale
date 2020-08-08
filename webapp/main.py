@@ -344,10 +344,10 @@ def get_query_firebase(num):
         "breakthrough-listen-sandbox").child("flask_vars").child("cache").get()
     for rc in retrieve_cache.each():
         db_cache_keys += [str(rc.key())]
-    # getting rid of mid resolution files 
-    
+    # getting rid of mid resolution files
+
     print(db_cache_keys)
-    
+
     for key in message_dict:
         cache[key] = get_processed_hist_and_img(message_dict[key]["object_uri"]+"/info_df.pkl")
         db.child("breakthrough-listen-sandbox").child("flask_vars").child("cache").child(key).set(cache[key])
@@ -495,26 +495,15 @@ def energy_detection_iframe():
 # ________________________________________START OF HOME PAGE____________________________________#
 ####################################################################################################
 
-
-def get_uri(bucket_name):
-    storage_client = storage.Client("BL-Scale")
-    bucket = storage_client.get_bucket(bucket_name)
-    print(bucket)
-    # List blobs iterate in folder
-    blobs = bucket.list_blobs()
-
-    uris = []
-    for blob in blobs:
-        if "info_df.pkl" in blob.name:
-            uris += ["gs://"+bucket_name+"/"+blob.name]
-    return uris
-
-
+# Intakes a string uri taken from the file on GCP
+# Returns the string observation name
 def get_observation(uri_str):
     obs = re.search(r"([A-Z])\w+(\+\w+)*", uri_str)
     return obs.group(0)
 
-
+# Intakes a pandas dataframe and string observation name
+# Returns a list of image urls
+# Use get_base64_images(observation_name) function instead of this
 def get_img_url(df, observation):
     indexes = []
     samples_url = []
@@ -527,13 +516,13 @@ def get_img_url(df, observation):
                         observation+"/filtered/"+str(blockn[i])+"/"+str(indexes[i])+".png"]
     return samples_url
 
-
-
 def get_random_string(length):
     letters = string.ascii_lowercase
     result_str = ''.join(random.choice(letters) for i in range(length))
     return result_str
 
+# Intakes a string observation name
+# Returns the base64 string of the images (use this for the images on the results page)
 def get_base64_images(observation_name):
     # checks to see if you already have the file, else
     # downloads the best_hits.npy file from the observation bucket
@@ -554,7 +543,8 @@ def get_base64_images(observation_name):
         base64_images[key] = img
     return base64_images
 
-
+# Intakes a pandas dataframe
+# Returns a base64 image of the generated histogram of frequence distribution
 def get_base64_hist(df):
     plt.style.use("dark_background")
     plt.figure(figsize=(8, 6))
@@ -569,9 +559,7 @@ def get_base64_hist(df):
     base64_img = "data:image/jpeg;base64, " + str(pic_hash.decode("utf8"))
     return base64_img
 
-# returns dataframe of 3*n filtered images
-
-
+# Returns dataframe of 3*n filtered images with the most extreme s-values
 def filter_images(df, n):
     # filter 1000 to 1400 freqs
     freq_1000_1400 = df[(df["freqs"] >= 1000) & (df["freqs"] <= 1400)]
@@ -590,13 +578,9 @@ def filter_images(df, n):
 
 # returns list of base64 string hist for first element, list of string image
 # urls for the second element. Intakes a string uri
-
-
 def get_processed_hist_and_img(single_uri):
     data = pd.read_pickle(single_uri)
     observ = get_observation(single_uri)
-    # processed_data = filter_images(data, 4)
-    # return [get_base64_hist(data), get_img_url(processed_data, observ)]
     return [get_base64_hist(data), get_base64_images(observ)]
 
 
