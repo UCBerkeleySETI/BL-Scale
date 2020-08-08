@@ -48,13 +48,14 @@
 		
 		<!-- Responsive -->
 		<link rel="stylesheet" href="../static/css/responsive.css">
-		<!-- Insert these scripts at the bottom of the HTML, but before you use any Firebase services -->
-		<!-- Firebase App is always required and must be first -->
-  
+		
 	
-
+	
 	</head>
 	<!-- End Head -->
+	
+
+	
 	<!-- Main Body -->
 	<body>
 		
@@ -76,7 +77,7 @@
 					<div class="uk-navbar-left padding-left-four-percent">
 					
 						<!-- Logo Image -->
-						<a class="uk-navbar-item uk-logo" href="./index" data-uk-scroll><img src="../static/images/BL-scale-logo.png" alt="" /></a>
+						<a class="uk-navbar-item uk-logo" href="../index" data-uk-scroll><img src="../static/images/BL-scale-logo.png" alt="" /></a>
 					
 					</div>
 					<!-- End Navigation Left Side -->
@@ -105,7 +106,7 @@
 							<!-- Link -->
 							<li>
 							
-								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="../#about">About</a>
+								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="./#about">About</a>
 								
 
 							</li>
@@ -115,7 +116,7 @@
 							<!-- Link -->
 							<li>
 							
-								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="../#status">Status Quo</a>
+								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="./#status">Status Quo</a>
 								
 
 							</li>
@@ -124,7 +125,7 @@
 							<!-- Link -->
 							<li>
 							
-								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="../#problem">Problem</a>
+								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="./#problem">Problem</a>
 
 							</li>
 							<!-- End Link -->
@@ -133,7 +134,7 @@
 							<!-- Link -->
 							<li>
 							
-								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="../#proposal">Solution</a>
+								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="./#proposal">Solution</a>
 
 							</li>
 							<!-- End Link -->
@@ -144,7 +145,7 @@
 							<!-- Link -->
 							<li>
 							
-								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="../#research-project">Research</a>
+								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="./#research-project">Research</a>
 								
 								
 							</li>
@@ -153,14 +154,14 @@
 							<!-- Link -->
 							<li>
 							
-								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="../#compute">BL-Reservoir</a>
+								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="./#compute">BL-Reservoir</a>
 								
 
 							</li>
 
 							<li>
 							
-								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="../result">Results</a>
+								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="./result">Results</a>
 								
 
 							</li>
@@ -337,74 +338,74 @@
 			
 		</div>
 		<!-- End Off-Canvas Navigation -->
-		
-	<p>&nbsp;</p>
-    <p>&nbsp;</p>
-	<p>&nbsp;</p>
-        <div  data-uk-scrollspy="cls:uk-animation-fade" class="row">
-          <div class="col-md-4">
+        <p>&nbsp;</p>
+		<p>&nbsp;</p>
+		<p>&nbsp;</p>
 
-          </div>
-		  <div class="col-md-4 login_border" >
-			<div style="padding-left: 5%; padding-right: 5%;">
-				<p>&nbsp;</p>
-				<p>&nbsp;</p>
-				<h2 class="text-weight-800 Raleway text-white">Welcome!👋 </h2>
-				<p class="text-white text-weight-400 no-margin-bottom">Login to access cloud-based platform for scaling SETI algorithms to process Breakthrough Listen data.</p>
-				<p class="text-white text-weight-400 no-margin-bottom"><b>NOTE</b>: If this is your first time loging in in the past few days, this may require 30 sec - 1 min to fully update your account with the data in our storage</p>
-				{% if smessage %}
-					<div class="alert alert-success">
-					{{ smessage }}
-					</div>
-				{% endif %}
-				{% if umessage %}
-					<div class="alert alert-danger">
-					{{ umessage }}
-					</div>
-				{% endif %}
-				<form action="/login" method="post">
-					<div class="form-group">
-					<label for="exampleInputEmail1">Email address</label>
-					<input type="email" class="form-control" name="name"  placeholder="Enter email">
-					</div>
-					<div class="form-group">
-					<label for="exampleInputPassword1">Password</label>
-					<input type="password" class="form-control" name="password" placeholder="Password">
-					</div>
-					<button type="submit" name="submit" class="btn btn-primary">Submit</button>
-				</form>
-
-				<div class="row">
-					<div class="col-sm">
-					<a href="/forgot_password" class="text-decoration-none">Forgot Password</a>
-					</div>
-					<div class="col-sm">
-					
-					</div>
-				</div>
-				<p>&nbsp;</p>
-				<p>&nbsp;</p>
+		<div class="row" style="padding-left: 5%; padding-right: 5%; ">
+			<div class="col-4">
+               
+			
 
 			</div>
-        </div>
-        <div class="col-md-4">
-			<p>&nbsp;</p>
-        </div>
-        </div>
+			<div class="col-4" style="text-align: center;">
+				
+                <h1 class="text-weight-700 Raleway linear-wipe">BL-Reservoir</h1>
+                <p>&nbsp;</p>
+			</div>
+			<div class="col-4">
+				
+			</div>
+
+		</div>
+		
+		
+		<div class="row" style="padding-left: 5%; padding-right: 5%; ">
+
+
+		
+			<div class="col-md-4" style="padding-bottom: 10%; height:90%" >
+				<div style="border: 3px solid #fc5603; border-radius:10px;">
+				
+					
+						<p>&nbsp;</p>
+						<div style="padding-left: 5%; padding-right: 5%;">
+						<h4 class="text-weight-800 Raleway text-white">Energy Detection <span class="badge badge-danger" style="background-color: #fc5603; text-align: left;">New!</span></h4>
+						
+							<p class="text-white text-weight-400 no-margin-bottom">
+                               
+                                Of the many possible ETI signal characteristics, an energized narrowband signal is an important indicator. In this notebook we will show a statistical method in detecting a highly energized signal.
+							</p>
+							<img class='img-responsive' src='../static/images/bellCurve1.png' style="width: 100%" class="center">
+							<p >&nbsp;</p>
+								<a class="btn btn-small btn-orange border-radius-50 sm-display-table xs-no-margin-bottom "  href="{{ '../energy_detection_notebook' }}" >Notebook</a>
+							<p>&nbsp;</p>
+							
+						</div>
+					</div>
+					
+				</div>
+				
+            </div>
+            
+            
+		</div>
+
+
         <p>&nbsp;</p>
         <p>&nbsp;</p>
         <p>&nbsp;</p>
         <p>&nbsp;</p>
-        <p>&nbsp;</p>
-        <p>&nbsp;</p>
-        <p>&nbsp;</p>
-        <p>&nbsp;</p>
-        <p>&nbsp;</p>
-        <p>&nbsp;</p>
-        <p>&nbsp;</p>
-        <p>&nbsp;</p>
+  
+		
+		<!-- Footer Detailed 4 Colums -->
 		<!-- Footer Detailed 4 Colums -->
 		<footer data-uk-scrollspy="cls:uk-animation-fade" id="foot">
+		
+			
+				
+			
+			
 			<!-- Row -->
 			<div class="row bg-black padding-top-bottom-50px padding-left-right-twelve-percent">
 				
@@ -423,6 +424,11 @@
 			<!-- End Row -->
 			
 		</footer>
+		<!-- End Footer -->
+			
+			
+			<!-- Row -->
+		
 		<!-- End Footer -->
 		
 		

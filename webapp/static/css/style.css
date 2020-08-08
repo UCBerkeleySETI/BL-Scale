@@ -1,14 +1,177 @@
 @charset "utf-8";
 
 
-/* ----------------------------------
+#myImg {
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+  
+  #myImg:hover {opacity: 0.7;}
+  
+  /* The Modal (background) */
+  .modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    padding-top: 100px; /* Location of the box */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.9); /* Black w/ opacity */
+  }
+  
+  /* Modal Content (image) */
+  .modal-content {
+    margin: auto;
+    display: block;
+    width: 80%;
+    max-width: 700px;
+  }
+  
+  /* Caption of Modal Image */
+  #caption {
+    margin: auto;
+    display: block;
+    width: 80%;
+    max-width: 700px;
+    text-align: center;
+    color: #ccc;
+    padding: 10px 0;
+    height: 150px;
+  }
+  
+  /* Add Animation */
+  .modal-content, #caption {  
+    -webkit-animation-name: zoom;
+    -webkit-animation-duration: 0.6s;
+    animation-name: zoom;
+    animation-duration: 0.6s;
+  }
+  
+  @-webkit-keyframes zoom {
+    from {-webkit-transform:scale(0)} 
+    to {-webkit-transform:scale(1)}
+  }
+  
+  @keyframes zoom {
+    from {transform:scale(0)} 
+    to {transform:scale(1)}
+  }
+  
+  /* The Close Button */
+  .close {
+    position: absolute;
+    top: 15px;
+    right: 35px;
+    color: #f1f1f1;
+    font-size: 40px;
+    font-weight: bold;
+    transition: 0.3s;
+  }
+  
+  .close:hover,
+  .close:focus {
+    color: #bbb;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  
+  /* 100% Image Width on Smaller Screens */
+  @media only screen and (max-width: 700px){
+    .modal-content {
+      width: 100%;
+    }
+  }
 
-Name: style.css
-Author: Fourtabs
-Website: https://www.fourtabs.com
-Exclusively available here: https://themeforest.net/user/fourtabsthemes
+/* .zoom {
+    transition: transform .2s; 
+    z-index: 100;
+  }
+  
+.zoom:hover {
+    -ms-transform: scale(5); 
+    -webkit-transform: scale(5); 
+    transform: scale(5); 
+    z-index: 9999!important;
+  } */
+meter,
+progress {
+  width: 100%;
+  height: 10px;
+}
 
-------------------------------------- */
+
+
+.styled meter {
+  /* Reset the default appearance */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+
+  width: 100%;
+  height: 10px;
+  
+  /* For Firefox */
+  background: #000;
+  box-shadow: 0 2px 3px rgba(0,0,0,0.2) inset;
+  border-radius: 3px;
+}
+
+/* WebKit */
+meter::-webkit-meter-bar {
+  background: #000;
+  box-shadow: 0 2px 3px rgba(0,0,0,0.2) inset;
+  border-radius: 3px;
+}
+meter::-webkit-meter-optimum-value,
+meter::-webkit-meter-suboptimum-value,
+ meter::-webkit-meter-even-less-good-value {
+  border-radius: 3px;
+}
+
+ meter::-webkit-meter-optimum-value {
+    background: #FF0000 ;
+}
+
+ meter::-webkit-meter-suboptimum-value {
+  background: #FFFF00;
+}
+
+meter::-webkit-meter-even-less-good-value  {
+    background:  #00FF00 ;
+}
+
+
+/* Firefox */
+ meter::-moz-meter-bar {
+  border-radius: 3px;
+}
+
+meter:-moz-meter-optimum::-moz-meter-bar {
+  background: #FF0000 ;
+}
+
+ meter:-moz-meter-sub-optimum::-moz-meter-bar {
+  background: #FFFF00;
+}
+
+ meter:-moz-meter-sub-sub-optimum::-moz-meter-bar {
+  background:  #00FF00 ;
+}
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -63,7 +226,7 @@ Exclusively available here: https://themeforest.net/user/fourtabsthemes
     display: block;
     margin-left: auto;
     margin-right: auto;
-    width: 50%;
+    width: 90%;
 }
 .group-pic{
     padding-top: 100px;
@@ -85,7 +248,41 @@ Exclusively available here: https://themeforest.net/user/fourtabsthemes
     padding-right: 35%;
 
 }
-
+.splash_heading{
+    font-size: 70px;
+}
+.splash_cloud{
+    font-size: 70px;
+}
+.login_border{
+    border: 3px solid #fc5603; 
+    border-radius:5%;
+}
+.hamburger{
+    width: 30px;
+}
+@media only screen and (max-width: 600px) {
+    .splash_heading{
+        font-size: 40px;
+    }
+    .splash_cloud{
+        font-size: 60px;
+    }
+    .backimg-wave{
+        background-size: 0% !important;
+    }
+    .login_border{
+        border: 3px solid #000; 
+        border-radius:5%;
+    }
+    .login_font{
+        font-size: 50px;
+    }
+    .hamburger{
+        width: 100px;
+    }
+    
+}
 
 .backimg{
     background: url('../images/radio-telescope-background2.png') no-repeat;

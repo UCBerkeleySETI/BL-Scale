@@ -1,0 +1,724 @@
+div#notebook {
+    color: #F8F8F2;
+}
+/* .container{
+    width:50% !important;
+} */
+body,
+div.body {
+    color: #F8F8F2;
+    background-color: #000;
+    background: #000;
+    -webkit-font-smoothing: antialiased !important;
+}
+span.filename{
+    font-weight: 1000;
+    color: rgba(250, 166, 11, 0.95);
+}
+span.checkpoint_status,
+span.auto_status {
+    color: #50FA7B;
+}
+body.notebook_app {
+    background-color: #000;
+    background: #000;
+    padding-right: 0px !important;
+    overflow-y: hidden;
+}
+
+#notebook-container > div.cell.code_cell.rendered.selected > div.input > div.inner_cell > div.ctb_hideshow.ctb_show > div > div > button,
+#notebook-container > div.input > div.inner_cell > div.ctb_hideshow.ctb_show > div > div > button {
+    color: #FFF;
+    background-color: #000;
+    border: 1px solid #000;
+}
+@media only screen and (max-width: 745) {
+    #notebook-container {
+        background-color: #000;
+        width:100% !important
+    }
+  }
+#notebook-container {
+    background-color: #000;
+    
+}
+.nav-tabs > li > a:active,
+.nav-tabs > li > a:focus,
+.nav-tabs > li > a:hover,
+.nav-tabs > li.active > a,
+.nav-tabs > li.active > a:focus,
+.nav-tabs > li.active > a:hover,
+.nav-tabs > li.active > a,
+.nav-tabs > li.active > a:hover,
+.nav-tabs > li.active > a:focus {
+    color: rgb(225, 235, 100);
+    background-color: #000;
+    border-color: white;
+    border-bottom: 2px solid transparent;
+}
+#tree-selector-btn {
+    border-color: #21222C;
+    background: #000;
+    background-color: #000;
+    color: #F8F8F2;
+}
+#tree-selector-btn:hover {
+    border-color: #21222C;
+    background: #000;
+    background-color: #000;
+    color: #FFF;
+}
+#button-select-all{
+    background: #000;
+    border-color: #21222C;
+    color: #F8F8F2;
+}
+#button-select-all:hover{
+    background: #000;
+    border-color: #21222C;
+    color: #FFF;
+}
+#notebook_list{
+    border-color: #21222C;
+}
+.list_header,
+div#notebook_list_header.row.list_header {
+    color: #F8F8F2;
+    background: #21222C;
+    background-color: #21222C;
+    height: 35px;
+    border-color: #21222C;
+}
+.list_placeholder{
+    color: #21222C;
+}
+#running .panel-group .panel .panel-body .list_container .list_item {
+    background: #000;
+    background-color: #000;
+}
+.list_item.row{
+    border-color: #21222C;
+}
+div.list_item:hover {
+    background-color: #21222C;
+}
+.pull-right{
+    color: #F8F8F2;
+}
+.item_name{
+    color: #FFF;
+    font-weight: bold;
+}
+div#new-buttons > button,
+#new-buttons > button{
+    color: #FFF;
+    background-color: #21222C;
+    background: #21222C;
+    border-color: #FFF;
+}
+div#refresh_notebook_list,
+#refresh_notebook_list {
+    color: #FFB86C;
+    background-color: #21222C;
+    background: #21222C;
+    border-color: #FFB86C;
+}
+div#refresh_notebook_list > button:hover,
+#refresh_notebook_list > button:hover,
+div.alternate_upload .btn-upload,
+.alternate_upload .btn-upload,
+div.dynamic-buttons > button,
+.dynamic-buttons > button,
+.dynamic-buttons > button:focus,
+.dynamic-buttons > button:active:focus,
+.dynamic-buttons > button.active:focus,
+.dynamic-buttons > button.focus,
+.dynamic-buttons > button:active.focus,
+.dynamic-buttons > button.active.focus,
+#new-buttons > button:focus,
+#new-buttons > button:active:focus,
+#new-buttons > button.active:focus,
+#new-buttons > button.focus,
+#new-buttons > button:active.focus,
+#new-buttons > button.active.focus,
+.alternate_upload .btn-upload:focus,
+.alternate_upload .btn-upload:active:focus,
+.alternate_upload .btn-upload.active:focus,
+.alternate_upload .btn-upload.focus,
+.alternate_upload .btn-upload:active.focus,
+.alternate_upload .btn-upload.active.focus {
+    color: #50FA7B;
+    background-color: #21222C;
+    background: #21222C;
+    border-color: #50FA7B;
+}
+div#new-buttons > button:hover,
+#new-buttons > button:hover{
+    border-color: #027497;
+}
+div#header {
+    background: #000;
+    background-color: #000;
+    position: relative;
+    z-index: 100;
+}
+.folder_icon:before {
+    display: inline-block;
+    font-size: inherit;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    content: "\f07b";
+    color: #FFF;
+}
+.notebook_icon:before {
+    display: inline-block;
+    font-size: inherit;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    content: "\f02d";
+    position: relative;
+    color: rgb(250, 80, 80) !important;
+    top: 0px;
+}
+.file_icon:before {
+    display: inline-block;
+    font-size: inherit;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    content: "\f15b";
+    position: relative;
+    top: 0px;
+    color: #FFB86C !important;
+}
+#sort-name{
+    background: #000;
+    background-color: #000;
+    border-color: #FFF;
+    color: #FFF;
+}
+#sort-name:hover{
+    border-color: #027497;
+}
+#last-modified{
+    background: #000;
+    background-color: #000;
+    border-color: #FFF;
+    color: #FFF;
+}
+#last-modified:hover{
+    border-color: #027497;
+}
+#file-size{
+    background: #000;
+    background-color: #000;
+    border-color: #FFF;
+    color: #FFF;
+}
+#file-size:hover{
+    border-color: #027497;
+}
+div#menubar {
+    background-color: #000;
+}
+.dropdown-menu {
+    background-color: #000;
+    background: #000;
+}
+.dropdown-menu:hover {
+    background-color: #21222C;
+}
+.dropdown-menu > li > a {
+    color: #F8F8F2;
+    background-color: #000;
+    background: #000;
+}
+#menubar .navbar,
+.navbar-default {
+    background-color: #21222C;
+    border-color: #21222C;
+}
+.navbar-default .navbar-nav > li > a:hover,
+.navbar-default .navbar-nav > li > a:focus {
+    color: #F8F8F2;
+    background-color: #21222C
+}
+.navbar-default .navbar-nav > .open > a,
+.navbar-default .navbar-nav > .open > a:hover,
+.navbar-default .navbar-nav > .open > a:focus {
+    color: #F8F8F2;
+    background-color: #000;
+    border-color: #000;
+}
+.dropdown-menu {
+    background-color: #000;
+    background: #000;
+}
+.dropdown-menu:hover {
+    background-color: #21222C;
+}
+.dropdown-menu > li > a {
+    display: block;
+    color: #F8F8F2;
+    background-color: #000;
+    background: #000;
+}
+.dropdown-menu > li > a:hover,
+.dropdown-menu > li > a:focus {
+    color: #F8F8F2;
+    background-color: #21222C;
+    background: #21222C;
+    transition: 50ms ease;
+}
+.dropdown-menu .divider {
+    overflow: hidden;
+    background-color: #000;
+}
+.dropdown-menu > .disabled > a:hover,
+.dropdown-menu > .disabled > a:focus {
+    color: #F8F8F2;
+    display: block;
+    clear: both;
+}
+.dropdown-submenu > a:after {
+    color: #F8F8F2;
+    display: inline-block;
+}
+.dropdown-submenu:hover > a:after,
+.dropdown-submenu:active > a:after,
+.dropdown-submenu:focus > a:after,
+.dropdown-submenu:visited > a:after {
+    color: #50FA7B;
+    display: inline-block !important;
+}
+.nbext-filter-menu.dropdown-menu > li > a:hover,
+.nbext-filter-menu.dropdown-menu > li > a:focus,
+.nbext-filter-menu.dropdown-menu > li > a.ui-state-focus {
+    color: #F8F8F2 !important;
+    background-color: #000 !important;
+    background: #000 !important;
+    border-color: #21222C !important;
+}#toc a,
+#navigate_menu a,
+.toc {
+    color: #F8F8F2 !important;
+}
+#toc a:hover,
+#navigate_menu a:hover,
+.toc {
+    color: #F8F8F2 !important;
+}
+.jupyter-dashboard-menu-item.selected::before {
+    content: '\f00c' !important;
+    position: absolute !important;
+    color: #8BE9FD !important;
+}
+#header .header-bar,
+.edit_app #header .header-bar {
+ background: #000;
+ background-color: #000;
+}
+body > #header .header-bar {
+    background: #000;
+}
+.toolbar select,
+.toolbar label {
+    display: inline;
+    padding: 0px;
+    background: #000 !important;
+    background-color: #000 !important;
+    border: 2px solid #21222C !important;
+}
+.celltoolbar {
+    font-size: 100%;
+    padding-top: 3px;
+    border-color: transparent;
+    background: transparent;
+}
+div.form-control,
+.form-control {
+    color: #F8F8F2;
+    background-color: #000;
+    border: 1px solid #21222C !important;
+}
+.form-control:focus {
+    outline: 2px solid #21222C;
+}
+.has-success .form-control {
+    border-color: #21222C;
+}
+.has-error .form-control {
+    border-color: #FFB86C;
+}
+.item_buttons > .btn,
+.item_buttons > .btn-group,
+.item_buttons > .input-group {
+    background: #000;
+    background-color: #000;
+}
+.item_buttons > .btn:hover,
+.item_buttons > .btn-group:hover,
+.item_buttons > .input-group:hover,
+.item_buttons > .btn.active,
+.item_buttons > .btn-group.active,
+.item_buttons > .input-group.active,
+.item_buttons > .btn.focus {
+    background: #000;
+    background-color: #000;
+}
+.btn-group > .btn + .dropdown-toggle:hover {
+    background: #21222C!important;
+}
+.input-group-btn:first-child > .btn,
+.input-group-btn:first-child > .btn-group {
+    background: #000;
+    background-color: #000;
+    border: 2px solid #21222C !important;
+}
+.input-group-btn:first-child > .btn:hover,
+.input-group-btn:first-child > .btn-group:hover {
+    background: #000;
+    background-color: #000;
+    border: 2px solid #21222C !important;
+}
+div.modal .btn-group > .btn:first-child {
+    background:#000;
+    background-color: #000;
+    border: 2px solid #21222C !important;
+}
+div.modal .btn-group > .btn:first-child:hover {
+    background: #000;
+    background-color: #000;
+    border: 2px solid #21222C !important;
+    transition: 50ms ease;
+}
+div.widget_item.btn-group > button.btn.btn-default.widget-combo-btn,
+div.widget_item.btn-group > button.btn.btn-default.widget-combo-btn:hover {
+    background: #000;
+    background-color: #000;
+    border: 2px solid #21222C !important;
+    z-index: 0;
+}
+.input-group .nbext-list-btn-add,
+.input-group-btn:last-child > .btn-group > .btn {
+    background: #000;
+    background-color: #000;
+    border-color: #21222C;
+}
+.input-group .nbext-list-btn-add:hover,
+.input-group-btn:last-child > .btn-group > .btn:hover {
+    background: #000;
+    background-color: #000;
+    border-color: #000;
+}
+#notebook-container > div.cell.code_cell.rendered.selected > div.widget-area > div.widget-subarea > div > div.widget_item.btn-group > button.btn.btn-default.dropdown-toggle.widget-combo-carrot-btn {
+    background: #000;
+    background-color: #000;
+    border-color: #21222C;
+}
+#notebook-container > div.cell.code_cell.rendered.selected > div.widget-area > div.widget-subarea > div > div.widget_item.btn-group > button.btn.btn-default.dropdown-toggle.widget-combo-carrot-btn:hover {
+    background: #000;
+    background-color: #000;
+    border-color: #21222C;
+}
+span#login_widget > .button:focus,
+#logout:focus,
+span#login_widget > .button.focus,
+#logout.focus,
+span#login_widget > .button:active,
+#logout:active,
+span#login_widget > .button.active,
+#logout.active,
+.open > .dropdown-togglespan#login_widget > .button,
+.open > .dropdown-toggle#logout {
+    color: #F8F8F2;
+    background-color: #21222C;
+    background: #21222C;
+    border-color: #000;
+}
+div.notification_widget.info,
+.notification_widget.info,
+.notification_widget:active:hover,
+.notification_widget.active:hover,
+.open > .dropdown-toggle.notification_widget:hover,
+.notification_widget:active:focus,
+.notification_widget.active:focus,
+.open > .dropdown-toggle.notification_widget:focus,
+.notification_widget:active.focus,
+.notification_widget.active.focus,
+.open > .dropdown-toggle.notification_widget.focus,
+div#notification_notebook.notification_widget.btn.btn-xs.navbar-btn,
+div#notification_notebook.notification_widget.btn.btn-xs.navbar-btn:hover,
+div#notification_notebook.notification_widget.btn.btn-xs.navbar-btn:focus {
+    color: #F8F8F2;
+    background-color: #21222C;
+    background: #21222C;
+    border-color: #000;
+}
+#modal_indicator {
+    float: right !important;
+    color: #8BE9FD;
+    background: #21222C;
+    background-color: #21222C;
+}
+#kernel_indicator {
+    float: right !important;
+    color: #8BE9FD;
+    background: #21222C;
+    background-color: #21222C;
+}
+div.notification_widget.info,
+.notification_widget.info,
+.notification_widget:active:hover,
+.notification_widget.active:hover,
+.open > .dropdown-toggle.notification_widget:hover,
+.notification_widget:active:focus,
+.notification_widget.active:focus,
+.open > .dropdown-toggle.notification_widget:focus,
+.notification_widget:active.focus,
+.notification_widget.active.focus,
+.open > .dropdown-toggle.notification_widget.focus,
+div#notification_notebook.notification_widget.btn.btn-xs.navbar-btn,
+div#notification_notebook.notification_widget.btn.btn-xs.navbar-btn:hover,
+div#notification_notebook.notification_widget.btn.btn-xs.navbar-btn:focus {
+    color: #FFB86C;
+    background-color: #21222C;
+    border-color: #21222C;
+}
+.navbar-btn.btn-xs{
+    background: #21222C;
+    background-color: #21222C;
+    color: #F8F8F2;
+    border-color: #F8F8F2;
+}
+.navbar-btn.btn-xs:hover {
+    background: #000;
+    background-color: #000;
+    color: #F8F8F2;
+    border-color: #F8F8F2;
+}
+#shutdown{
+    background: #000;
+    background-color: #000;
+    color: #FF5555;
+    border-color: #FF5555;
+}
+#shutdown:hover{
+    color: #FF5555;
+    background: #000;
+    background-color: #000;
+    border-color: rgb(143, 47, 47);
+}
+span#login_widget > .button,
+#logout {
+    color: #FF5555;
+    background: #000;
+    background-color: #000;
+    border-color: #FF5555;
+}
+span#login_widget > .button:hover,
+#logout:hover {
+    color: #FF5555;
+    background-color: #000;
+    background: #000;
+    border-color: rgb(143, 47, 47);
+}
+.modal-content {
+    position: relative;
+    background: #21222C;
+    background-color: #21222C;
+    border-radius: 1px;
+    background-clip: padding-box;
+    outline: none;
+}
+.btn-upload:hover{
+    color: #50FA7B;
+    background-color: #21222C;
+    background: #21222C;
+    border-color: #287d3c;
+}
+#new-dropdown-button {
+    background-color: #21222C;
+    background: #21222C;
+    border-color: #FFF;
+}
+.modal-content h4 {
+    color: #F8F8F2;
+    padding: 5px;
+}
+button.close {
+    border: 0px none;
+    font-size: 20pt;
+    font-weight: normal;
+}
+.close {
+    color: #FF5555;
+    opacity: .5;
+    font-weight: normal;
+}
+div.input_area {
+    background-color: #141414;
+    background: #141414;
+    color: #F8F8F2;
+    border: 2px;
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+    border-radius: 10px;
+}
+div.cell.text_cell.unrendered div.input_area,
+div.cell.text_cell.rendered div.input_area {
+    color: #F8F8F2;
+    background-color: #21222C;
+    background: #21222C;
+    border: 2px;
+    border-radius: 2px;
+}
+div.text_cell,
+div.text_cell_render pre,
+div.text_cell_render {
+    color: #b5b5b5;
+    background: #000;
+    background-color: #000;
+}
+div.prompt.input_prompt {
+    color: #f50;
+    background-color: #000;
+}
+div.output_subarea.output_text.output_stream.output_stdout,
+div.output_subarea.output_text {
+    font-size: 10pt;
+    background-color: #000;
+    color: #F8F8F2;
+}
+div.output_area pre {
+    color: #b5b5b5;
+}
+div.prompt.output_prompt {
+    color: #50FA7B;
+}
+input.raw_input {
+    color: #F8F8F2;
+    background-color:#000;
+    background: #000;
+    border-color: #21222C;
+}
+.CodeMirror{
+    color: #F8F8F2;
+}
+.CodeMirror-gutters {
+    background-color: #000;
+    background: #000;
+    border-color: #FFF;
+}
+div.CodeMirror-sizer {
+    border-color: #191919;
+}
+.cm-s-ipython .CodeMirror-linenumber {
+    color: #FFB86C;
+}
+div.timing_area{
+    background: #000;
+    background-color: #000;
+    border-color: #21222C;
+    color: #FFB86C;
+}
+div.cell.code_cell .input_prompt {
+    border-right: 1px solid #f50;
+}
+div.cell.code_cell.rendered.selected .run_this_cell:hover {
+    background-color: #000;
+    background: #000;
+    color: #50FA7B;
+}
+div.cell.code_cell.rendered.unselected .run_this_cell:hover {
+    background-color: #000;
+    background: #000;
+    color: #50FA7B;
+}
+div.cell.selected.jupyter-soft-selected .run_this_cell,
+div.cell.selected.jupyter-soft-selected .run_this_cell:hover,
+div.cell.unselected.jupyter-soft-selected .run_this_cell:hover,
+div.cell.code_cell.rendered.selected.jupyter-soft-selected .run_this_cell:hover,
+div.cell.code_cell.rendered.unselected.jupyter-soft-selected .run_this_cell:hover {
+ background-color: #000;
+ background: #000;
+ color: #FFF;
+}
+#notebook-container > div.cell.code_cell.rendered.selected > div.widget-area > div.widget-subarea > div > div.widget_item.btn-group > button.btn.btn-default.dropdown-toggle.widget-combo-carrot-btn {
+    background: #000;
+    background-color: #000;
+    border-color: #21222C;
+}
+#notebook-container > div.cell.code_cell.rendered.selected > div.widget-area > div.widget-subarea > div > div.widget_item.btn-group > button.btn.btn-default.dropdown-toggle.widget-combo-carrot-btn:hover {
+    background: #000;
+    background-color:#000;
+    border-color: #21222C;
+}
+#notebook-container > div.cell.code_cell.rendered.selected > div.input > div.inner_cell > div.ctb_hideshow.ctb_show > div > div > button,
+#notebook-container > div.input > div.inner_cell > div.ctb_hideshow.ctb_show > div > div > button {
+    color: #F8F8F2;
+    background-color: #000;
+    background-image: none;
+    border: 1px solid #a2b0c7;
+}
+.dataframe{
+    background-color: rgb(219,219,219);
+    background: rgb(219,219,219);
+}
+.output_subarea.output_png{
+    background-color: rgb(219,219,219);
+    background: rgb(219,219,219);
+}
+.cm-s-ipython .CodeMirror-cursor {
+    border-left: 3px solid #a2b0c7 !important;
+}
+.cm-s-ipython{
+    color: #F8F8F2;
+}
+.cm-s-ipython span.cm-comment {
+    color: rgb(110, 130, 180);
+    font-style: italic;
+}
+.cm-s-ipython span.cm-atom {
+    color: rgb(250, 250, 240);
+}
+.cm-s-ipython span.cm-number {
+    color: rgb(240, 155, 140);
+}
+.cm-s-ipython span.cm-property {
+    color: rgb(80, 250, 125);
+}
+.cm-s-ipython span.cm-attribute {
+    color: rgb(70, 100, 225);
+}
+.cm-s-ipython span.cm-keyword {
+    color: rgb(255, 100, 190);
+    font-weight: bold;
+}
+.cm-s-ipython span.cm-string {
+    color: rgb(230, 235, 75);
+}
+.cm-s-ipython span.cm-meta {
+    color: rgb(175, 40, 50);
+}
+.cm-s-ipython span.cm-operator {
+    color: rgb(240, 110, 85);
+}
+.cm-s-ipython span.cm-builtin {
+    color: rgb(5, 170, 225);
+}
+.cm-s-ipython span.cm-variable {
+    color: rgb(250, 250, 240);
+}
+.cm-s-ipython span.cm-def {
+    color: rgb(80, 250, 125);
+    font-weight: bold;
+}
+.cm-s-ipython span.cm-error {
+    background: rgba(210, 40, 60);
+}
+.cm-s-ipython span.cm-link {
+    color: rgb(100, 175, 240);
+}

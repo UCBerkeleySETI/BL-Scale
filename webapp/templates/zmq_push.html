@@ -13,12 +13,13 @@
 
 		<!-- description -->
         <meta name="description" content="">
+		<meta id="uid" content="{{ uid }}">
         <!-- keywords -->
         <meta name="keywords" content="">
 
 
 		<!--Start Title -->
-		<title>BL@Scale</title>
+		<title>Breakthrough Listen @ Scale</title>
 		<!--End Title -->
 
 
@@ -95,7 +96,7 @@
 
 								<div class="uk-navbar-left uk-hidden@l">
 
-									<a class="uk-navbar-toggle" data-uk-navbar-toggle-icon data-uk-toggle="target: #offcanvas-nav"></a>
+									<a class="uk-navbar-toggle" data-uk-navbar-toggle-icon data-uk-toggle="target: #offcanvas-nav"><img class="hamburger" src="../static/images/menu.png"></a>
 
 								</div>
 
@@ -103,25 +104,22 @@
 							<!-- End Off-Canvas Navigation Toggle -->
 							<li>
 
-								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="../home">Dashboard</a>
-
-
-							</li>
-
-
-							<li>
-
-								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="./trigger">Trigger</a>
+								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="{{ '../home' }}">Dashboard</a>
 
 
 							</li>
 							<li>
 
-								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="./result">Results</a>
+								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="{{ '../trigger' }}">Trigger</a>
 
 
 							</li>
-							
+							<li>
+
+								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="{{ '../result' }}">Results</a>
+
+
+							</li>
 
 							<!-- Link -->
 							<li>
@@ -132,15 +130,15 @@
 							</li>
 							<!-- Link -->
 							<li>
-								<div style="padding-top: 20%; padding-left: 20%;" >
-									<a class="btn btn-small btn-orange border-radius-50 sm-display-table xs-no-margin-bottom "  href="{{ url_for('index') }}" >Logout</a>
-							</div>
+
+									<a class="btn-orange  "  href="{{ url_for('logout') }}" >Logout</a>
+
 							<!-- End Link -->
 
 
 
 							<!-- Link -->
-							
+
 							</li>
 							<!-- End Link -->
 							<li><a style="padding-left: 0;" href="https://github.com/UCBerkeleySETI"><img style="width: 25%;"src="../static/images/BL_Scale_icon.png"  ></a></li>
@@ -159,6 +157,98 @@
 
 		</div>
 		<!-- End Header Transparent -->
+		<div id="offcanvas-nav" data-uk-offcanvas="mode: reveal; overlay: true; esc-close: true;">
+
+			<!-- Off-Canvas Bar -->
+			<div class="uk-offcanvas-bar menu-white bg-black">
+
+				<!-- Off-Canvas Links-->
+				<ul class="uk-nav-sub text-left" data-uk-nav>
+
+
+					<li><a class="uk-navbar-item uk-logo" href="index.html" data-uk-scroll><img src="../static/images/BL-scale-logo.png" alt="" /></a></li>
+
+					<!-- Link -->
+					<li class="margin-bottom-10px">
+
+						<a href="{{ '../home'  }}" class="bottom-border border-1px border-color-white-extra-light"><span class="text-small text-white text-uppercase text-weight-700 padding-bottom-20px">
+							Dashboard
+							<span class="margin-left-10px" ></span></span></a>
+
+					</li>
+					<!-- End Link -->
+
+					<!-- Link -->
+					<li class="margin-bottom-10px">
+						<a  href="{{ '../trigger' }}" class="bottom-border border-1px border-color-gray-extra-light"><span class="text-small text-white text-uppercase text-weight-700 padding-bottom-20px">
+							Trigger
+							<span class="margin-left-10px" ></span></span></a>
+
+
+					</li>
+					<!-- End Link -->
+
+
+
+
+
+					<!-- Link -->
+					<li class=" margin-bottom-10px">
+
+						<a href="{{ '../result' }}" class="bottom-border border-1px border-color-gray-extra-light"><span class="text-small text-white text-uppercase text-weight-700 padding-bottom-20px">
+							Result
+							<span class="margin-left-10px" ></span></span></a>
+
+					</li>
+					<!-- End Link -->
+
+
+
+
+
+					<!-- Link -->
+					<li class="margin-bottom-10px">
+
+						<a href="{{ url_for('monitor.base') }}" class="bottom-border border-1px border-color-gray-extra-light"><span class="text-small text-white text-uppercase text-weight-700 padding-bottom-20px">
+							Monitor
+							<span class="margin-left-10px" ></span></span></a>
+
+					</li>
+					<!-- End Link -->
+
+
+
+
+
+
+					<!-- Link -->
+					<li class="margin-bottom-10px">
+
+						<a href="{{ url_for('logout') }}" class="bottom-border border-1px border-color-gray-extra-light"><span class="text-small btn-orange text-uppercase text-weight-700 padding-bottom-20px">
+							Logout
+							<span class="margin-left-10px" ></span></span></a>
+					</li>
+					<!-- End Link -->
+
+				</ul>
+				<!-- End Off-Canvas Links -->
+
+
+
+				<!-- Navigation Footer -->
+				<div class="nav-footer margin-top-100px">
+					<!-- Copyright Information -->
+					<p class="no-margin-bottom margin-top-20px text-small text-gray-dark text-weight-400">Copyright © 2020 of <a href="http://seti.berkeley.edu/" target="_blank">UC Berkeley SETI Research Center.</a></p>
+					<p class="no-margin-bottom text-small text-gray-dark text-weight-400 text-black">All rights reserved.</p>
+					<!-- End Copyright Information -->
+				</div>
+				<!-- End Navigation Footer -->
+
+			</div>
+			<!-- End Off-Canvas Bar -->
+
+		</div>
+		<!-- End Off-Canvas Navigation -->
     <p>&nbsp;</p>
     <p>&nbsp;</p>
     <p>&nbsp;</p>
@@ -167,48 +257,65 @@
 
         <div  data-uk-scrollspy="cls:uk-animation-fade" class="row">
           <div class="col-md-6" style="padding-left: 5% ">
-			<h2 class="text-weight-800 Raleway text-white">Target IP  </h2>
-
-            <form method="POST">
-                <input name="target_ip" type="text">
+			<form method="POST" style=" padding-right: 5% ">
+				<h2 class="text-weight-800 Raleway text-white">Algorithm Package</h2>
+                    <input name="alg_package" type="text">
+                <h2 class="text-weight-800 Raleway text-white">Algorithm Name</h2>
+                    <input name="alg_name" type="text">
                 <h2 class="text-weight-800 Raleway text-white">File URL</h2>
-
-              <input name="message" type="text">
+                    <input name="input_file_url" type="text">
               <button type="submit" name="submit" class="btn btn-primary">Submit</button>
               <!-- <input type="submit"> -->
           </form>
 
           </div>
-          <div class="col-md-6" >
-			<h2 class="text-weight-800 Raleway text-white">Most Recent Triggers</h2>
-
-			{%for key in message_sub%}
-			<div class="row" style=" padding-left: 5%;">
-				<p>&nbsp;</p>
+		  <div class="col-md-6" >
+			<div style=" padding-right: 5% ">
+				<h2 class="text-weight-800 Raleway text-white">Most Recent Triggers</h2>
+				{%for key in message_sub%}
 				<div class="row">
-					<h4 class="text-weight-500 Raleway text-white">
-					{{ message_sub[key]["url"].replace("sslberkeleyedudl","").replace("blpd","")}}
-					</h4>
+					<div class="col-12">
+						<h4 class="text-weight-800 Raleway text-white">{{ message_sub[key]["filename"].split('_')[3] }}</h4>
+					</div>
+
+					<p>&nbsp;</p>
 				</div>
 				<div class="row">
-					<div class="col-4">
-						<p class="text-white text-weight-400 no-margin-bottom"><b>Algorithm:</b> {{ message_sub[key]["algo_type"] }}</p>
 
+					<div class="col-4">
+						<h6 class="text-white text-weight-400 no-margin-bottom"><b>Telescope:</b>{{ message_sub[key]["filename"].split('_')[0] }}</h6>
+					</div>
+					<div class="col-4">
+						<h6 class="text-white text-weight-400 no-margin-bottom"><b>MJD:</b>{{ message_sub[key]["filename"].split('_')[1] }}.{{ message_sub[key]["filename"].split('_')[2] }}</h6>
+					</div>
+
+					<div class="col-4">
+						<h6 class="text-white text-weight-400 no-margin-bottom"><b>Resolution:</b>{{ message_sub[key]["filename"].split('_')[4] }}</h6>
+					</div>
+
+				</div>
+
+
+
+
+
+					<div class="row">
+						<div class="col-4">
+							<p class="text-white text-weight-400 no-margin-bottom"><b>Algorithm:</b> {{ message_sub[key]["algo_type"] }}</p>
+							</div>
+						<div class="col-4">
+						<p class="text-white text-weight-400 no-margin-bottom"><b>Time Triggered:</b> </p>
+						<p class="text-white text-weight-400 no-margin-bottom">{{ message_sub[key]["start_timestamp"] }}</p>
 						</div>
-					<div class="col-4">
-					<p class="text-white text-weight-400 no-margin-bottom"><b>Time Triggered:</b> {{ message_sub[key]["start_timestamp"] }}</p>
-
-					</div>
-					<div class="col-4">
-						<p class="text-white text-weight-400 no-margin-bottom"><b>Message:</b> {{ message_sub[key]["message"]}}</p>
+						<div class="col-4">
+							<p class="text-white text-weight-400 no-margin-bottom"><b>Message:</b> {{ message_sub[key]["message"]}}</p>
+						</div>
 					</div>
 
-				</div>
+				<p>&nbsp;</p>
+				<p>&nbsp;</p>
+				{%endfor%}
 			</div>
-			<p>&nbsp;</p>
-			<p>&nbsp;</p>
-		  {%endfor%}
-
 
         </div>
         </div>

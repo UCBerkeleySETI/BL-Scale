@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: cpu-mem-min-max-lr
+  namespace: algo-compute
+spec:
+  limits:
+  - max:
+      cpu: "15000m"
+      memory: "30G"
+    default:
+      cpu: "15000m"
+      memory: "24G"
+    defaultRequest:
+      cpu: "8000m"
+      memory: "12G"
+    min:
+      cpu: "8000m"
+      memory: "10G"
+    type: Container

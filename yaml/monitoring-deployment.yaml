@@ -2,13 +2,13 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
     labels:
-        app: bl-scale-flask
-    name: bl-scale-flask
+        app: bl-scale-monitor
+    name: bl-scale-monitor
 spec:
     replicas: 1
     selector:
         matchLabels:
-            app: bl-scale-flask
+            app: bl-scale-monitor
     strategy:
         rollingUpdate:
             maxSurge: 25%
@@ -17,33 +17,18 @@ spec:
     template:
         metadata:
             labels:
-                app: bl-scale-flask
+                app: bl-scale-monitor
         spec:
             containers:
             - env:
                 - name: GOOGLE_APPLICATION_CREDENTIALS
                   value: "/var/run/secret/cloud.google.com/bl-scale_key.json"
-                - name: FIREBASE_API_KEY
-                  valueFrom:
-                      secretKeyRef:
-                        name: firebase-api-key
-                        key: FIREBASE_API_KEY
-                - name: SECRET_KEY
-                  valueFrom:
-                      secretKeyRef:
-                        name: flask-session-secrets
-                        key: secret-key
-                - name: SESSION_REDIS
-                  valueFrom:
-                      secretKeyRef:
-                        name: flask-session-secrets
-                        key: redis-url
               volumeMounts:
               - name: "cred-key"
                 mountPath: "/var/run/secret/cloud.google.com"
-              image: gcr.io/breakthrough-listen-sandbox/bl-scale:webapp-latest
+              image: gcr.io/breakthrough-listen-sandbox/bl-scale:monitor-latest
               imagePullPolicy: Always
-              name: bl-scale-flask
+              name: bl-scale-monitor
               terminationMessagePath: /dev/termination-log
               terminationMessagePolicy: File
             volumes:
