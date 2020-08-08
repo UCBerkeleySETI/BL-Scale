@@ -140,13 +140,13 @@ def config_app():
 # __________________________________START OF USER AUTHENTICATIONS__________________________________#
 ####################################################################################################
 
-
+# Renders main page
 @app.route('/')
 @app.route('/index')
 def index():
     return render_template('index.html')
 
-
+# Login function
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if (request.method == 'POST'):
@@ -167,21 +167,23 @@ def login():
             return render_template('login.html', umessage=unsuccessful)
     return render_template('login.html')
 
-# User forgets pass word 
+# User forgets password lets user reset 
 @app.route('/forgot_password', methods=['GET', 'POST'])
-
 def forgot_password():
-    
     if (request.method == 'POST'):
         email = request.form['name']
+        # Firebase is triggered to check if the email exists 
+        # Sends an auth to reset the password via an email.
         auth.send_password_reset_email(email)
         return render_template('login.html')
     return render_template('forgot_password.html')
 
-
+# Logout function 
 @app.route('/logout', methods=['GET', 'POST'])
 def logout():
     print("passed through")
+    # deletes the session token that is used to check if the user is logged in
+    # session token should print None 
     session['token'] = None
     print(session['token'])
     auth.current_user = None
@@ -192,56 +194,65 @@ def logout():
 # ________________________________________START OF ZMQ NETWORKING__________________________________#
 ####################################################################################################
 
-
+# Creates base64 encoding of the health of CPU and Ram
 def get_base64_hist_monitor(list_cpu, list_ram, threshold):
+    # Create the x axis for plot 
     x = np.arange(len(list_cpu))
+    # Use the dark theme plots
     plt.style.use("dark_background")
     plt.figure(figsize=(8, 6))
+    # Plot the ram and the cpu list
     plt.plot(x, list_cpu)
     plt.plot(x, list_ram)
+    # Labels
     plt.title("Health")
     plt.xlabel("Time")
     plt.ylabel("Percent Usage % ")
     plt.legend(['CPU', 'MEMORY'], loc='upper left')
+    # Convert image into bytes
     pic_IObytes = io.BytesIO()
     plt.savefig(pic_IObytes,  format='png')
+    # Close plots to save memory
     plt.close("all")
     pic_IObytes.seek(0)
+    # Convert to base 64 
     pic_hash = base64.b64encode(pic_IObytes.read())
     base64_img = "data:image/jpeg;base64, " + str(pic_hash.decode("utf8"))
     return base64_img
 
-
+#  Function to fill list with zeros to initialize a pod's health
 def fill_zeros(array, length):
     array = ([0] * (length - len(array))) + array
     return array
 
-
+# Update the monitored data with the results from firebase flask variables
 def update_monitor_data(update, TIME=20):
     front_end_data = {}
     data = db.child("breakthrough-listen-sandbox").child("flask_vars").child("monitor").get().val()
     if not data:
         data = {}
     for key in update:
+        # Only displays the bl-scale-algo pods 
         if key.startswith("bl-scale-algo"):
             temp_dict = {}
             app.logger.debug('appending values')
-            # app.logger.debug(data)
+            
             total_CPU = update[key]["CPU_REQUESTED"]
             total_RAM = update[key]["RAM_REQUESTED"]
             if key not in data:
-                # app.logger.debug(f"{key} not in data, adding key")
                 data[key] = collections.defaultdict(dict)
                 data[key]["CPU"] = []
                 data[key]["RAM"] = []
+            # If there is nothing from before we pad it with zeros 
             if len(data[key]["CPU"]) < TIME or len(data[key]["CPU"]) < TIME:
                 app.logger.debug("padding zeroes")
                 data[key]["CPU"] = fill_zeros(data[key]["CPU"], TIME)
                 data[key]["RAM"] = fill_zeros(data[key]["RAM"], TIME)
-                # app.logger.debug(data[key])
+            # Appends the new updated values based on percentages 
             data[key]["CPU"].append(np.round((update[key]["CPU"]/total_CPU)*100, decimals=2))
             data[key]["RAM"].append(np.round((update[key]["RAM"]/total_RAM)*100, decimals=2))
             app.logger.debug('Finished appending values')
+            # Pop the old values keeping 
             while len(data[key]["CPU"]) > TIME:
                 data[key]["CPU"].pop(0)
             while len(data[key]["RAM"]) > TIME:
@@ -253,42 +264,18 @@ def update_monitor_data(update, TIME=20):
             temp_dict["RAM"] = data[key]["RAM"]
             temp_dict["encode"] = image_encode
             front_end_data[key] = temp_dict
-            # except:
-            #     print("JUST ONLINE")
-            #     app.logger.debug('JUST ONLINE')
-            #     data[key] = {}
-            #     data[key]["CPU"] = fill_zero(TIME)
-            #     data[key]["RAM"] = fill_zero(TIME)
-            #     app.logger.debug('Appending values')
-            #     total_CPU = update[key]["CPU_REQUESTED"]
-            #     total_RAM = update[key]["RAM_REQUESTED"]
-            #     data[key]["CPU"].append(int(update[key]["CPU"]))
-            #     data[key]["RAM"].append(int(update[key]["RAM"])/total_RAM)
-            #     app.logger.debug('Finished appending values')
-            #     if len( data[key]["CPU"]) >TIME:
-            #         data[key]["CPU"].pop(0)
-            #     if len( data[key]["RAM"]) >TIME:
-            #         data[key]["RAM"].pop(0)
-            #     image_encode = get_base64_hist_monitor(list_cpu=data[key]["CPU"], list_ram=data[key]["RAM"],  threshold=TIME )
-            #     app.logger.debug('BASE64 DONE')
-            #     temp_dict["CPU"] = data[key]["CPU"]
-            #     app.logger.debug('CPU UPDATE DONE')
-            #     temp_dict["RAM"] = data[key]["RAM"]
-            #     app.logger.debug('RAM UPDATE DONE')
-            #     temp_dict["encode"] = image_encode
-            #     app.logger.debug('ENCODE UPDATE DONE')
-            #     front_end_data[key] = temp_dict
-            #     app.logger.debug('BUNDLED UPDATE DONE')
+    # push the updates to the firebase flask variable 
     db.child("breakthrough-listen-sandbox").child("flask_vars").child("monitor").set(front_end_data)
     app.logger.debug('Updated database WITH MONITOR')
 
 
 def socket_listener():
     context = zmq.Context()
+    # First socket listens to proxy publisher 
     message_sub_socket = context.socket(zmq.SUB)
     message_sub_socket.connect("tcp://10.0.3.141:5560")
     message_sub_socket.setsockopt(zmq.SUBSCRIBE, b'MESSAGE')
-
+    # Second socket to listen to the monitor publisher 
     monitor_sub_socket = context.socket(zmq.SUB)
     monitor_sub_socket.connect("tcp://10.0.3.141:5560")
     monitor_sub_socket.setsockopt(zmq.SUBSCRIBE, b'METRICS')
@@ -307,17 +294,20 @@ def socket_listener():
             # Update the string variable
             message_dict = pickle.loads(serialized_message_dict)
             app.logger.debug(f"Received message: {message_dict}")
+            # Adds message to the firebase variables 
             db.child("breakthrough-listen-sandbox").child("flask_vars").child("sub_message").set(message_dict)
             if message_dict["done"]:
                 time_stamp = time.time()*1000
                 algo_type = message_dict["algo_type"]
                 message_dict["timestamp"] = time_stamp
                 target_name = message_dict["target"]
+                # Updates the completed observation status and metrics
                 db.child("breakthrough-listen-sandbox").child("flask_vars").child(
                     'processed_observations').child(algo_type).child(target_name).set(message_dict)
             else:
                 algo_type = message_dict["algo_type"]
                 url = message_dict["url"]
+                # Updates the observation status
                 db.child("breakthrough-listen-sandbox").child("flask_vars").child(
                     'observation_status').child(algo_type).child(url).set(message_dict)
             app.logger.debug(f'Updated database with {message_dict}')
@@ -326,13 +316,17 @@ def socket_listener():
             monitoring_serialized = monitor_sub_socket.recv_multipart()[1]
             monitoring_dict = pickle.loads(monitoring_serialized)
             app.logger.debug(monitoring_dict)
+            # Runs the update monitor function which then pushes updates to the firebase. 
+            # This is then pulled by the monitor script once its called. 
             update_monitor_data(monitoring_dict)
             app.logger.debug("updated monitor data")
         time.sleep(1)
 
 
 def get_query_firebase(num):
+    # Gets a query for the observations from energy detection based on a certain number
     message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("processed_observations").child("Energy-Detection").order_by_child("timestamp").limit_to_last(num).get().val()
+    # Mutating the dictionary within the loop and needs a deep copy 
     copy_of_dict = message_dict.copy()
     for index in  message_dict.items():
         # getting rid of mid resolution files 
@@ -343,19 +337,21 @@ def get_query_firebase(num):
            
     db_cache_keys = []
     print("got query")
+    # Storing the files in the firebase flask variable "cache"
     retrieve_cache = db.child(
         "breakthrough-listen-sandbox").child("flask_vars").child("cache").get()
     for rc in retrieve_cache.each():
         db_cache_keys += [str(rc.key())]
     
     for key in copy_of_dict:
+        # Creates the Base64 encode of the values and pushes it to the firebase. 
         cache[key] = get_processed_hist_and_img(copy_of_dict[key]["object_uri"]+"/info_df.pkl")
         db.child("breakthrough-listen-sandbox").child("flask_vars").child("cache").child(key).set(cache[key])
-    print(copy_of_dict)
     return copy_of_dict, cache
 
 
 def convert_time_to_datetime(dict, time_stamp_key="start_timestamp"):
+    # Helps convert the timestamp values in Milliseconds since Epoch to readable date time string. 
     for k in dict:
         if time_stamp_key in dict[k]:
             temp = dict[k][time_stamp_key]
@@ -389,25 +385,31 @@ def hits_form():
     global cache
     session["results_counter"]=1
     try:
+        # Check if the user is logged in 
         if session['token'] is not None:
+            # Query the last 3 results 
             message_dict, cache = get_query_firebase(3)
+            # Make plots for the queried results
             message_dict = process_message_dict(message_dict, time_stamp_key="timestamp")
+            # Push them to front end
             return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict, sample_urls=cache, test_login=True)
         else:
             message_dict, cache = get_query_firebase(3)
             message_dict = process_message_dict(message_dict, time_stamp_key="timestamp")
             return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict, sample_urls=cache, test_login=False)
     except:
+        # If user isn't logged in we show a different UI 
         message_dict, cache = get_query_firebase(3)
         message_dict = process_message_dict(message_dict, time_stamp_key="timestamp")
         return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict,  sample_urls=cache, test_login=False)
 
 
-
+# Request to add 3 more 
 @app.route('/result', methods=['GET', 'POST'])
 def zmq_sub():
     global cache
     print("adding 3 more images")
+    # Added 3 more token incremented 
     try:
         if session['token'] is not None:
             message_dict = {}
@@ -422,6 +424,7 @@ def zmq_sub():
             message_dict = process_message_dict(message_dict, time_stamp_key="timestamp")
             return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict,  sample_urls=cache, test_login=False)
     except:
+        # add three function for not logged in users. 
         message_dict, cache =get_query_firebase(3*session["results_counter"])
         message_dict = process_message_dict(message_dict, time_stamp_key="timestamp" )
         return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict, sample_urls = cache ,test_login = False)
