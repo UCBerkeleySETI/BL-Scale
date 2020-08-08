@@ -24,6 +24,8 @@ import pickle
 import logging
 from google.cloud import storage
 import threading
+import random
+import string
 global cache
 
 
@@ -332,20 +334,27 @@ def socket_listener():
 
 
 def get_query_firebase(num):
-    message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child(
-        "processed_observations").child("Energy-Detection").order_by_child("timestamp").limit_to_last(num).get().val()
+    message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("processed_observations").child("Energy-Detection").order_by_child("timestamp").limit_to_last(num).get().val()
+    copy_of_dict = message_dict.copy()
+    for index in  message_dict.items():
+        # getting rid of mid resolution files 
+        print("getting rid of mid res "+ str(index[0]))
+        if "mid" in str(index[0]):
+            print("deleting")
+            del  copy_of_dict[index[0]]
+           
     db_cache_keys = []
     print("got query")
     retrieve_cache = db.child(
         "breakthrough-listen-sandbox").child("flask_vars").child("cache").get()
     for rc in retrieve_cache.each():
         db_cache_keys += [str(rc.key())]
-    # print(db_cache_keys)
-    for key in message_dict:
-        cache[key] = get_processed_hist_and_img(message_dict[key]["object_uri"]+"/info_df.pkl")
-        db.child(
-            "breakthrough-listen-sandbox").child("flask_vars").child("cache").child(key).set(cache[key])
-    return message_dict, cache
+    
+    for key in copy_of_dict:
+        cache[key] = get_processed_hist_and_img(copy_of_dict[key]["object_uri"]+"/info_df.pkl")
+        db.child("breakthrough-listen-sandbox").child("flask_vars").child("cache").child(key).set(cache[key])
+    print(copy_of_dict)
+    return copy_of_dict, cache
 
 
 def convert_time_to_datetime(dict, time_stamp_key="start_timestamp"):
@@ -373,12 +382,14 @@ def process_message_dict(message_dict, time_stamp_key="start_timestamp"):
             message_dict[obs]["filename"] = message_dict[obs]["url"]
     return message_dict
 
+@app.route('/image_page.html')
+def image_display():
+    return render_template("image_page.html")
 
 @app.route('/result')
 def hits_form():
     global cache
-    session["results_counter"] = 1
-
+    session["results_counter"]=1
     try:
         if session['token'] is not None:
             message_dict, cache = get_query_firebase(3)
@@ -392,6 +403,7 @@ def hits_form():
         message_dict, cache = get_query_firebase(3)
         message_dict = process_message_dict(message_dict, time_stamp_key="timestamp")
         return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict,  sample_urls=cache, test_login=False)
+
 
 
 @app.route('/result', methods=['GET', 'POST'])
@@ -409,15 +421,12 @@ def zmq_sub():
             print("trying to get three")
             session["results_counter"] += 1
             message_dict, cache = get_query_firebase(3*session["results_counter"])
-            print(cache)
             message_dict = process_message_dict(message_dict, time_stamp_key="timestamp")
             return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict,  sample_urls=cache, test_login=False)
     except:
-
-        message_dict, cache = get_query_firebase(3*session["results_counter"])
-        message_dict = process_message_dict(message_dict, time_stamp_key="timestamp")
-        return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict, sample_urls=cache, test_login=False)
-
+        message_dict, cache =get_query_firebase(3*session["results_counter"])
+        message_dict = process_message_dict(message_dict, time_stamp_key="timestamp" )
+        return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict, sample_urls = cache ,test_login = False)
 
 @app.route('/trigger')
 def my_form():
@@ -520,6 +529,12 @@ def get_img_url(df, observation):
     return samples_url
 
 
+
+def get_random_string(length):
+    letters = string.ascii_lowercase
+    result_str = ''.join(random.choice(letters) for i in range(length))
+    return result_str
+
 def get_base64_images(observation_name):
     # checks to see if you already have the file, else
     # downloads the best_hits.npy file from the observation bucket
@@ -529,14 +544,15 @@ def get_base64_images(observation_name):
         utils.download_blob("bl-scale", observation_name + "/best_hits.npy",
                             observation_name + "_best_hits.npy")
     img_array = np.load(observation_name + "_best_hits.npy")
-    base64_images = []
+    base64_images = {}
     for i in np.arange(0, img_array.shape[0]):
+        key= get_random_string(6)
         rawBytes = io.BytesIO()
         plt.imsave(rawBytes, arr=img_array[i], cmap="viridis")
         rawBytes.seek(0)  # return to the start of the file
         pic_hash = base64.b64encode(rawBytes.read())
         img = "data:image/jpeg;base64, " + str(pic_hash.decode("utf8"))
-        base64_images += [img]
+        base64_images[key] = img
     return base64_images
 
 

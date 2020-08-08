@@ -516,9 +516,26 @@
 				<div class="row">
 					{% for sample in sample_urls[key][1] %}
 						<div class="col-sm-3">
-							<div class="zoom">
-							<img src='{{ sample }}' alt="This zooms-in really well and smooth">
-						</div>
+							
+							<!-- <img id="myImg" src='{{ sample }}' alt="This zooms-in really well and smooth">
+							The Modal -->
+							<img  id='{{ sample }}' src="{{ sample_urls[key][1][sample] }}" onclick="newTabImage('{{ sample }}')"/>
+							<script>
+								function newTabImage(sample) {
+									console.log("#"+sample);
+									tag = "#"+sample
+									var image = new Image();
+									image.src = $("#"+sample).attr('src');							
+									var w = window.open("",'_blank');
+									w.document.write('<body style="background-color:black;">');
+									w.document.write('<img src="'+ image.src+'" style="width:100%">');
+									w.document.close(); 
+								}
+							</script>
+
+
+						
+							
 					</div>
 					{%endfor%}
 				</div>
