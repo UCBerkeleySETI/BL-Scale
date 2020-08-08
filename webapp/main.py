@@ -144,6 +144,7 @@ def config_app():
 @app.route('/')
 @app.route('/index')
 def index():
+    # Renders the index page
     return render_template('index.html')
 
 # Login function
@@ -268,7 +269,7 @@ def update_monitor_data(update, TIME=20):
     db.child("breakthrough-listen-sandbox").child("flask_vars").child("monitor").set(front_end_data)
     app.logger.debug('Updated database WITH MONITOR')
 
-
+#  Socket listener that runs on a seperate thread 
 def socket_listener():
     context = zmq.Context()
     # First socket listens to proxy publisher 
@@ -360,14 +361,14 @@ def convert_time_to_datetime(dict, time_stamp_key="start_timestamp"):
             dict[k][time_stamp_key] = date_time
     return dict
 
-
+# Rounding values from the dictionary 
 def round_processing_time(dict):
     for obs in dict:
         if "processing_time" in dict[obs]:
             dict[obs]["processing_time"] = np.round(dict[obs]["processing_time"] / 60, decimals=2)
     return dict
 
-
+# Includes rounding of time and converting timestamp to a date. 
 def process_message_dict(message_dict, time_stamp_key="start_timestamp"):
     message_dict = convert_time_to_datetime(message_dict, time_stamp_key=time_stamp_key)
     message_dict = round_processing_time(message_dict)
@@ -376,10 +377,7 @@ def process_message_dict(message_dict, time_stamp_key="start_timestamp"):
             message_dict[obs]["filename"] = message_dict[obs]["url"]
     return message_dict
 
-@app.route('/image_page.html')
-def image_display():
-    return render_template("image_page.html")
-
+# Display the default results page.
 @app.route('/result')
 def hits_form():
     global cache
@@ -413,12 +411,13 @@ def zmq_sub():
     try:
         if session['token'] is not None:
             message_dict = {}
+            # Increase the counter 
             session["results_counter"] += 1
+            # Request for 3 more
             message_dict, cache = get_query_firebase(3*session["results_counter"])
             message_dict = process_message_dict(message_dict, time_stamp_key="timestamp")
             return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict,  sample_urls=cache, test_login=True)
         else:
-            print("trying to get three")
             session["results_counter"] += 1
             message_dict, cache = get_query_firebase(3*session["results_counter"])
             message_dict = process_message_dict(message_dict, time_stamp_key="timestamp")
@@ -429,16 +428,18 @@ def zmq_sub():
         message_dict = process_message_dict(message_dict, time_stamp_key="timestamp" )
         return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict, sample_urls = cache ,test_login = False)
 
+# Displays the trigger page and gets the most recent triggers
 @app.route('/trigger')
 def my_form():
     try:
         if session['token'] is not None:
             print("get querry")
+            # Gets the most recent triggers from the observation status variables 
             message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("observation_status").child(
                 "Energy-Detection").order_by_child("start_timestamp").limit_to_last(3).get().val()
             print("Convert time")
+            # Gets the results and forms the time 
             message_dict = process_message_dict(message_dict)
-            print("Return")
             return render_template('zmq_push.html', message_sub=message_dict)
         else:
             return redirect('../login')
@@ -478,17 +479,17 @@ listener = threading.Thread(target=socket_listener, args=())
 # ________________________________________START OF Notebook PAGE____________________________________#
 ####################################################################################################
 
-
+# Note book menu page
 @app.route('/BL-Reservoir', methods=['GET', 'POST'])
 def algo_menu():
     return render_template('algo_menu.html')
 
-
+# Render notebook holder 
 @app.route('/energy_detection_notebook', methods=['GET', 'POST'])
 def energy_detection_notebook():
     return render_template('energy_detection_wrapper.html')
 
-
+# Render the iframe for the notebook
 @app.route('/energydetection_notebook/seti-energy-detection.html')
 def energy_detection_iframe():
     return render_template('./energydetection_notebook/seti-energy-detection.html')
@@ -585,16 +586,18 @@ def get_processed_hist_and_img(single_uri):
     observ = get_observation(single_uri)
     return [get_base64_hist(data), get_base64_images(observ)]
 
-
+# Dashboard page and displays the cards
 @app.route('/home', methods=['GET', 'POST'])
 def home():
-
+# Checks if user is logged in 
     try:
         if session['token'] is not None:
             print("entering home")
             app.logger.debug(session['user'])
+            # Add in email to front end to display
             return render_template("home.html", email=session['email'], title="Main Page")
         else:
+            # Redirect to login page if user isn't logged in
             return redirect('../login')
     except:
         return redirect('../login')
