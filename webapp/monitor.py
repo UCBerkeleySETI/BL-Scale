@@ -16,16 +16,18 @@ from datetime import datetime
 from flask import (
     Blueprint, render_template
 )
-TIME =20
-# Calls the firebase credentials and gives back the firebase objects to make http requests 
+TIME = 20
+# Calls the firebase credentials and gives back the firebase objects to make http requests
 firebase, db = pyrebase_cred_wrapper()
 
 bp = Blueprint('monitor', __name__, url_prefix='/monitor')
 
 #  Monitor page routing
+
+
 @bp.route('/')
 def base():
     # Pulls from the firebase stored values for the monitor
     front_end_data = db.child("breakthrough-listen-sandbox").child("flask_vars").child("monitor").get().val()
-    # Passes in the time to show when the page was last updated. 
-    return render_template("monitor.html", title="Monitor", encoded = front_end_data, time=str(datetime.now())  )
+    # Passes in the time to show when the page was last updated.
+    return render_template("monitor.html", title="Monitor", encoded=front_end_data, time=str(datetime.now()))
