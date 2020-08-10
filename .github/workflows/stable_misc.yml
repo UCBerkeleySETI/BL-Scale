@@ -6,9 +6,7 @@ name: Build Monitor and Proxy
 # events but only for the master branch
 on:
   push:
-    branches-ignore: [ stable ]
-  pull_request:
-    branches-ignore: [ stable ]
+    branches: [ stable ]
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -50,7 +48,7 @@ jobs:
           registry: gcr.io
           repository: breakthrough-listen-sandbox/bl-scale
           dockerfile: dockerfiles/monitor.dockerfile
-          tags: monitor-latest
+          tags: monitor-stable
 
     # Runs a single command using the runners shell
     - name: Build and push Monitoring Image to dockerhub
@@ -60,7 +58,7 @@ jobs:
               password: ${{ secrets.DOCKER_PASSWORD }}
               repository: fx196/bl-scale
               dockerfile: dockerfiles/monitor.dockerfile
-              tags: monitor-latest
+              tags: monitor-stable
 
     - name: Build and push Proxy Image to Google Container Registry
       uses: docker/build-push-action@v1
@@ -70,7 +68,7 @@ jobs:
           registry: gcr.io
           repository: breakthrough-listen-sandbox/bl-scale
           dockerfile: dockerfiles/zproxy.dockerfile
-          tags: zproxy-latest
+          tags: zproxy-stable
 
     # # Runs a single command using the runners shell
     # - name: Build and push Web App Image to dockerhub
