@@ -53,18 +53,18 @@ spec:
                   terminationMessagePath: /dev/termination-log
                   terminationMessagePolicy: File
                   resources:
-                      # limits:
-                      #     cpu: "15000m"
-                      #     memory: "30G"
+                      limits:
+                          cpu: "15000m"
+                          memory: "30G"
                       requests:
                           cpu: "7000m"
-                          memory: "12G"
+                          memory: "16G"
             volumes:
               - name: "cred-key"
                 secret:
                   secretName: "bl-scale-cred-key"
             nodeSelector:
-                cloud.google.com/gke-nodepool: algo-compute-pool
+                cloud.google.com/gke-nodepool: algo-pool
             dnsPolicy: ClusterFirst
             restartPolicy: Always
             schedulerName: default-scheduler
