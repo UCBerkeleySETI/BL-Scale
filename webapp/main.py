@@ -232,6 +232,7 @@ def socket_listener():
         if int(time.time()) % 60 == 0:
             app.logger.debug("Polling")
         if message_sub_socket in socks and socks[message_sub_socket] == zmq.POLLIN:
+            app.logger.debug("Received message from worker")
             serialized_message_dict = message_sub_socket.recv_multipart()[1]
             app.logger.debug(serialized_message_dict)
             # Update the string variable
