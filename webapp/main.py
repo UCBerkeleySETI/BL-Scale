@@ -582,6 +582,7 @@ def filter_images(df, n):
 # returns list of base64 string hist for first element, list of string image
 # urls for the second element. Intakes a string uri
 def get_processed_hist_and_img(single_uri):
+    print(single_uri)
     data = pd.read_pickle(single_uri)
     observ = get_observation(single_uri)
     return [get_base64_hist(data), get_base64_images(observ)]
