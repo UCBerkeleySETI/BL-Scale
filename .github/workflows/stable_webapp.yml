@@ -2,9 +2,7 @@ name: Build Webapp
 
 on:
   push:
-    branches-ignore: [ stable ]
-  pull_request:
-    branches-ignore: [ stable ]
+    branches: [ stable ]
 
 jobs:
   # This workflow contains a single job called "build"
@@ -25,7 +23,7 @@ jobs:
           registry: gcr.io
           repository: breakthrough-listen-sandbox/bl-scale
           dockerfile: dockerfiles/webapp.dockerfile
-          tags: webapp-latest
+          tags: webapp-stable
 
     # Runs a single command using the runners shell
     - name: Build and push Web App Image to dockerhub
@@ -35,7 +33,7 @@ jobs:
               password: ${{ secrets.DOCKER_PASSWORD }}
               repository: fx196/bl-scale
               dockerfile: dockerfiles/webapp.dockerfile
-              tags: webapp-latest
+              tags: webapp-stable
 
     # Runs a single command using the runners shell
     - name: Build and push Web App Test Image to dockerhub
@@ -45,4 +43,4 @@ jobs:
               password: ${{ secrets.DOCKER_PASSWORD }}
               repository: fx196/bl-scale
               dockerfile: dockerfiles/webapp-test.dockerfile
-              tags: webapp-test-latest
+              tags: webapp-test-stable
