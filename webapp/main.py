@@ -176,7 +176,7 @@ def update_monitor_data(update, TIME=20):
         # Only displays the bl-scale-algo pods
         if key.startswith("bl-scale-algo"):
             temp_dict = {}
-            app.logger.debug('appending values')
+            # app.logger.debug('appending values')
 
             total_CPU = update[key]["CPU_REQUESTED"]
             total_RAM = update[key]["RAM_REQUESTED"]
@@ -192,7 +192,7 @@ def update_monitor_data(update, TIME=20):
             # Appends the new updated values based on percentages
             data[key]["CPU"].append(np.round((update[key]["CPU"]/total_CPU)*100, decimals=2))
             data[key]["RAM"].append(np.round((update[key]["RAM"]/total_RAM)*100, decimals=2))
-            app.logger.debug('Finished appending values')
+            # app.logger.debug('Finished appending values')
             # Pop the old values keeping
             while len(data[key]["CPU"]) > TIME:
                 data[key]["CPU"].pop(0)
@@ -200,14 +200,14 @@ def update_monitor_data(update, TIME=20):
                 data[key]["RAM"].pop(0)
             image_encode = get_base64_hist_monitor(
                 list_cpu=data[key]["CPU"], list_ram=data[key]["RAM"], threshold=TIME)
-            app.logger.debug('BASE64 DONE')
+            # app.logger.debug('BASE64 DONE')
             temp_dict["CPU"] = data[key]["CPU"]
             temp_dict["RAM"] = data[key]["RAM"]
             temp_dict["encode"] = image_encode
             front_end_data[key] = temp_dict
     # push the updates to the firebase flask variable
     db.child("breakthrough-listen-sandbox").child("flask_vars").child("monitor").set(front_end_data)
-    app.logger.debug('Updated database WITH MONITOR')
+    # app.logger.debug('Updated database WITH MONITOR')
 
 #  Socket listener that runs on a seperate thread
 
@@ -259,11 +259,11 @@ def socket_listener():
         if monitor_sub_socket in socks and socks[monitor_sub_socket] == zmq.POLLIN:
             monitoring_serialized = monitor_sub_socket.recv_multipart()[1]
             monitoring_dict = pickle.loads(monitoring_serialized)
-            app.logger.debug(monitoring_dict)
+            # app.logger.debug(monitoring_dict)
             # Runs the update monitor function which then pushes updates to the firebase.
             # This is then pulled by the monitor script once its called.
             update_monitor_data(monitoring_dict)
-            app.logger.debug("updated monitor data")
+            # app.logger.debug("updated monitor data")
         time.sleep(1)
 
 
