@@ -40,7 +40,11 @@ For the API key, you should set environment variable `FIREBASE_API_KEY` to its c
 export FIREBASE_API_KEY=$(ssh blpc0 "cat /home/ychen/secrets/firebase-apiKey.txt")
 ```
 
-For the service account key, you will need to download it to a secure location on your machine, and set environment variable `GOOGLE_APPLICATION_CREDENTIALS` to the key's **path**. For example, download it to `/secrets`, and set `GOOGLE_APPLICATION_CREDENTIALS` to `/secrets/bl_scale_key.json`.
+For the service account key, you will need to download it to a secure location on your machine, and set environment variable `GOOGLE_APPLICATION_CREDENTIALS` to the key's **path**. For example, download it to `/secrets`, and set `GOOGLE_APPLICATION_CREDENTIALS` to `/secrets/bl_scale_key.json`. e.g.:
+
+```bash
+export GOOGLE_APPLICATION_CREDENTIALS=/secrets/bl_scale_key.json
+```
 
 ## Running with gunicorn
 
