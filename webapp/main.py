@@ -92,7 +92,8 @@ def login():
             session['token'] = user['idToken']
             print("completed logging in " + session['token'])
             return redirect('/home')
-        except:
+        except Exception as e:
+            app.logger.debug(e)
             # Login failed and message is passed onto the front end
             unsuccessful = 'Please check your credentials'
             return render_template('login.html', umessage=unsuccessful)
@@ -345,8 +346,9 @@ def hits_form():
             message_dict, cache = get_query_firebase(3)
             message_dict = process_message_dict(message_dict, time_stamp_key="timestamp")
             return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict, sample_urls=cache, test_login=False)
-    except:
+    except Exception as e:
         # If user isn't logged in we show a different UI
+        app.logger.debug(e)
         message_dict, cache = get_query_firebase(3)
         message_dict = process_message_dict(message_dict, time_stamp_key="timestamp")
         return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict,  sample_urls=cache, test_login=False)
@@ -372,7 +374,8 @@ def zmq_sub():
             message_dict, cache = get_query_firebase(3*session["results_counter"])
             message_dict = process_message_dict(message_dict, time_stamp_key="timestamp")
             return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict,  sample_urls=cache, test_login=False)
-    except:
+    except Exception as e:
+        app.logger.debug(e)
         # add three function for not logged in users.
         message_dict, cache = get_query_firebase(3*session["results_counter"])
         message_dict = process_message_dict(message_dict, time_stamp_key="timestamp")
@@ -395,7 +398,8 @@ def my_form():
             return render_template('zmq_push.html', message_sub=message_dict)
         else:
             return redirect('../login')
-    except:
+    except Exception as e:
+        app.logger.debug(e)
         print("returning to login")
         return redirect('../login')
 
@@ -419,7 +423,8 @@ def zmq_push():
             return render_template('zmq_push.html',  message_sub=message_dict)
         else:
             return redirect('../login')
-    except:
+    except Exception as e:
+        app.logger.debug(e)
         print("returning to login")
         return redirect('../login')
 
@@ -572,7 +577,8 @@ def home():
         else:
             # Redirect to login page if user isn't logged in
             return redirect('../login')
-    except:
+    except Exception as e:
+        app.logger.debug(e)
         return redirect('../login')
 
 
