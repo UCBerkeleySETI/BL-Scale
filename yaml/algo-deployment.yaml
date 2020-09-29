@@ -47,6 +47,14 @@ spec:
                           name: bl-scale-config-38mx
                     - name: GOOGLE_APPLICATION_CREDENTIALS
                       value: "/var/run/secret/cloud.google.com/bl-scale_key.json"
+                    - name: POD_NAME
+                      valueFrom:
+                        fieldRef:
+                          fieldPath: metadata.name
+                    - name: POD_IP
+                      valueFrom:
+                        fieldRef:
+                          fieldPath: status.podIP
                   volumeMounts:
                     - name: "cred-key"
                       mountPath: "/var/run/secret/cloud.google.com"
