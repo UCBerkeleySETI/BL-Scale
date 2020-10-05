@@ -1,4 +1,4 @@
-(function poll() {
+$(function poll() {
 
     queryString = "state="+JSON.stringify(message_sub);
     
@@ -12,10 +12,11 @@
             poll();
         },
         error: function() {
+            console.log("failed")
             window.location.href = 'login.html'
         }
     });
-})();
+});
 
 function update() {
     $.ajax({

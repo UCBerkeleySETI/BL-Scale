@@ -379,12 +379,13 @@ def zmq_sub():
 
 @app.route('/poll')
 def poll():
-    client_state = json.loads(request.args.get("state"))
+    client_state = request.args.get("state")
 
     #poll the database
     while True:
         try:
-            print("polling for triggers")
+            app.logger.debug("polling for triggers")
+            time.sleep(1)
             if session['token'] is not None:
                 # Gets the most recent triggers from the observation status variables
                 message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("observation_status").child(
@@ -405,7 +406,7 @@ def poll():
 def my_form():
     try:
         if session['token'] is not None:
-            print("get querry")
+            print("get querry, trigger")
             # Gets the most recent triggers from the observation status variables
             message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("observation_status").child(
                 "Energy-Detection").order_by_child("start_timestamp").limit_to_last(3).get().val()
