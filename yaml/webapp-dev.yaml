@@ -43,7 +43,7 @@ spec:
                 mountPath: "/var/run/secret/cloud.google.com"
               image: gcr.io/breakthrough-listen-sandbox/bl-scale:webapp-latest
               imagePullPolicy: Always
-              name: bl-scale-flask-test
+              name: bl-scale-flask-dev
               terminationMessagePath: /dev/termination-log
               terminationMessagePolicy: File
             volumes:
