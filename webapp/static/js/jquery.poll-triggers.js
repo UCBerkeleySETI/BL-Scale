@@ -1,14 +1,17 @@
 $(function poll() {
-
-    queryString = "state="+JSON.stringify(message_sub);
+    var message_sub = $('#pollScript').attr("current_state");
+    queryString = "state="+message_sub;
     
     $.ajax({
         url:"/poll",
         data: queryString,
         timeout: 60000,
-        success: function() {
-            console.log("detected change");
-            update();
+        success: function(change) {
+            if(change == "change"){
+                console.log("detected change");
+                update();
+            }
+            console.log("did not detect change")
             poll();
         },
         error: function() {

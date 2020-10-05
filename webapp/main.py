@@ -9,9 +9,11 @@ from db import pyrebase_cred_wrapper
 from flask import (render_template, request, redirect, session, Flask)
 from flask_session import Session
 import os
+import ast
 import base64
 import collections
 import io
+import json
 import re
 import pandas as pd
 import numpy as np
@@ -379,7 +381,8 @@ def zmq_sub():
 
 @app.route('/poll')
 def poll():
-    client_state = request.args.get("state")
+
+    client_state = ast.literal_eval(request.args.get("state"))
 
     #poll the database
     while True:
@@ -395,7 +398,10 @@ def poll():
                 # Gets the results and forms the time
                 message_dict = process_message_dict(message_dict)
                 if message_dict != client_state:
-                    return "CHANGE"
+                    print("client_state", type(client_state))
+                    return "change"
+                else:
+                    return "Same"
             else:
                 raise RuntimeError("Need to login")
         except:
