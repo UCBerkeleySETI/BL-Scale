@@ -2,13 +2,13 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
     labels:
-        app: bl-scale-flask-test
-    name: bl-scale-flask-test
+        app: bl-scale-flask-dev
+    name: bl-scale-flask-dev
 spec:
     replicas: 1
     selector:
         matchLabels:
-            app: bl-scale-flask-test
+            app: bl-scale-flask-dev
     strategy:
         rollingUpdate:
             maxSurge: 25%
@@ -17,7 +17,7 @@ spec:
     template:
         metadata:
             labels:
-                app: bl-scale-flask-test
+                app: bl-scale-flask-dev
         spec:
             containers:
             - env:
@@ -41,7 +41,7 @@ spec:
               volumeMounts:
               - name: "cred-key"
                 mountPath: "/var/run/secret/cloud.google.com"
-              image: gcr.io/breakthrough-listen-sandbox/bl-scale:webapp-test-latest
+              image: gcr.io/breakthrough-listen-sandbox/bl-scale:webapp-latest
               imagePullPolicy: Always
               name: bl-scale-flask-test
               terminationMessagePath: /dev/termination-log
