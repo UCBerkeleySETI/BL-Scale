@@ -258,13 +258,24 @@
         <div  data-uk-scrollspy="cls:uk-animation-fade" class="row">
           <div class="col-md-6" style="padding-left: 5% ">
 			<form method="POST" style=" padding-right: 5% ">
-				<h2 class="text-weight-800 Raleway text-white">Algorithm Package</h2>
-                    <input name="alg_package" type="text">
-                <h2 class="text-weight-800 Raleway text-white">Algorithm Name</h2>
-                    <input name="alg_name" type="text">
-                <h2 class="text-weight-800 Raleway text-white">File URL</h2>
-                    <input name="input_file_url" type="text">
-              <button type="submit" name="submit" class="btn btn-primary">Submit</button>
+			  <h2 class="text-weight-800 Raleway text-white">Algorithm Package</h2>
+				<select name="alg_package">
+					<option value="energy_detection">Energy Detection</option>
+					<option value="object_detection">Object Detection</option>
+					<option value="DeepSeti">Deep Seti</option>
+				</select>
+
+			  <h2 class="text-weight-800 Raleway text-white">Algorithm Name</h2>
+				<select name="alg_name">
+					<option value="energy_detection_fine_dry_run.py">energy_detection_fine_dry_run.py</option>
+					<option value="object_detection.py">object_detection.py</option>
+					<option value="DeepSeti.py">DeepSeti.py</option>
+				</select>
+			 
+			  <h2 class="text-weight-800 Raleway text-white">File URL</h2>
+				<input name="input_file_url" type="text">
+
+			  <button type="submit" name="submit" class="btn btn-primary">Submit</button> -->
               <!-- <input type="submit"> -->
           </form>
 
