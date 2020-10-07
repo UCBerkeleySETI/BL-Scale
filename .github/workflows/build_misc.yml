@@ -42,6 +42,16 @@ jobs:
     #       dockerfile: dockerfiles/webapp-test.dockerfile
     #       tags: webapp-test-latest
 
+    - name: Build and push Scheduler Image to Google Container Registry
+      uses: docker/build-push-action@v1
+      with:
+          username: _json_key
+          password: ${{ secrets.GCP_JSON_KEY }}
+          registry: gcr.io
+          repository: breakthrough-listen-sandbox/bl-scale
+          dockerfile: dockerfiles/scheduler.dockerfile
+          tags: scheduler-latest
+
     - name: Build and push Monitoring Image to Google Container Registry
       uses: docker/build-push-action@v1
       with:
