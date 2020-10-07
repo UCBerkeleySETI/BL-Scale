@@ -86,8 +86,10 @@ while True:
     if broadcast_sub_socket in sockets and sockets[broadcast_sub_socket] == zmq.POLLIN:
         serialized_status = broadcast_sub_socket.recv_multipart()[1]
         status = pickle.loads(serialized_status)
+        logging.info(f"Received status update: {status}")
         scheduler.update_worker(status)
 
     if int(time.time()) % 60 == 0 and int(time.time()) != last_info_time:
         logging.info("scheduler running normally")
+        logging.info(f"Idle workers: {scheduler.idle_workers}")
         last_info_time = int(time.time())
