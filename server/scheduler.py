@@ -77,6 +77,7 @@ while True:
         if connect["pod_id"] not in scheduler.workers:
             new_worker = Worker(connect["pod_id"], connect["pod_ip"], context)
             scheduler.connect_worker(new_worker)
+            logging.info(f"Connected worker {connect['pod_id']} at {connect['pod_ip']}")
 
     if request_recv_socket in sockets and sockets[request_recv_socket] == zmq.POLLIN:
         serialized = request_recv_socket.recv()
