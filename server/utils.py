@@ -4,9 +4,10 @@ from collections import defaultdict
 
 
 class Scheduler:
-    def __init__(self):
+    def __init__(self, context):
         self.workers = dict()
         self.idle_workers = set()
+        self.context = context
 
     def connect_worker(self, worker):
         self.workers[worker.id] = worker
@@ -20,7 +21,11 @@ class Scheduler:
         worker.schedule(serialized)
 
     def update_worker(self, status):
-        worker = self.workers[status["pod_id"]]
+        if status["pod_id"] not in self.workers:
+            worker = Worker(status["pod_id"], status["pod_ip"], self.context)
+            self.workers[status["pod_id"]] = worker
+        else:
+            worker = self.workers[status["pod_id"]]
         if worker.update(status):
             self.idle_workers.add(worker)
 

@@ -61,7 +61,7 @@ logging.info(json.dumps(metrics, indent=2))
 ########################################
 # set up scheduler abstraction
 ########################################
-scheduler = Scheduler()
+scheduler = Scheduler(context)
 
 ########################################
 # Run event loop
