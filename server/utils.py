@@ -54,6 +54,9 @@ class Worker:
             self.idle = True
         return self.idle
 
+    def __str__(self):
+        return f"{self.id} at {self.ip}:5555 \t STATUS: {'IDLE' if self.idle else 'WORKING'}"
+
 
 def get_pod_data(api_client, v1):
     ret_metrics = api_client.call_api(
