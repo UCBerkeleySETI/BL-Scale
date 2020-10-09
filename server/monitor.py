@@ -39,7 +39,7 @@ logging.info(json.dumps(metrics, indent=2))
 
 while True:
     # get metrics from cluster
-    pod_data, pod_specs = get_pod_data(api_client)
+    pod_data, pod_specs = get_pod_data(api_client, v1)
     metrics = extract_metrics(pod_data, pod_specs)
 
     # broadcast from socket
