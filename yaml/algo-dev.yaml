@@ -48,7 +48,7 @@ spec:
                     - name: SCHEDULER_IP
                       valueFrom:
                         configMapKeyRef:
-                          key: SCHEDULER_IP
+                          key: SCHEDULER_IP_DEV
                           name: bl-scale-config-38mx
                     - name: GOOGLE_APPLICATION_CREDENTIALS
                       value: "/var/run/secret/cloud.google.com/bl-scale_key.json"

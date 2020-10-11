@@ -39,11 +39,11 @@ class Worker:
         self.last_status = None
 
     def schedule(self, serialized):
-        if self.status == "IDLE":
+        if self.idle:
             request_send_socket = self.context.socket(zmq.PUSH)
             request_send_socket.connect(f"tcp://{self.ip}:5555")
             request_send_socket.send(serialized)
-            self.status = "WORKING"
+            self.idle = False
             return True
         else:
             return False
