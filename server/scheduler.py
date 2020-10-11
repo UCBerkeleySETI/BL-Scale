@@ -61,7 +61,7 @@ logging.info(json.dumps(metrics, indent=2))
 ########################################
 # set up scheduler abstraction
 ########################################
-scheduler = Scheduler(context)
+scheduler = Scheduler(context, os.environ.get("STAGE", "DEV"))
 
 ########################################
 # Run event loop

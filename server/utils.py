@@ -4,10 +4,11 @@ from collections import defaultdict
 
 
 class Scheduler:
-    def __init__(self, context):
+    def __init__(self, context, stage="DEV"):
         self.workers = dict()
         self.idle_workers = set()
         self.context = context
+        self.stage = stage
 
     def connect_worker(self, worker):
         self.workers[worker.id] = worker
@@ -22,8 +23,10 @@ class Scheduler:
 
     def update_worker(self, status):
         if status["pod_id"] not in self.workers:
-            worker = Worker(status["pod_id"], status["pod_ip"], self.context)
-            self.workers[status["pod_id"]] = worker
+            if ((self.stage == "DEV" and "dev" in status["pod_id"])
+               or (self.stage == "PROD" and "dev" not in status["pod_id"])):
+                worker = Worker(status["pod_id"], status["pod_ip"], self.context)
+                self.workers[status["pod_id"]] = worker
         else:
             worker = self.workers[status["pod_id"]]
         if worker.update(status):
