@@ -1,9 +1,15 @@
+
+
 $("#alg_package").change(function() {
 
 	var $dropdown = $(this);
 
-	$.getJSON("./algorithm_dropdowns.json", function(data) {
-    
+	data = {
+		"energy_detection": "energy_detection.py,energy_detection_fine.py,energy_detection_fine_BAT.py,energy_detection_fine_dry_run.py,energy_detection_mid.py",
+		"object_detection": "object_detection.py",
+		"DeepSeti": "DeepSeti.py"
+	}
+
         console.log("dependant dropdowns")
 		var key = $dropdown.val();
 		var vals = [];
@@ -26,5 +32,4 @@ $("#alg_package").change(function() {
 			$secondChoice.append("<option>" + value + "</option>");
 		});
 
-	});
 });
