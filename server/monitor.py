@@ -17,6 +17,13 @@ context = zmq.Context()
 broadcast_socket = context.socket(zmq.PUB)
 broadcast_socket.connect("tcp://10.0.3.141:5559")
 
+logging_socket = context.socket(zmq.SUB)
+logging_socket.connect("tcp://10.0.3.141:5560")
+logging_socket.setsockopt(zmq.SUBSCRIBE, b"MESSAGE")
+
+poller = zmq.Poller()
+poller.register(logging_socket, zmq.POLLIN)
+
 # set up kubernetes client
 
 # Configs can be set in Configuration class directly or using helper utility
@@ -103,6 +110,11 @@ while True:
     # broadcast from socket
     broadcast_socket.send_multipart([b"METRICS", pickle.dumps(metrics)])
     logging.info(json.dumps(metrics, indent=2))
+
+    # log messages received through proxy
+    poll_data = dict(poller.poll(1000))
+    if logging_socket in poll_data:
+        logging.info(pickle.loads(logging_socket.recv()))
 
     # sleep 30 seconds
     time.sleep(30)
