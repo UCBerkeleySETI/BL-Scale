@@ -114,7 +114,7 @@ while True:
     # log messages received through proxy
     poll_data = dict(poller.poll(1000))
     if logging_socket in poll_data:
-        logging.info(pickle.loads(logging_socket.recv()))
+        logging.info(json.dumps(pickle.loads(logging_socket.recv_multipart()[1]), indent=2))
 
     # sleep 30 seconds
     time.sleep(30)
