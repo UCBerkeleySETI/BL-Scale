@@ -1,13 +1,13 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-    name: bl-scale-algo
+    name: bl-scale-algo-dev
     labels:
-        app: bl-scale-algo
+        app: bl-scale-algo-dev
 spec:
     selector:
         matchLabels:
-            app: bl-scale-algo
+            app: bl-scale-algo-dev
     strategy:
         rollingUpdate:
           maxSurge: 25%
@@ -16,7 +16,7 @@ spec:
     template:
         metadata:
             labels:
-                app: bl-scale-algo
+                app: bl-scale-algo-dev
         spec:
             containers:
                 - name: bl-scale-energy-detection
@@ -45,9 +45,14 @@ spec:
                         configMapKeyRef:
                           key: ALG_NAME
                           name: bl-scale-config-38mx
+                    - name: SCHEDULER_IP
+                      valueFrom:
+                        configMapKeyRef:
+                          key: SCHEDULER_IP_DEV
+                          name: bl-scale-config-38mx
                     - name: GOOGLE_APPLICATION_CREDENTIALS
                       value: "/var/run/secret/cloud.google.com/bl-scale_key.json"
-                    - name: POD_NAME
+                    - name: POD_ID
                       valueFrom:
                         fieldRef:
                           fieldPath: metadata.name
