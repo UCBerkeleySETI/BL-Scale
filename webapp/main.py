@@ -32,7 +32,6 @@ cache = {}
 
 compute_service_address = "tcp://34.66.198.113:5555"
 dev_service_address = "tcp://34.122.126.21:5555"
-current_service_address = compute_service_address
 
 
 firebase, db = pyrebase_cred_wrapper()
@@ -94,6 +93,7 @@ def login():
             session['user'] = user
             session['email'] = email
             session['token'] = user['idToken']
+            session['server'] = compute_service_address
             print("completed logging in " + session['token'])
             return redirect('/home')
         except:
@@ -411,12 +411,11 @@ def poll():
 
 @app.route('/toggle-server')
 def toggleServer():
-    global current_service_address
-    if current_service_address == compute_service_address:
-        current_service_address = dev_service_address
+    if session["server"] == compute_service_address:
+        session["server"] = dev_service_address
         return "development"
     else:
-        current_service_address = compute_service_address
+        session["server"] = compute_service_address
         return "production"
 
     
@@ -452,7 +451,7 @@ def zmq_push():
             app.logger.debug(compute_request)
             context = zmq.Context()
             socket = context.socket(zmq.PUSH)
-            socket.connect(current_service_address)
+            socket.connect(session["server"])
             socket.send_pyobj(compute_request)
             # keys are "alg_package", "alg_name", and "input_file_url"
             message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("observation_status").child(
