@@ -22,7 +22,7 @@ redis
 requests
 requests-toolbelt
 rsa
-six
+six>=1.13.0
 Werkzeug
 oauthlib
 olefile
