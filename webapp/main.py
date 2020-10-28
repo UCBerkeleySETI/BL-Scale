@@ -447,8 +447,11 @@ def zmq_push():
     try:
         if session['token'] is not None:
             compute_request = {}
-            for key in request.form:
-                compute_request[key] = request.form[key]
+            request_dict = request.form.to_dict()
+            for key in request_dict:
+                if(key != "is_cadence"):
+                    compute_request[key] = request_dict[key]
+            print("compute request", compute_request)
             app.logger.debug(compute_request)
             context = zmq.Context()
             socket = context.socket(zmq.PUSH)
