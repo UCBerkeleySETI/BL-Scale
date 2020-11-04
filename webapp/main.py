@@ -9,9 +9,11 @@ from db import pyrebase_cred_wrapper
 from flask import (render_template, request, redirect, session, Flask)
 from flask_session import Session
 import os
+import ast
 import base64
 import collections
 import io
+import json
 import re
 import pandas as pd
 import numpy as np
@@ -91,6 +93,7 @@ def login():
             session['user'] = user
             session['email'] = email
             session['token'] = user['idToken']
+            session['server'] = compute_service_address
             print("completed logging in " + session['token'])
             return redirect('/home')
         except Exception as e:
@@ -382,18 +385,56 @@ def zmq_sub():
         message_dict = process_message_dict(message_dict, time_stamp_key="timestamp")
         return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict, sample_urls=cache, test_login=False)
 
-# Displays the trigger page and gets the most recent triggers
+@app.route('/poll')
+def poll():
+
+    client_state = ast.literal_eval(request.args.get("state"))
+
+    #poll the database
+    while True:
+        try:
+            app.logger.debug("polling for triggers")
+            time.sleep(1)
+            if session['token'] is not None:
+                # Gets the most recent triggers from the observation status variables
+                message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("observation_status").child(
+                    "Energy-Detection").order_by_child("start_timestamp").limit_to_last(3).get().val()
+                # we want the order of the most recent triggers to be from most recent to least recent
+                message_dict = dict(reversed(list(message_dict.items())))
+                # Gets the results and forms the time
+                message_dict = process_message_dict(message_dict)
+                if message_dict != client_state:
+                    print("client_state", type(client_state))
+                    return "change"
+                else:
+                    return "Same"
+            else:
+                raise RuntimeError("Need to login")
+        except:
+            raise RuntimeError("Need to login")
+
+@app.route('/toggle-server')
+def toggleServer():
+    if session["server"] == compute_service_address:
+        session["server"] = dev_service_address
+        return "development"
+    else:
+        session["server"] = compute_service_address
+        return "production"
+
 
 
 @app.route('/trigger')
 def my_form():
     try:
         if session['token'] is not None:
-            print("get querry")
+            print("get querry, trigger")
             # Gets the most recent triggers from the observation status variables
             message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("observation_status").child(
                 "Energy-Detection").order_by_child("start_timestamp").limit_to_last(3).get().val()
             print("Convert time")
+            # we want the order of the most recent triggers to be from most recent to least recent
+            message_dict = dict(reversed(list(message_dict.items())))
             # Gets the results and forms the time
             message_dict = process_message_dict(message_dict)
             return render_template('zmq_push.html', message_sub=message_dict)
@@ -415,11 +456,13 @@ def zmq_push():
             app.logger.debug(compute_request)
             context = zmq.Context()
             socket = context.socket(zmq.PUSH)
-            socket.connect(compute_service_address)
+            socket.connect(session["server"])
             socket.send_pyobj(compute_request)
             # keys are "alg_package", "alg_name", and "input_file_url"
             message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("observation_status").child(
                 "Energy-Detection").order_by_child("start_timestamp").limit_to_last(3).get().val()
+            # we want the order of the most recent triggers to be from most recent to least recent
+            message_dict = dict(reversed(list(message_dict.items())))
             message_dict = process_message_dict(message_dict)
             return render_template('zmq_push.html',  message_sub=message_dict)
         else:
