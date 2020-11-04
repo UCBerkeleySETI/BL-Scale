@@ -23,12 +23,14 @@ spec:
             - env:
                 - name: GOOGLE_APPLICATION_CREDENTIALS
                   value: "/var/run/secret/cloud.google.com/bl-scale_key.json"
+                - name: STAGE
+                  value: PROD
               volumeMounts:
               - name: "cred-key"
                 mountPath: "/var/run/secret/cloud.google.com"
-              image: gcr.io/breakthrough-listen-sandbox/bl-scale:scheduler-latest
+              image: gcr.io/breakthrough-listen-sandbox/bl-scale:scheduler-stable
               imagePullPolicy: Always
-              name: bl-scale-sched-dev
+              name: bl-scale-sched
               terminationMessagePath: /dev/termination-log
               terminationMessagePolicy: File
             volumes:
