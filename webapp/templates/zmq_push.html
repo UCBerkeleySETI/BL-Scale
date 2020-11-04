@@ -253,6 +253,15 @@
     <p>&nbsp;</p>
     <p>&nbsp;</p>
     <p>&nbsp;</p>
+
+		<!-- toggle -->
+		<!-- Rounded switch -->
+		<label id="switch" class="switch">
+			<input type="checkbox" id="togBtn">
+			<div class="slider round" >
+			</div>
+		</label>
+
     <p>&nbsp;</p>
 
         <div  data-uk-scrollspy="cls:uk-animation-fade" class="row">
@@ -378,6 +387,9 @@
 
 		<!-- polling triggers -->
 		<script id="pollScript" src="../static/js/jquery.poll-triggers.js" current_state='{{ message_sub }}'></script>
+
+		<!-- change compute server based on toggle state -->
+		<script id="pollScript" src="../static/js/jquery.toggle-server.js"></script>
 
 		<!-- alg_names are dependant on alg_package selected -->
 		<script src="../static/js/jquery.algorithm-dropdowns.js"></script>

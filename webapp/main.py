@@ -93,6 +93,7 @@ def login():
             session['user'] = user
             session['email'] = email
             session['token'] = user['idToken']
+            session['server'] = compute_service_address
             print("completed logging in " + session['token'])
             return redirect('/home')
         except Exception as e:
@@ -411,6 +412,16 @@ def poll():
                 raise RuntimeError("Need to login")
         except:
             raise RuntimeError("Need to login")
+
+@app.route('/toggle-server')
+def toggleServer():
+    if session["server"] == compute_service_address:
+        session["server"] = dev_service_address
+        return "development"
+    else:
+        session["server"] = compute_service_address
+        return "production"
+
     
 
 @app.route('/trigger')
@@ -445,7 +456,7 @@ def zmq_push():
             app.logger.debug(compute_request)
             context = zmq.Context()
             socket = context.socket(zmq.PUSH)
-            socket.connect(compute_service_address)
+            socket.connect(session["server"])
             socket.send_pyobj(compute_request)
             # keys are "alg_package", "alg_name", and "input_file_url"
             message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("observation_status").child(
