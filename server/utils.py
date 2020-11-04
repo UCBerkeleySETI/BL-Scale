@@ -7,6 +7,7 @@ class Scheduler:
     def __init__(self, context):
         self.workers = dict()
         self.idle_workers = set()
+        self.requests = list()
         self.context = context
 
     def connect_worker(self, worker):
@@ -17,8 +18,11 @@ class Scheduler:
         pass
 
     def schedule_request(self, serialized):
-        worker = self.idle_workers.pop()
-        worker.schedule(serialized)
+        if self.idle_workers:
+            worker = self.idle_workers.pop()
+            worker.schedule(serialized)
+        else:
+            self.requests.append(serialized)
 
     def update_worker(self, status):
         if status["pod_id"] not in self.workers:
