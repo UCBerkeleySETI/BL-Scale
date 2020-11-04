@@ -1,5 +1,8 @@
 import zmq
+import logging
+import sys
 
+logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
 def main():
 
@@ -13,12 +16,17 @@ def main():
     downstream = context.socket(zmq.XPUB)
     downstream.bind("tcp://*:5560")
 
-    zmq.proxy(upstream, downstream)
+    try:
+        zmq.proxy(upstream, downstream)
+    except KeyboardInterrupt:
+        pass
+    except Exception as e:
+        logging.error("Unexpected error: {}".format(str(e)))
+    finally:
+        upstream.close()
+        downstream.close()
+        context.term()
 
-    # We never get here…
-    upstream.close()
-    downstream.close()
-    context.term()
 
 if __name__ == "__main__":
     main()

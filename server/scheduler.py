@@ -1,12 +1,10 @@
 from kubernetes import client, config
 import zmq
 import time
-import os
 import logging
 import sys
 import pickle
 import json
-from collections import defaultdict
 from utils import get_pod_data, extract_metrics, Scheduler, Worker
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
@@ -61,7 +59,7 @@ logging.info(json.dumps(metrics, indent=2))
 ########################################
 # set up scheduler abstraction
 ########################################
-scheduler = Scheduler(context, os.environ.get("STAGE", "DEV"))
+scheduler = Scheduler(context)
 
 ########################################
 # Run event loop
@@ -88,6 +86,9 @@ while True:
         status = pickle.loads(serialized_status)
         logging.info(f"Received status update: {status}")
         scheduler.update_worker(status)
+
+        if scheduler.requests:
+            scheduler.schedule_request(scheduler.requests.pop(0))
 
     if int(time.time()) % 60 == 0 and int(time.time()) != last_info_time:
         logging.info("scheduler running normally")
