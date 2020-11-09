@@ -263,17 +263,20 @@ def socket_listener():
                 db.child("breakthrough-listen-sandbox").child("flask_vars").child(
                     'observation_status').child(algo_type).child(url).set(message_dict)
             app.logger.debug(f'Updated database with {message_dict}')
+        print("in function")
         if monitor_sub_socket in socks and socks[monitor_sub_socket] == zmq.POLLIN:
             monitoring_serialized = monitor_sub_socket.recv_multipart()[1]
             monitoring_dict = pickle.loads(monitoring_serialized)
             app.logger.debug(monitoring_dict)
-            status_serialized = status_sub_socket.recv_multipart()[1]
-            status_dict = pickle.loads(status_serialized)
-            print("status serialized", status_dict)
             # Runs the update monitor function which then pushes updates to the firebase.
             # This is then pulled by the monitor script once its called.
             update_monitor_data(monitoring_dict)
             app.logger.debug("updated monitor data")
+        if status_sub_socket in socks and socks[status_sub_socket] == zmq.POLLIN:
+            status_serialized = status_sub_socket.recv_multipart()[1]
+            status_dict = pickle.loads(status_serialized)
+            print("status serialized", status_dict)
+
 
         time.sleep(1)
 
