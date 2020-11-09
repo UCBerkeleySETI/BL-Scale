@@ -267,6 +267,9 @@ def socket_listener():
             monitoring_serialized = monitor_sub_socket.recv_multipart()[1]
             monitoring_dict = pickle.loads(monitoring_serialized)
             app.logger.debug(monitoring_dict)
+            status_serialized = status_sub_socket.recv_multipart()[1]
+            status_dict = pickle.loads(status_serialized)
+            print("status serialized", status_dict)
             # Runs the update monitor function which then pushes updates to the firebase.
             # This is then pulled by the monitor script once its called.
             update_monitor_data(monitoring_dict)
