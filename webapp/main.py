@@ -226,11 +226,16 @@ def socket_listener():
     monitor_sub_socket = context.socket(zmq.SUB)
     monitor_sub_socket.connect("tcp://10.0.3.141:5560")
     monitor_sub_socket.setsockopt(zmq.SUBSCRIBE, b'METRICS')
+    # Third socket to listen to b'STATUS'
+    status_sub_socket = context.socket(zmq.SUB)
+    status_sub_socket.connect("tcp://10.0.3.141:5560")
+    status_sub_socket.setsockopt(zmq.SUBSCRIBE, b'STATUS')
 
     # set up poller
     poller = zmq.Poller()
     poller.register(message_sub_socket, zmq.POLLIN)
     poller.register(monitor_sub_socket, zmq.POLLIN)
+    poller.register(status_sub_socket, zmq.POLLIN)
     while True:
         socks = dict(poller.poll(2))
         if int(time.time()) % 60 == 0:
@@ -258,7 +263,6 @@ def socket_listener():
                 db.child("breakthrough-listen-sandbox").child("flask_vars").child(
                     'observation_status').child(algo_type).child(url).set(message_dict)
             app.logger.debug(f'Updated database with {message_dict}')
-
         if monitor_sub_socket in socks and socks[monitor_sub_socket] == zmq.POLLIN:
             monitoring_serialized = monitor_sub_socket.recv_multipart()[1]
             monitoring_dict = pickle.loads(monitoring_serialized)
@@ -267,6 +271,7 @@ def socket_listener():
             # This is then pulled by the monitor script once its called.
             update_monitor_data(monitoring_dict)
             app.logger.debug("updated monitor data")
+
         time.sleep(1)
 
 
