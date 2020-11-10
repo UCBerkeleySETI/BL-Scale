@@ -82,7 +82,7 @@ def index():
 
 # Login function
 
-
+import traceback
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if (request.method == 'POST'):
@@ -97,7 +97,8 @@ def login():
             session['token'] = user['idToken']
             print("completed logging in " + session['token'])
             return redirect('/home')
-        except:
+        except Exception:
+            traceback.print_exc()
             # Login failed and message is passed onto the front end
             unsuccessful = 'Please check your credentials'
             return render_template('login.html', umessage=unsuccessful)
@@ -208,22 +209,28 @@ def update_monitor_data(update, TIME=20):
             app.logger.debug('BASE64 DONE')
             temp_dict["CPU"] = data[key]["CPU"]
             temp_dict["RAM"] = data[key]["RAM"]
+            if 'STATUS' in data[key]:
+                temp_dict[key]['STATUS'] = data[key]['STATUS']
             temp_dict["encode"] = image_encode
             front_end_data[key] = temp_dict
+    for key in data:
+        if key not in front_end_data:
+           front_end_data[key] = data[key]
     # push the updates to the firebase flask variable
-    db.child("breakthrough-listen-sandbox").child("flask_vars").child("monitor").update(front_end_data)
+    db.child("breakthrough-listen-sandbox").child("flask_vars").child("monitor").set(front_end_data)
     app.logger.debug('Updated database WITH MONITOR')
 
 #  Socket listener that runs on a seperate thread
 
 def update_status_messages(status_dict):
-    messages = {}
-    for key in status_dict:
-        app.logger.debug('appending status messages')
-        if key == 'pod_id':
-            messages[status_dict[key]] = status_dict
-    db.child("breakthrough-listen-sandbox").child("flask_vars").child("monitor").update(messages)
-    app.logger.debug(f'messages {messages}')
+    data = db.child("breakthrough-listen-sandbox").child("flask_vars").child("monitor").get().val()
+    for pod, poddata in data:
+        if pod in status_dict:
+            if status_dict[pod]['IDLE']:
+                poddata['STATUS'] = 'IDLE'
+            else:
+                poddata['STATUS'] = 'ACTIVE'
+    db.child("breakthrough-listen-sandbox").child("flask_vars").child("monitor").set(data)
 
 
 
@@ -279,7 +286,7 @@ def socket_listener():
                 status_serialized = serialized
                 status_dict = pickle.loads(status_serialized)
                 app.logger.debug(f"status serialized: {status_dict}")
-                update_status_messages(status_dict)
+                #update_status_messages(status_dict)
 
 
 def get_query_firebase(num):
@@ -450,6 +457,7 @@ def my_form():
             message_dict = process_message_dict(message_dict)
             return render_template('zmq_push.html', message_sub=message_dict)
         else:
+            print("no session token")
             return redirect('../login')
     except:
         print("returning to login")
@@ -636,7 +644,8 @@ def home():
         else:
             # Redirect to login page if user isn't logged in
             return redirect('../login')
-    except:
+    except Exception as e:
+        print("exception", e)
         return redirect('../login')
 
 
