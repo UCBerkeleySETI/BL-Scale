@@ -25,6 +25,7 @@ import logging
 import threading
 import random
 import string
+import pprint
 global cache
 
 
@@ -219,66 +220,56 @@ def update_monitor_data(update, TIME=20):
 def socket_listener():
     context = zmq.Context()
     # First socket listens to proxy publisher
-    message_sub_socket = context.socket(zmq.SUB)
-    message_sub_socket.connect("tcp://10.0.3.141:5560")
-    message_sub_socket.setsockopt(zmq.SUBSCRIBE, b'MESSAGE')
-    # Second socket to listen to the monitor publisher
-    monitor_sub_socket = context.socket(zmq.SUB)
-    monitor_sub_socket.connect("tcp://10.0.3.141:5560")
-    monitor_sub_socket.setsockopt(zmq.SUBSCRIBE, b'METRICS')
-    # Third socket to listen to b'STATUS'
-    status_sub_socket = context.socket(zmq.SUB)
-    status_sub_socket.connect("tcp://10.0.3.141:5560")
-    status_sub_socket.setsockopt(zmq.SUBSCRIBE, b'STATUS')
+    sub_socket = context.socket(zmq.SUB)
+    sub_socket.connect("tcp://10.0.3.141:5560")
+    sub_socket.setsockopt(zmq.SUBSCRIBE, b'')
 
     # set up poller
     poller = zmq.Poller()
-    poller.register(message_sub_socket, zmq.POLLIN)
-    poller.register(monitor_sub_socket, zmq.POLLIN)
-    poller.register(status_sub_socket, zmq.POLLIN)
+    poller.register(sub_socket, zmq.POLLIN)
     while True:
         socks = dict(poller.poll(2))
         if int(time.time()) % 60 == 0:
             app.logger.debug("Polling")
-        if message_sub_socket in socks and socks[message_sub_socket] == zmq.POLLIN:
-            serialized_message_dict = message_sub_socket.recv_multipart()[1]
-            app.logger.debug(serialized_message_dict)
-            # Update the string variable
-            message_dict = pickle.loads(serialized_message_dict)
-            app.logger.debug(f"Received message: {message_dict}")
-            # Adds message to the firebase variables
-            db.child("breakthrough-listen-sandbox").child("flask_vars").child("sub_message").set(message_dict)
-            if message_dict["done"]:
-                time_stamp = time.time()*1000
-                algo_type = message_dict["algo_type"]
-                message_dict["timestamp"] = time_stamp
-                target_name = message_dict["target"]
-                # Updates the completed observation status and metrics
-                db.child("breakthrough-listen-sandbox").child("flask_vars").child(
-                    'processed_observations').child(algo_type).child(target_name).set(message_dict)
-            else:
-                algo_type = message_dict["algo_type"]
-                url = message_dict["url"]
-                # Updates the observation status
-                db.child("breakthrough-listen-sandbox").child("flask_vars").child(
-                    'observation_status').child(algo_type).child(url).set(message_dict)
-            app.logger.debug(f'Updated database with {message_dict}')
-#         print("in function")
-        if monitor_sub_socket in socks and socks[monitor_sub_socket] == zmq.POLLIN:
-            monitoring_serialized = monitor_sub_socket.recv_multipart()[1]
-            monitoring_dict = pickle.loads(monitoring_serialized)
-            app.logger.debug(monitoring_dict)
-            # Runs the update monitor function which then pushes updates to the firebase.
-            # This is then pulled by the monitor script once its called.
-            update_monitor_data(monitoring_dict)
-            print("updated monitor data")
-        if status_sub_socket in socks and socks[status_sub_socket] == zmq.POLLIN:
-            status_serialized = status_sub_socket.recv_multipart()[1]
-            status_dict = pickle.loads(status_serialized)
-            app.logger.debug(f"status serialized: {status_dict}")
-
-
-        time.sleep(1)
+            app.logger.debug(pprint.pformat(socks))
+            time.sleep(1)
+        if sub_socket in socks and socks[sub_socket] == zmq.POLLIN:
+            topic, serialized = sub_socket.recv_multipart()
+            if topic == b"MESSAGE":
+                serialized_message_dict = serialized
+                app.logger.debug(serialized_message_dict)
+                # Update the string variable
+                message_dict = pickle.loads(serialized_message_dict)
+                app.logger.debug(f"Received message: {message_dict}")
+                # Adds message to the firebase variables
+                db.child("breakthrough-listen-sandbox").child("flask_vars").child("sub_message").set(message_dict)
+                if message_dict["done"]:
+                    time_stamp = time.time()*1000
+                    algo_type = message_dict["algo_type"]
+                    message_dict["timestamp"] = time_stamp
+                    target_name = message_dict["target"]
+                    # Updates the completed observation status and metrics
+                    db.child("breakthrough-listen-sandbox").child("flask_vars").child(
+                        'processed_observations').child(algo_type).child(target_name).set(message_dict)
+                else:
+                    algo_type = message_dict["algo_type"]
+                    url = message_dict["url"]
+                    # Updates the observation status
+                    db.child("breakthrough-listen-sandbox").child("flask_vars").child(
+                        'observation_status').child(algo_type).child(url).set(message_dict)
+                app.logger.debug(f'Updated database with {message_dict}')
+            if topic == b"METRICS":
+                monitoring_serialized = serialized
+                monitoring_dict = pickle.loads(monitoring_serialized)
+                app.logger.debug(monitoring_dict)
+                # Runs the update monitor function which then pushes updates to the firebase.
+                # This is then pulled by the monitor script once its called.
+                update_monitor_data(monitoring_dict)
+                print("updated monitor data")
+            if topic == b"STATUS":
+                status_serialized = serialized
+                status_dict = pickle.loads(status_serialized)
+                app.logger.debug(f"status serialized: {status_dict}")
 
 
 def get_query_firebase(num):
@@ -287,7 +278,7 @@ def get_query_firebase(num):
         "Energy-Detection").order_by_child("timestamp").limit_to_last(num).get().val()
     # Mutating the dictionary within the loop and needs a deep copy
     copy_of_dict = message_dict.copy()
-    message_dict = collections.OrderedDict(reversed(list(message_dict.items()))) 
+    message_dict = collections.OrderedDict(reversed(list(message_dict.items())))
     for index in message_dict.items():
         # getting rid of mid resolution files
         print("getting rid of mid res " + str(index[0]))
@@ -409,7 +400,7 @@ def poll():
                 message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("observation_status").child(
                     "Energy-Detection").order_by_child("start_timestamp").limit_to_last(3).get().val()
                 # we want the order of the most recent triggers to be from most recent to least recent
-                message_dict = collections.OrderedDict(reversed(list(message_dict.items()))) 
+                message_dict = collections.OrderedDict(reversed(list(message_dict.items())))
                 # Gets the results and forms the time
                 message_dict = process_message_dict(message_dict)
                 if message_dict != client_state:
@@ -432,7 +423,7 @@ def toggleServer():
         current_service_address = compute_service_address
         return "production"
 
-    
+
 
 @app.route('/trigger')
 def my_form():
@@ -444,7 +435,7 @@ def my_form():
                 "Energy-Detection").order_by_child("start_timestamp").limit_to_last(3).get().val()
             print("Convert time")
             # we want the order of the most recent triggers to be from most recent to least recent
-            message_dict = collections.OrderedDict(reversed(list(message_dict.items()))) 
+            message_dict = collections.OrderedDict(reversed(list(message_dict.items())))
             # Gets the results and forms the time
             message_dict = process_message_dict(message_dict)
             return render_template('zmq_push.html', message_sub=message_dict)
@@ -474,7 +465,7 @@ def zmq_push():
             message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("observation_status").child(
                 "Energy-Detection").order_by_child("start_timestamp").limit_to_last(3).get().val()
             # we want the order of the most recent triggers to be from most recent to least recent
-            message_dict = collections.OrderedDict(reversed(list(message_dict.items()))) 
+            message_dict = collections.OrderedDict(reversed(list(message_dict.items())))
             message_dict = process_message_dict(message_dict)
             return render_template('zmq_push.html',  message_sub=message_dict)
         else:
@@ -617,7 +608,7 @@ def get_processed_hist_and_img(single_uri):
         data = pd.read_pickle(single_uri)
         observ = get_observation(single_uri)
         return [get_base64_hist(data), get_base64_images(observ)]
-    except: 
+    except:
         print("could not find file "+ single_uri)
 
 # Dashboard page and displays the cards
