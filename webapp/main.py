@@ -33,7 +33,6 @@ cache = {}
 
 compute_service_address = "tcp://34.66.198.113:5555"
 dev_service_address = "tcp://34.122.126.21:5555"
-current_service_address = compute_service_address
 
 
 firebase, db = pyrebase_cred_wrapper()
@@ -95,9 +94,11 @@ def login():
             session['user'] = user
             session['email'] = email
             session['token'] = user['idToken']
+            session['server'] = compute_service_address
             print("completed logging in " + session['token'])
             return redirect('/home')
-        except Exception:
+        except Exception as e:
+            app.logger.debug(e)
             traceback.print_exc()
             # Login failed and message is passed onto the front end
             unsuccessful = 'Please check your credentials'
@@ -182,7 +183,7 @@ def update_monitor_data(update, TIME=20):
         # Only displays the bl-scale-algo pods
         if key.startswith("bl-scale-algo"):
             temp_dict = {}
-            app.logger.debug('appending values')
+            # app.logger.debug('appending values')
 
             total_CPU = update[key]["CPU_REQUESTED"]
             total_RAM = update[key]["RAM_REQUESTED"]
@@ -198,7 +199,7 @@ def update_monitor_data(update, TIME=20):
             # Appends the new updated values based on percentages
             data[key]["CPU"].append(np.round((update[key]["CPU"]/total_CPU)*100, decimals=2))
             data[key]["RAM"].append(np.round((update[key]["RAM"]/total_RAM)*100, decimals=2))
-            app.logger.debug('Finished appending values')
+            # app.logger.debug('Finished appending values')
             # Pop the old values keeping
             while len(data[key]["CPU"]) > TIME:
                 data[key]["CPU"].pop(0)
@@ -206,7 +207,7 @@ def update_monitor_data(update, TIME=20):
                 data[key]["RAM"].pop(0)
             image_encode = get_base64_hist_monitor(
                 list_cpu=data[key]["CPU"], list_ram=data[key]["RAM"], threshold=TIME)
-            app.logger.debug('BASE64 DONE')
+            # app.logger.debug('BASE64 DONE')
             temp_dict["CPU"] = data[key]["CPU"]
             temp_dict["RAM"] = data[key]["RAM"]
             if 'STATUS' in data[key]:
@@ -357,7 +358,6 @@ def hits_form():
             # Query the last 3 results
             message_dict, cache = get_query_firebase(3)
             # Make plots for the queried results
-            print(message_dict)
             message_dict = process_message_dict(message_dict, time_stamp_key="timestamp")
             # Push them to front end
             return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict, sample_urls=cache, test_login=True)
@@ -365,8 +365,9 @@ def hits_form():
             message_dict, cache = get_query_firebase(3)
             message_dict = process_message_dict(message_dict, time_stamp_key="timestamp")
             return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict, sample_urls=cache, test_login=False)
-    except:
+    except Exception as e:
         # If user isn't logged in we show a different UI
+        app.logger.debug(e)
         message_dict, cache = get_query_firebase(3)
         message_dict = process_message_dict(message_dict, time_stamp_key="timestamp")
         return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict,  sample_urls=cache, test_login=False)
@@ -392,7 +393,8 @@ def zmq_sub():
             message_dict, cache = get_query_firebase(3*session["results_counter"])
             message_dict = process_message_dict(message_dict, time_stamp_key="timestamp")
             return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict,  sample_urls=cache, test_login=False)
-    except:
+    except Exception as e:
+        app.logger.debug(e)
         # add three function for not logged in users.
         message_dict, cache = get_query_firebase(3*session["results_counter"])
         message_dict = process_message_dict(message_dict, time_stamp_key="timestamp")
@@ -431,12 +433,11 @@ def poll():
 
 @app.route('/toggle-server')
 def toggleServer():
-    global current_service_address
-    if current_service_address == compute_service_address:
-        current_service_address = dev_service_address
+    if session["server"] == compute_service_address:
+        session["server"] = dev_service_address
         return "development"
     else:
-        current_service_address = compute_service_address
+        session["server"] = compute_service_address
         return "production"
 
 
@@ -458,7 +459,8 @@ def my_form():
         else:
             print("no session token")
             return redirect('../login')
-    except:
+    except Exception as e:
+        app.logger.debug(e)
         print("returning to login")
         return redirect('../login')
 
@@ -468,15 +470,12 @@ def zmq_push():
     try:
         if session['token'] is not None:
             compute_request = {}
-            request_dict = request.form.to_dict()
-            for key in request_dict:
-                if(key != "is_cadence"):
-                    compute_request[key] = request_dict[key]
-            print("compute request", compute_request)
+            for key in request.form:
+                compute_request[key] = request.form[key]
             app.logger.debug(compute_request)
             context = zmq.Context()
             socket = context.socket(zmq.PUSH)
-            socket.connect(current_service_address)
+            socket.connect(session["server"])
             socket.send_pyobj(compute_request)
             # keys are "alg_package", "alg_name", and "input_file_url"
             message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("observation_status").child(
@@ -487,7 +486,8 @@ def zmq_push():
             return render_template('zmq_push.html',  message_sub=message_dict)
         else:
             return redirect('../login')
-    except:
+    except Exception as e:
+        app.logger.debug(e)
         print("returning to login")
         return redirect('../login')
 
@@ -644,7 +644,7 @@ def home():
             # Redirect to login page if user isn't logged in
             return redirect('../login')
     except Exception as e:
-        print("exception", e)
+        app.logger.debug(e)
         return redirect('../login')
 
 

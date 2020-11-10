@@ -266,7 +266,7 @@
 
         <div  data-uk-scrollspy="cls:uk-animation-fade" class="row">
           <div class="col-md-6" style="padding-left: 5% ">
-			<form id="trigger-form" name="trigger-form" style=" padding-right: 5% ">
+			<form method="POST" style=" padding-right: 5% ">
 			  <h2 class="text-weight-800 Raleway text-white">Algorithm Package</h2>
 				<select id="alg_package" name="alg_package">
 					<option value="energy_detection">Energy Detection</option>
@@ -282,15 +282,9 @@
 					<option value="energy_detection_fine_dry_run.py">energy_detection_fine_dry_run.py</option>
 					<option value="energy_detection_mid.py">energy_detection_mid.py</option>
 				</select>
-
-				<h2 class="text-weight-800 Raleway text-white">Is this a cadence?</h2>
-				<select id="is_cadence" name="is_cadence">
-					<option value="no">no</option>
-					<option value="yes">yes</option>
-				</select>
 			 
-			  <h2 id="url" class="text-weight-800 Raleway text-white">File URL</h2>
-				<input id="input_file_url" name="input_file_url" type="text">
+			  <h2 class="text-weight-800 Raleway text-white">File URL</h2>
+				<input name="input_file_url" type="text">
 
 			  <button type="submit" name="submit" class="btn btn-primary">Submit</button> -->
               <!-- <input type="submit"> -->
@@ -391,14 +385,11 @@
 		<!-- jQuery Library -->
 		<script src="../static/js/jquery.min.js"></script>
 
-		<!-- submit trigger -->
-		<script src="../static/js/jquery.submit-trigger.js"></script>
-
 		<!-- polling triggers -->
 		<script id="pollScript" src="../static/js/jquery.poll-triggers.js" current_state='{{ message_sub }}'></script>
 
 		<!-- change compute server based on toggle state -->
-		<script src="../static/js/jquery.toggle-server.js"></script>
+		<script id="pollScript" src="../static/js/jquery.toggle-server.js"></script>
 
 		<!-- alg_names are dependant on alg_package selected -->
 		<script src="../static/js/jquery.algorithm-dropdowns.js"></script>
