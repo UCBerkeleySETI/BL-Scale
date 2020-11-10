@@ -217,7 +217,7 @@ def update_monitor_data(update, TIME=20):
         if key not in front_end_data:
            front_end_data[key] = data[key]
     # push the updates to the firebase flask variable
-    db.child("breakthrough-listen-sandbox").child("flask_vars").child("monitor").set(front_end_data)
+    db.child("breakthrough-listen-sandbox").child("flask_vars").child("monitor").update(front_end_data)
     app.logger.debug('Updated database WITH MONITOR')
 
 #  Socket listener that runs on a seperate thread
