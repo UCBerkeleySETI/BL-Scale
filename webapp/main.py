@@ -282,7 +282,7 @@ def socket_listener():
                 status_serialized = serialized
                 status_dict = pickle.loads(status_serialized)
                 app.logger.debug(f"status serialized: {status_dict}")
-                #update_status_messages(status_dict)
+                update_status_messages(status_dict)
 
 
 def get_query_firebase(num):
