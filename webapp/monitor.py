@@ -36,6 +36,6 @@ def base():
             flask_var[key] = front_end_data[key]
         else:
             messages[key] = front_end_data[key]
-    print("messages", messages)
+    print('messages', messages)
     # Passes in the time to show when the page was last updated.
     return render_template("monitor.html", title="Monitor", encoded=flask_var, messages=messages, time=str(datetime.now()))
