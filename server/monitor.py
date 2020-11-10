@@ -61,4 +61,6 @@ while True:
     # log messages received through proxy
     poll_data = dict(poller.poll(2))
     if logging_socket in poll_data and poll_data[logging_socket] == zmq.POLLIN:
-        logging.info(json.dumps(pickle.loads(logging_socket.recv_multipart()[1]), indent=2))
+        topic, message = logging_socket.recv_multipart()
+        logging.info(f"Received message in topic {topic}")
+        logging.info(json.dumps(pickle.loads(message), indent=2))
