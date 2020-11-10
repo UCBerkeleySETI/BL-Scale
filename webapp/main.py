@@ -25,6 +25,7 @@ import logging
 import threading
 import random
 import string
+import pprint
 global cache
 
 
@@ -81,7 +82,7 @@ def index():
 
 # Login function
 
-
+import traceback
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if (request.method == 'POST'):
@@ -96,7 +97,8 @@ def login():
             session['token'] = user['idToken']
             print("completed logging in " + session['token'])
             return redirect('/home')
-        except:
+        except Exception:
+            traceback.print_exc()
             # Login failed and message is passed onto the front end
             unsuccessful = 'Please check your credentials'
             return render_template('login.html', umessage=unsuccessful)
@@ -207,67 +209,80 @@ def update_monitor_data(update, TIME=20):
             app.logger.debug('BASE64 DONE')
             temp_dict["CPU"] = data[key]["CPU"]
             temp_dict["RAM"] = data[key]["RAM"]
+            if 'STATUS' in data[key]:
+                temp_dict[key]['STATUS'] = data[key]['STATUS']
             temp_dict["encode"] = image_encode
             front_end_data[key] = temp_dict
+    for key in data:
+        if key not in front_end_data:
+           front_end_data[key] = data[key]
     # push the updates to the firebase flask variable
-    db.child("breakthrough-listen-sandbox").child("flask_vars").child("monitor").set(front_end_data)
+    db.child("breakthrough-listen-sandbox").child("flask_vars").child("monitor").update(front_end_data)
     app.logger.debug('Updated database WITH MONITOR')
 
 #  Socket listener that runs on a seperate thread
+
+def update_status_messages(status_dict):
+    key = status_dict['pod_id']
+    if status_dict['IDLE']:
+        db.child("breakthrough-listen-sandbox").child("flask_vars").child("monitor").child(key).child("STATUS").set("IDLE")
+    else:
+        db.child("breakthrough-listen-sandbox").child("flask_vars").child("monitor").child(key).child("STATUS").set("ACTIVE")
 
 
 def socket_listener():
     context = zmq.Context()
     # First socket listens to proxy publisher
-    message_sub_socket = context.socket(zmq.SUB)
-    message_sub_socket.connect("tcp://10.0.3.141:5560")
-    message_sub_socket.setsockopt(zmq.SUBSCRIBE, b'MESSAGE')
-    # Second socket to listen to the monitor publisher
-    monitor_sub_socket = context.socket(zmq.SUB)
-    monitor_sub_socket.connect("tcp://10.0.3.141:5560")
-    monitor_sub_socket.setsockopt(zmq.SUBSCRIBE, b'METRICS')
+    sub_socket = context.socket(zmq.SUB)
+    sub_socket.connect("tcp://10.0.3.141:5560")
+    sub_socket.setsockopt(zmq.SUBSCRIBE, b'')
 
     # set up poller
     poller = zmq.Poller()
-    poller.register(message_sub_socket, zmq.POLLIN)
-    poller.register(monitor_sub_socket, zmq.POLLIN)
+    poller.register(sub_socket, zmq.POLLIN)
     while True:
         socks = dict(poller.poll(2))
         if int(time.time()) % 60 == 0:
             app.logger.debug("Polling")
-        if message_sub_socket in socks and socks[message_sub_socket] == zmq.POLLIN:
-            serialized_message_dict = message_sub_socket.recv_multipart()[1]
-            app.logger.debug(serialized_message_dict)
-            # Update the string variable
-            message_dict = pickle.loads(serialized_message_dict)
-            app.logger.debug(f"Received message: {message_dict}")
-            # Adds message to the firebase variables
-            db.child("breakthrough-listen-sandbox").child("flask_vars").child("sub_message").set(message_dict)
-            if message_dict["done"]:
-                time_stamp = time.time()*1000
-                algo_type = message_dict["algo_type"]
-                message_dict["timestamp"] = time_stamp
-                target_name = message_dict["target"]
-                # Updates the completed observation status and metrics
-                db.child("breakthrough-listen-sandbox").child("flask_vars").child(
-                    'processed_observations').child(algo_type).child(target_name).set(message_dict)
-            else:
-                algo_type = message_dict["algo_type"]
-                url = message_dict["url"]
-                # Updates the observation status
-                db.child("breakthrough-listen-sandbox").child("flask_vars").child(
-                    'observation_status').child(algo_type).child(url).set(message_dict)
-            app.logger.debug(f'Updated database with {message_dict}')
-
-        if monitor_sub_socket in socks and socks[monitor_sub_socket] == zmq.POLLIN:
-            monitoring_serialized = monitor_sub_socket.recv_multipart()[1]
-            monitoring_dict = pickle.loads(monitoring_serialized)
-            app.logger.debug(monitoring_dict)
-            # Runs the update monitor function which then pushes updates to the firebase.
-            # This is then pulled by the monitor script once its called.
-            update_monitor_data(monitoring_dict)
-            app.logger.debug("updated monitor data")
-        time.sleep(1)
+            app.logger.debug(pprint.pformat(socks))
+            time.sleep(1)
+        if sub_socket in socks and socks[sub_socket] == zmq.POLLIN:
+            topic, serialized = sub_socket.recv_multipart()
+            if topic == b"MESSAGE":
+                serialized_message_dict = serialized
+                app.logger.debug(serialized_message_dict)
+                # Update the string variable
+                message_dict = pickle.loads(serialized_message_dict)
+                app.logger.debug(f"Received message: {message_dict}")
+                # Adds message to the firebase variables
+                db.child("breakthrough-listen-sandbox").child("flask_vars").child("sub_message").set(message_dict)
+                if message_dict["done"]:
+                    time_stamp = time.time()*1000
+                    algo_type = message_dict["algo_type"]
+                    message_dict["timestamp"] = time_stamp
+                    target_name = message_dict["target"]
+                    # Updates the completed observation status and metrics
+                    db.child("breakthrough-listen-sandbox").child("flask_vars").child(
+                        'processed_observations').child(algo_type).child(target_name).set(message_dict)
+                else:
+                    algo_type = message_dict["algo_type"]
+                    url = message_dict["url"]
+                    # Updates the observation status
+                    db.child("breakthrough-listen-sandbox").child("flask_vars").child(
+                        'observation_status').child(algo_type).child(url).set(message_dict)
+                app.logger.debug(f'Updated database with {message_dict}')
+            if topic == b"METRICS":
+                monitoring_serialized = serialized
+                monitoring_dict = pickle.loads(monitoring_serialized)
+                app.logger.debug(monitoring_dict)
+                # Runs the update monitor function which then pushes updates to the firebase.
+                # This is then pulled by the monitor script once its called.
+                update_monitor_data(monitoring_dict)
+            if topic == b"STATUS":
+                status_serialized = serialized
+                status_dict = pickle.loads(status_serialized)
+                app.logger.debug(f"status serialized: {status_dict}")
+                update_status_messages(status_dict)
 
 
 def get_query_firebase(num):
@@ -438,6 +453,7 @@ def my_form():
             message_dict = process_message_dict(message_dict)
             return render_template('zmq_push.html', message_sub=message_dict)
         else:
+            print("no session token")
             return redirect('../login')
     except:
         print("returning to login")
@@ -624,7 +640,8 @@ def home():
         else:
             # Redirect to login page if user isn't logged in
             return redirect('../login')
-    except:
+    except Exception as e:
+        print("exception", e)
         return redirect('../login')
 
 
