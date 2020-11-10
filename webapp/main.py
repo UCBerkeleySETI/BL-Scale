@@ -402,6 +402,7 @@ def zmq_sub():
 def poll():
 
     # client_state = ast.literal_eval(request.args.get("state"))
+    last_state = session.get("trigger_state", {})
 
     #poll the database
     while True:
@@ -416,14 +417,16 @@ def poll():
                 message_dict = collections.OrderedDict(reversed(list(message_dict.items())))
                 # Gets the results and forms the time
                 message_dict = process_message_dict(message_dict)
-                # if message_dict != client_state:
-                #     print("client_state", type(client_state))
-                #     return "change"
-                # else:
-                #     return "Same"
+                if message_dict != last_state:
+                    print("client_state", type(last_state))
+                    session["trigger_state"] = message_dict
+                    return "change"
+                else:
+                    return "Same"
             else:
                 raise RuntimeError("Need to login")
-        except:
+        except Exception as e:
+            app.logger.info(f"Exception encountered: {e}")
             raise RuntimeError("Need to login")
 
 @app.route('/toggle-server')
