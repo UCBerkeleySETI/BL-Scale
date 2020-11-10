@@ -271,7 +271,7 @@ def socket_listener():
             # Runs the update monitor function which then pushes updates to the firebase.
             # This is then pulled by the monitor script once its called.
             update_monitor_data(monitoring_dict)
-            app.logger.debug("updated monitor data")
+            print("updated monitor data")
         if status_sub_socket in socks and socks[status_sub_socket] == zmq.POLLIN:
             status_serialized = status_sub_socket.recv_multipart()[1]
             status_dict = pickle.loads(status_serialized)
