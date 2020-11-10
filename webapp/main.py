@@ -278,6 +278,7 @@ def get_query_firebase(num):
         "Energy-Detection").order_by_child("timestamp").limit_to_last(num).get().val()
     # Mutating the dictionary within the loop and needs a deep copy
     copy_of_dict = message_dict.copy()
+    message_dict = collections.OrderedDict(reversed(list(message_dict.items()))) 
     for index in message_dict.items():
         # getting rid of mid resolution files
         print("getting rid of mid res " + str(index[0]))
@@ -343,6 +344,7 @@ def hits_form():
             # Query the last 3 results
             message_dict, cache = get_query_firebase(3)
             # Make plots for the queried results
+            print(message_dict)
             message_dict = process_message_dict(message_dict, time_stamp_key="timestamp")
             # Push them to front end
             return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict, sample_urls=cache, test_login=True)
@@ -400,7 +402,7 @@ def poll():
                 message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("observation_status").child(
                     "Energy-Detection").order_by_child("start_timestamp").limit_to_last(3).get().val()
                 # we want the order of the most recent triggers to be from most recent to least recent
-                message_dict = dict(reversed(list(message_dict.items()))) 
+                message_dict = collections.OrderedDict(reversed(list(message_dict.items()))) 
                 # Gets the results and forms the time
                 message_dict = process_message_dict(message_dict)
                 if message_dict != client_state:
@@ -434,7 +436,7 @@ def my_form():
                 "Energy-Detection").order_by_child("start_timestamp").limit_to_last(3).get().val()
             print("Convert time")
             # we want the order of the most recent triggers to be from most recent to least recent
-            message_dict = dict(reversed(list(message_dict.items()))) 
+            message_dict = collections.OrderedDict(reversed(list(message_dict.items()))) 
             # Gets the results and forms the time
             message_dict = process_message_dict(message_dict)
             return render_template('zmq_push.html', message_sub=message_dict)
@@ -451,8 +453,11 @@ def zmq_push():
     try:
         if session['token'] is not None:
             compute_request = {}
-            for key in request.form:
-                compute_request[key] = request.form[key]
+            request_dict = request.form.to_dict()
+            for key in request_dict:
+                if(key != "is_cadence"):
+                    compute_request[key] = request_dict[key]
+            print("compute request", compute_request)
             app.logger.debug(compute_request)
             context = zmq.Context()
             socket = context.socket(zmq.PUSH)
@@ -462,7 +467,7 @@ def zmq_push():
             message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("observation_status").child(
                 "Energy-Detection").order_by_child("start_timestamp").limit_to_last(3).get().val()
             # we want the order of the most recent triggers to be from most recent to least recent
-            message_dict = dict(reversed(list(message_dict.items()))) 
+            message_dict = collections.OrderedDict(reversed(list(message_dict.items()))) 
             message_dict = process_message_dict(message_dict)
             return render_template('zmq_push.html',  message_sub=message_dict)
         else:
@@ -602,9 +607,12 @@ def filter_images(df, n):
 
 
 def get_processed_hist_and_img(single_uri):
-    data = pd.read_pickle(single_uri)
-    observ = get_observation(single_uri)
-    return [get_base64_hist(data), get_base64_images(observ)]
+    try:
+        data = pd.read_pickle(single_uri)
+        observ = get_observation(single_uri)
+        return [get_base64_hist(data), get_base64_images(observ)]
+    except: 
+        print("could not find file "+ single_uri)
 
 # Dashboard page and displays the cards
 
