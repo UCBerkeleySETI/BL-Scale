@@ -7,7 +7,7 @@ $("#alg_package").change(function() {
 	data = {
 		"energy_detection": "energy_detection.py,energy_detection_fine.py,energy_detection_fine_BAT.py,energy_detection_fine_dry_run.py,energy_detection_mid.py",
 		"object_detection": "object_detection.py",
-		"DeepSeti": "DeepSeti.py",
+		"DeepSeti": "DeepSeti.py"
 	}
 
         console.log("dependant dropdowns")
@@ -33,12 +33,3 @@ $("#alg_package").change(function() {
 		});
 
 });
-
-
-$("#is_cadence").change(function() {
-	if (document.getElementById("is_cadence").value == "yes"){
-		document.getElementById("url").innerHTML = "Cadence URL";		
-	} else{
-		document.getElementById("url").innerHTML = "File URL";
-	}
-})
