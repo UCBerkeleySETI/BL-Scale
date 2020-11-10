@@ -291,6 +291,14 @@
 				</div>
 			{%endfor%}
 		</div>
+		<div>
+			{%for key in messages%}
+			<h4 class="text-weight-800 Raleway text-white">{{ key }}</h4>
+			{%for subkey in messages[key]%}
+			<h6 class="text-weight-800 Raleway text-white">{{ messages[key][subkey]}}%</h6>
+			{%endfor%}
+			{%endfor%}
+		</div>
 	<script> 
 		$(document).ready(function(){
 		setInterval(function(){

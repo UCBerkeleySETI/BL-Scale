@@ -209,6 +209,11 @@ def update_monitor_data(update, TIME=20):
             temp_dict["RAM"] = data[key]["RAM"]
             temp_dict["encode"] = image_encode
             front_end_data[key] = temp_dict
+        elif key == 'pod_id':
+            app.logger.debug('appending status messages')
+            front_end_data[key] = update
+        app.logger.debug('key is:' + key)
+
     # push the updates to the firebase flask variable
     db.child("breakthrough-listen-sandbox").child("flask_vars").child("monitor").set(front_end_data)
     app.logger.debug('Updated database WITH MONITOR')
@@ -276,6 +281,7 @@ def socket_listener():
             status_serialized = status_sub_socket.recv_multipart()[1]
             status_dict = pickle.loads(status_serialized)
             app.logger.debug(f"status serialized: {status_dict}")
+            update_monitor_data(status_dict)
 
 
         time.sleep(1)
