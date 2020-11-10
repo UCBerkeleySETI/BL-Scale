@@ -223,15 +223,11 @@ def update_monitor_data(update, TIME=20):
 #  Socket listener that runs on a seperate thread
 
 def update_status_messages(status_dict):
-    data = db.child("breakthrough-listen-sandbox").child("flask_vars").child("monitor").get().val()
-    for pod, poddata in data:
-        if pod in status_dict:
-            if status_dict[pod]['IDLE']:
-                poddata['STATUS'] = 'IDLE'
-            else:
-                poddata['STATUS'] = 'ACTIVE'
-    db.child("breakthrough-listen-sandbox").child("flask_vars").child("monitor").set(data)
-
+    key = status_dict['pod_id']
+    if status_dict['IDLE']:
+        db.child("breakthrough-listen-sandbox").child("flask_vars").child("monitor").child(key).child("STATUS").set("IDLE")
+    else:
+        db.child("breakthrough-listen-sandbox").child("flask_vars").child("monitor").child(key).child("STATUS").set("ACTIVE")
 
 
 def socket_listener():
