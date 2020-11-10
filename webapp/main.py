@@ -220,7 +220,8 @@ def update_status_messages(status_dict):
     messages = {}
     for key in status_dict:
         app.logger.debug('appending status messages')
-        messages[key] = status_dict
+        if key == 'pod_id':
+            messages[status_dict[key]] = status_dict
     db.child("breakthrough-listen-sandbox").child("flask_vars").child("monitor").update(messages)
     app.logger.debug(f'messages {messages}')
 
