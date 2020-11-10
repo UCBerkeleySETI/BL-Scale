@@ -19,7 +19,7 @@ broadcast_socket.connect("tcp://10.0.3.141:5559")
 
 logging_socket = context.socket(zmq.SUB)
 logging_socket.connect("tcp://10.0.3.141:5560")
-logging_socket.setsockopt(zmq.SUBSCRIBE, b"MESSAGE")
+logging_socket.setsockopt(zmq.SUBSCRIBE, b"")
 
 poller = zmq.Poller()
 poller.register(logging_socket, zmq.POLLIN)
