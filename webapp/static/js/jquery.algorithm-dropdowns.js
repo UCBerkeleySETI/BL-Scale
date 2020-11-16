@@ -7,8 +7,8 @@ $("#alg_package").change(function() {
 	data = {
 		"energy_detection": "energy_detection.py,energy_detection_fine.py,energy_detection_fine_BAT.py,energy_detection_fine_dry_run.py,energy_detection_mid.py",
 		"object_detection": "object_detection.py",
-		"DeepSeti": "DeepSeti.py",
-		"turboSETI": "turboSETI"
+		"DeepSeti": "DeepSeti.py" //,
+		// "turboSETI": "turboSETI"
 	}
 
         console.log("dependant dropdowns")
@@ -25,6 +25,9 @@ $("#alg_package").change(function() {
 			case 'DeepSeti':
 				vals = data.DeepSeti.split(",");
 				break;
+//			case 'turboSETI':
+//			    vals = data.turboSETI.split(",");
+//			    break;
 		}
 		
 		var $secondChoice = $("#alg_name");
