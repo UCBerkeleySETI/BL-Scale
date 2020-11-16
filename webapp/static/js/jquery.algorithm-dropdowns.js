@@ -8,6 +8,7 @@ $("#alg_package").change(function() {
 		"energy_detection": "energy_detection.py,energy_detection_fine.py,energy_detection_fine_BAT.py,energy_detection_fine_dry_run.py,energy_detection_mid.py",
 		"object_detection": "object_detection.py",
 		"DeepSeti": "DeepSeti.py",
+		"turboSETI": "turboSETI"
 	}
 
         console.log("dependant dropdowns")
