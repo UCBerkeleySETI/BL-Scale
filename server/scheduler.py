@@ -29,6 +29,10 @@ broadcast_sub_socket = context.socket(zmq.SUB)
 broadcast_sub_socket.connect("tcp://10.0.3.141:5560")
 broadcast_sub_socket.setsockopt(zmq.SUBSCRIBE, b'STATUS')
 
+error_sub_socket = context.socket(zmq.SUB)
+error_sub_socket.connect("tcp://10.0.3.141:5560")
+error_sub_socket.setsockopt(zmq.SUBSCRIBE, b'ERROR')
+
 # set up poller, for polling messages from request_recv_socket
 poller = zmq.Poller()
 poller.register(connect_recv_socket, zmq.POLLIN)
@@ -89,6 +93,15 @@ while True:
 
         if scheduler.requests:
             scheduler.schedule_request(scheduler.requests.pop(0))
+
+    if error_sub_socket in sockets and sockets[error_sub_socket] == zmq.POLLIN:
+        serialized_error_status = error_sub_socket.recv_multipart()[1]
+        error_status = pickle.loads(serialized_error_status)
+        pod_id = error_status['pod_id']
+        logging.error(f"Received failure on pod with id: {pod_id}")
+        request = scheduler.workers[pod_id].request
+        del scheduler.workers[pod_id]
+        scheduler.schedule_request(request)
 
     if int(time.time()) % 60 == 0 and int(time.time()) != last_info_time:
         logging.info("scheduler running normally")

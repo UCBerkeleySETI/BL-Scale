@@ -50,6 +50,11 @@ spec:
                         configMapKeyRef:
                           key: SCHEDULER_IP_DEV
                           name: bl-scale-config-38mx
+                    - name: PROXY_IP
+                      valueFrom:
+                        configMapKeyRef:
+                          key: PROXY_IP
+                          name: bl-scale-config-38mx
                     - name: GOOGLE_APPLICATION_CREDENTIALS
                       value: "/var/run/secret/cloud.google.com/bl-scale_key.json"
                     - name: POD_ID
