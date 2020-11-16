@@ -1,9 +1,12 @@
 import zmq
 import json
+import pickle
 from collections import defaultdict
 
 
 class Scheduler:
+    MAX_RETRIES = 3
+
     def __init__(self, context):
         self.workers = dict()
         self.idle_workers = set()
@@ -18,6 +21,15 @@ class Scheduler:
         pass
 
     def schedule_request(self, serialized):
+        request = pickle.loads(serialized)
+        if "RETRIES" not in request:
+            request["RETRIES"] = 0
+        elif request["RETRIES"] <= self.MAX_RETRIES:
+            request["RETRIES"] += 1
+        else:
+            return
+        serialized = pickle.dumps(request)
+
         if self.idle_workers:
             worker = self.idle_workers.pop()
             worker.schedule(serialized)

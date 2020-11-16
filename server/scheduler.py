@@ -38,6 +38,7 @@ poller = zmq.Poller()
 poller.register(connect_recv_socket, zmq.POLLIN)
 poller.register(request_recv_socket, zmq.POLLIN)
 poller.register(broadcast_sub_socket, zmq.POLLIN)
+poller.register(error_sub_socket, zmq.POLLIN)
 
 ########################################
 # set up kubernetes client
@@ -100,7 +101,6 @@ while True:
         pod_id = error_status['pod_id']
         logging.error(f"Received failure on pod with id: {pod_id}")
         request = scheduler.workers[pod_id].request
-        del scheduler.workers[pod_id]
         scheduler.schedule_request(request)
 
     if int(time.time()) % 60 == 0 and int(time.time()) != last_info_time:
