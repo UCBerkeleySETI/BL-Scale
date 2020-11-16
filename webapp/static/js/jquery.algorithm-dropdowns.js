@@ -17,7 +17,6 @@ $("#alg_package").change(function() {
 		var vals = [];
 							
 		switch(key) {
-		    console.log("in here")
 			case 'energy_detection':
 				vals = data.energy_detection.split(",");
 				break;
