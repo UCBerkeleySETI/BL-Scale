@@ -32,7 +32,7 @@ global cache
 cache = {}
 
 compute_service_address = "tcp://34.66.198.113:5555"
-dev_service_address = "tcp://34.122.126.21:5555"
+dev_service_address = "tcp://35.238.79.79:5555"
 
 
 firebase, db = pyrebase_cred_wrapper()
