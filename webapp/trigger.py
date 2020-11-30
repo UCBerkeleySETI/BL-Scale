@@ -1,7 +1,7 @@
 import zmq
-from flask import (Blueprint, render_template, request, redirect, session, Flask)
+from flask import (Blueprint, render_template, current_app, request, redirect, session, Flask)
 
-from main import get_query_firebase, db, app
+from main import get_query_firebase, db
 
 import collections
 

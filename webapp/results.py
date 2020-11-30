@@ -1,7 +1,7 @@
 
-from flask import (Blueprint, render_template, request, redirect, session, Flask)
+from flask import (Blueprint, render_template, current_app, request, redirect, session, Flask)
 
-from main import get_query_firebase, app
+from main import get_query_firebase
 from utils import process_message_dict
 
 bp = Blueprint('result', __name__, url_prefix='/result')
@@ -25,7 +25,7 @@ def hits_form():
             return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict, sample_urls=cache, test_login=False)
     except Exception as e:
         # If user isn't logged in we show a different UI
-        app.logger.debug(e)
+        current_app.logger.debug(e)
         message_dict, cache = get_query_firebase(3)
         message_dict = process_message_dict(message_dict, time_stamp_key="timestamp")
         return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict,  sample_urls=cache, test_login=False)
@@ -52,7 +52,7 @@ def zmq_sub():
             message_dict = process_message_dict(message_dict, time_stamp_key="timestamp")
             return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict,  sample_urls=cache, test_login=False)
     except Exception as e:
-        app.logger.debug(e)
+        current_app.logger.debug(e)
         # add three function for not logged in users.
         message_dict, cache = get_query_firebase(3*session["results_counter"])
         message_dict = process_message_dict(message_dict, time_stamp_key="timestamp")
