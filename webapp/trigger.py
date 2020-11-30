@@ -27,7 +27,7 @@ def my_form():
             print("no session token")
             return redirect('../login')
     except Exception as e:
-        app.logger.debug(e)
+        current_app.logger.debug(e)
         print("returning to login")
         return redirect('../login')
 
@@ -39,7 +39,7 @@ def zmq_push():
             compute_request = {}
             for key in request.form:
                 compute_request[key] = request.form[key]
-            app.logger.debug(compute_request)
+            current_app.logger.debug(compute_request)
             context = zmq.Context()
             socket = context.socket(zmq.PUSH)
             socket.connect(session["server"])
@@ -54,6 +54,6 @@ def zmq_push():
         else:
             return redirect('../login')
     except Exception as e:
-        app.logger.debug(e)
+        current_app.logger.debug(e)
         print("returning to login")
         return redirect('../login')
