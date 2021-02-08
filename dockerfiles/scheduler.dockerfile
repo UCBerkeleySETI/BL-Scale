@@ -17,6 +17,10 @@ RUN mkdir /code
 WORKDIR /code
 COPY . /code/BL-Scale
 WORKDIR /code/BL-Scale/
+RUN pip3.8 install --upgrade pip
 RUN pip3.8 install zmq kubernetes tqdm
+
+# hack to remove carrige return
+RUN sed $'s/\r$//' /code/BL-Scale/scripts/start_scheduler_pod.sh > /code/BL-Scale/scripts/start_scheduler_pod.sh
 
 CMD sh /code/BL-Scale/scripts/start_scheduler_pod.sh

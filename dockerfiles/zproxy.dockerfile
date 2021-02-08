@@ -11,6 +11,7 @@ RUN mkdir /code
 WORKDIR /code
 COPY . /code/BL-Scale
 WORKDIR /code/BL-Scale/webapp
+RUN pip3 install --upgrade pip
 RUN pip3 install -r requirements.txt
 
 WORKDIR /code/BL-Scale/server

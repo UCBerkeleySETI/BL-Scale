@@ -14,6 +14,7 @@ RUN mkdir /code
 WORKDIR /code
 COPY . /code/BL-Scale
 WORKDIR /code/BL-Scale/
+RUN pip3 install --upgrade pip
 RUN pip3 install zmq kubernetes tqdm
 
 # hack to remove carrige return
