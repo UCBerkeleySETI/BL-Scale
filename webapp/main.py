@@ -2,6 +2,7 @@ import monitor
 import datetime
 from os import path
 import os.path
+
 import utils
 import firebase_admin
 from firebase_admin import auth
@@ -25,13 +26,14 @@ import logging
 import threading
 import random
 import string
+import pprint
 global cache
 
 
 cache = {}
 
 compute_service_address = "tcp://34.66.198.113:5555"
-dev_service_address = "tcp://34.122.126.21:5555"
+dev_service_address = "tcp://35.238.79.79:5555"
 
 
 firebase, db = pyrebase_cred_wrapper()
@@ -80,7 +82,7 @@ def index():
 
 # Login function
 
-
+import traceback
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if (request.method == 'POST'):
@@ -98,6 +100,7 @@ def login():
             return redirect('/home')
         except Exception as e:
             app.logger.debug(e)
+            traceback.print_exc()
             # Login failed and message is passed onto the front end
             unsuccessful = 'Please check your credentials'
             return render_template('login.html', umessage=unsuccessful)
@@ -137,39 +140,39 @@ def logout():
 # Creates base64 encoding of the health of CPU and Ram
 
 
-def get_base64_hist_monitor(list_cpu, list_ram, threshold):
-    # Create the x axis for plot
-    x = np.arange(len(list_cpu))
-    # Use the dark theme plots
-    plt.style.use("dark_background")
-    plt.figure(figsize=(8, 6))
-    # Plot the ram and the cpu list
-    plt.plot(x, list_cpu)
-    plt.plot(x, list_ram)
-    # Labels
-    plt.title("Health")
-    plt.xlabel("Time")
-    plt.ylabel("Percent Usage % ")
-    plt.legend(['CPU', 'MEMORY'], loc='upper left')
-    # Convert image into bytes
-    pic_IObytes = io.BytesIO()
-    plt.savefig(pic_IObytes,  format='png')
-    # Close plots to save memory
-    plt.close("all")
-    pic_IObytes.seek(0)
-    # Convert to base 64
-    pic_hash = base64.b64encode(pic_IObytes.read())
-    base64_img = "data:image/jpeg;base64, " + str(pic_hash.decode("utf8"))
-    return base64_img
+# def get_base64_hist_monitor(list_cpu, list_ram, threshold):
+#     # Create the x axis for plot
+#     x = np.arange(len(list_cpu))
+#     # Use the dark theme plots
+#     plt.style.use("dark_background")
+#     plt.figure(figsize=(8, 6))
+#     # Plot the ram and the cpu list
+#     plt.plot(x, list_cpu)
+#     plt.plot(x, list_ram)
+#     # Labels
+#     plt.title("Health")
+#     plt.xlabel("Time")
+#     plt.ylabel("Percent Usage % ")
+#     plt.legend(['CPU', 'MEMORY'], loc='upper left')
+#     # Convert image into bytes
+#     pic_IObytes = io.BytesIO()
+#     plt.savefig(pic_IObytes,  format='png')
+#     # Close plots to save memory
+#     plt.close("all")
+#     pic_IObytes.seek(0)
+#     # Convert to base 64
+#     pic_hash = base64.b64encode(pic_IObytes.read())
+#     base64_img = "data:image/jpeg;base64, " + str(pic_hash.decode("utf8"))
+#     return base64_img
 
 #  Function to fill list with zeros to initialize a pod's health
 
 
-def fill_zeros(array, length):
-    array = ([0] * (length - len(array))) + array
-    return array
+# def fill_zeros(array, length):
+#     array = ([0] * (length - len(array))) + array
+#     return array
 
-# Update the monitored data with the results from firebase flask variables
+#Update the monitored data with the results from firebase flask variables
 
 
 def update_monitor_data(update, TIME=20):
@@ -192,8 +195,8 @@ def update_monitor_data(update, TIME=20):
             # If there is nothing from before we pad it with zeros
             if len(data[key]["CPU"]) < TIME or len(data[key]["CPU"]) < TIME:
                 app.logger.debug("padding zeroes")
-                data[key]["CPU"] = fill_zeros(data[key]["CPU"], TIME)
-                data[key]["RAM"] = fill_zeros(data[key]["RAM"], TIME)
+                data[key]["CPU"] = utils.fill_zeros(data[key]["CPU"], TIME)
+                data[key]["RAM"] = utils.fill_zeros(data[key]["RAM"], TIME)
             # Appends the new updated values based on percentages
             data[key]["CPU"].append(np.round((update[key]["CPU"]/total_CPU)*100, decimals=2))
             data[key]["RAM"].append(np.round((update[key]["RAM"]/total_RAM)*100, decimals=2))
@@ -203,73 +206,87 @@ def update_monitor_data(update, TIME=20):
                 data[key]["CPU"].pop(0)
             while len(data[key]["RAM"]) > TIME:
                 data[key]["RAM"].pop(0)
-            image_encode = get_base64_hist_monitor(
+            image_encode = utils.get_base64_hist_monitor(
                 list_cpu=data[key]["CPU"], list_ram=data[key]["RAM"], threshold=TIME)
             # app.logger.debug('BASE64 DONE')
             temp_dict["CPU"] = data[key]["CPU"]
             temp_dict["RAM"] = data[key]["RAM"]
+            if 'STATUS' in data[key]:
+                temp_dict[key]['STATUS'] = data[key]['STATUS']
             temp_dict["encode"] = image_encode
             front_end_data[key] = temp_dict
+    for key in data:
+        if key not in front_end_data:
+           front_end_data[key] = data[key]
     # push the updates to the firebase flask variable
-    db.child("breakthrough-listen-sandbox").child("flask_vars").child("monitor").set(front_end_data)
-    # app.logger.debug('Updated database WITH MONITOR')
+    db.child("breakthrough-listen-sandbox").child("flask_vars").child("monitor").update(front_end_data)
+    app.logger.debug('Updated database WITH MONITOR')
+
+
 
 #  Socket listener that runs on a seperate thread
+
+def update_status_messages(status_dict):
+    key = status_dict['pod_id']
+    if status_dict['IDLE']:
+        db.child("breakthrough-listen-sandbox").child("flask_vars").child("monitor").child(key).child("STATUS").set("IDLE")
+    else:
+        db.child("breakthrough-listen-sandbox").child("flask_vars").child("monitor").child(key).child("STATUS").set("ACTIVE")
 
 
 def socket_listener():
     context = zmq.Context()
     # First socket listens to proxy publisher
-    message_sub_socket = context.socket(zmq.SUB)
-    message_sub_socket.connect("tcp://10.0.3.141:5560")
-    message_sub_socket.setsockopt(zmq.SUBSCRIBE, b'MESSAGE')
-    # Second socket to listen to the monitor publisher
-    monitor_sub_socket = context.socket(zmq.SUB)
-    monitor_sub_socket.connect("tcp://10.0.3.141:5560")
-    monitor_sub_socket.setsockopt(zmq.SUBSCRIBE, b'METRICS')
+    sub_socket = context.socket(zmq.SUB)
+    sub_socket.connect("tcp://10.0.3.141:5560")
+    sub_socket.setsockopt(zmq.SUBSCRIBE, b'')
 
     # set up poller
     poller = zmq.Poller()
-    poller.register(message_sub_socket, zmq.POLLIN)
-    poller.register(monitor_sub_socket, zmq.POLLIN)
+    poller.register(sub_socket, zmq.POLLIN)
     while True:
         socks = dict(poller.poll(2))
         if int(time.time()) % 60 == 0:
             app.logger.debug("Polling")
-        if message_sub_socket in socks and socks[message_sub_socket] == zmq.POLLIN:
-            app.logger.debug("Received message from worker")
-            serialized_message_dict = message_sub_socket.recv_multipart()[1]
-            app.logger.debug(serialized_message_dict)
-            # Update the string variable
-            message_dict = pickle.loads(serialized_message_dict)
-            app.logger.debug(f"Received message: {message_dict}")
-            # Adds message to the firebase variables
-            db.child("breakthrough-listen-sandbox").child("flask_vars").child("sub_message").set(message_dict)
-            if message_dict["done"]:
-                time_stamp = time.time()*1000
-                algo_type = message_dict["algo_type"]
-                message_dict["timestamp"] = time_stamp
-                target_name = message_dict["target"]
-                # Updates the completed observation status and metrics
-                db.child("breakthrough-listen-sandbox").child("flask_vars").child(
-                    'processed_observations').child(algo_type).child(target_name).set(message_dict)
-            else:
-                algo_type = message_dict["algo_type"]
-                url = message_dict["url"]
-                # Updates the observation status
-                db.child("breakthrough-listen-sandbox").child("flask_vars").child(
-                    'observation_status').child(algo_type).child(url).set(message_dict)
-            app.logger.debug(f'Updated database with {message_dict}')
-
-        if monitor_sub_socket in socks and socks[monitor_sub_socket] == zmq.POLLIN:
-            monitoring_serialized = monitor_sub_socket.recv_multipart()[1]
-            monitoring_dict = pickle.loads(monitoring_serialized)
-            # app.logger.debug(monitoring_dict)
-            # Runs the update monitor function which then pushes updates to the firebase.
-            # This is then pulled by the monitor script once its called.
-            update_monitor_data(monitoring_dict)
-            # app.logger.debug("updated monitor data")
-        time.sleep(1)
+            app.logger.debug(pprint.pformat(socks))
+            time.sleep(1)
+        if sub_socket in socks and socks[sub_socket] == zmq.POLLIN:
+            topic, serialized = sub_socket.recv_multipart()
+            if topic == b"MESSAGE":
+                serialized_message_dict = serialized
+                app.logger.debug(serialized_message_dict)
+                # Update the string variable
+                message_dict = pickle.loads(serialized_message_dict)
+                app.logger.debug(f"Received message: {message_dict}")
+                # Adds message to the firebase variables
+                db.child("breakthrough-listen-sandbox").child("flask_vars").child("sub_message").set(message_dict)
+                if message_dict["done"]:
+                    time_stamp = time.time()*1000
+                    algo_type = message_dict["algo_type"]
+                    message_dict["timestamp"] = time_stamp
+                    target_name = message_dict["target"]
+                    # Updates the completed observation status and metrics
+                    db.child("breakthrough-listen-sandbox").child("flask_vars").child(
+                        'processed_observations').child(algo_type).child(target_name).set(message_dict)
+                else:
+                    algo_type = message_dict["algo_type"]
+                    url = message_dict["url"]
+                    # Updates the observation status
+                    db.child("breakthrough-listen-sandbox").child("flask_vars").child(
+                        'observation_status').child(algo_type).child(url).set(message_dict)
+                app.logger.debug(f'Updated database with {message_dict}')
+            if topic == b"METRICS":
+                monitoring_serialized = serialized
+                monitoring_dict = pickle.loads(monitoring_serialized)
+                app.logger.debug(monitoring_dict)
+                # Runs the update monitor function which then pushes updates to the firebase.
+                # This is then pulled by the monitor script once its called.
+                update_monitor_data(monitoring_dict)
+            if topic == b"STATUS":
+                status_serialized = serialized
+                status_dict = pickle.loads(status_serialized)
+                app.logger.debug(f"status serialized: {status_dict}")
+                update_status_messages(status_dict)
 
 
 def get_query_firebase(num):
@@ -278,6 +295,7 @@ def get_query_firebase(num):
         "Energy-Detection").order_by_child("timestamp").limit_to_last(num).get().val()
     # Mutating the dictionary within the loop and needs a deep copy
     copy_of_dict = message_dict.copy()
+    message_dict = collections.OrderedDict(reversed(list(message_dict.items())))
     for index in message_dict.items():
         # getting rid of mid resolution files
         print("getting rid of mid res " + str(index[0]))
@@ -299,96 +317,96 @@ def get_query_firebase(num):
         db.child("breakthrough-listen-sandbox").child("flask_vars").child("cache").child(key).set(cache[key])
     return copy_of_dict, cache
 
-
-def convert_time_to_datetime(dict, time_stamp_key="start_timestamp"):
-    # Helps convert the timestamp values in Milliseconds since Epoch to readable date time string.
-    for k in dict:
-        if time_stamp_key in dict[k]:
-            temp = dict[k][time_stamp_key]
-            temp = temp/1000
-            date_time = datetime.datetime.fromtimestamp(temp).strftime('%c')
-            dict[k][time_stamp_key] = date_time
-    return dict
+# Helps convert the timestamp values in Milliseconds since Epoch to readable date time string.
+# def convert_time_to_datetime(dict, time_stamp_key="start_timestamp"):
+#     for k in dict:
+#         if time_stamp_key in dict[k]:
+#             temp = dict[k][time_stamp_key]
+#             temp = temp/1000
+#             date_time = datetime.datetime.fromtimestamp(temp).strftime('%c')
+#             dict[k][time_stamp_key] = date_time
+#     return dict
 
 # Rounding values from the dictionary
 
 
-def round_processing_time(dict):
-    for obs in dict:
-        if "processing_time" in dict[obs]:
-            dict[obs]["processing_time"] = np.round(dict[obs]["processing_time"] / 60, decimals=2)
-    return dict
+# def round_processing_time(dict):
+#     for obs in dict:
+#         if "processing_time" in dict[obs]:
+#             dict[obs]["processing_time"] = np.round(dict[obs]["processing_time"] / 60, decimals=2)
+#     return dict
 
 # Includes rounding of time and converting timestamp to a date.
 
 
-def process_message_dict(message_dict, time_stamp_key="start_timestamp"):
-    message_dict = convert_time_to_datetime(message_dict, time_stamp_key=time_stamp_key)
-    message_dict = round_processing_time(message_dict)
-    for obs in message_dict:
-        if "filename" not in message_dict[obs]:
-            message_dict[obs]["filename"] = message_dict[obs]["url"]
-    return message_dict
+# def process_message_dict(message_dict, time_stamp_key="start_timestamp"):
+#     message_dict = convert_time_to_datetime(message_dict, time_stamp_key=time_stamp_key)
+#     message_dict = round_processing_time(message_dict)
+#     for obs in message_dict:
+#         if "filename" not in message_dict[obs]:
+#             message_dict[obs]["filename"] = message_dict[obs]["url"]
+#     return message_dict
 
 # Display the default results page.
 
 
-@app.route('/result')
-def hits_form():
-    global cache
-    session["results_counter"] = 1
-    try:
-        # Check if the user is logged in
-        if session['token'] is not None:
-            # Query the last 3 results
-            message_dict, cache = get_query_firebase(3)
-            # Make plots for the queried results
-            message_dict = process_message_dict(message_dict, time_stamp_key="timestamp")
-            # Push them to front end
-            return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict, sample_urls=cache, test_login=True)
-        else:
-            message_dict, cache = get_query_firebase(3)
-            message_dict = process_message_dict(message_dict, time_stamp_key="timestamp")
-            return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict, sample_urls=cache, test_login=False)
-    except Exception as e:
-        # If user isn't logged in we show a different UI
-        app.logger.debug(e)
-        message_dict, cache = get_query_firebase(3)
-        message_dict = process_message_dict(message_dict, time_stamp_key="timestamp")
-        return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict,  sample_urls=cache, test_login=False)
-
-
-# Request to add 3 more
-@app.route('/result', methods=['GET', 'POST'])
-def zmq_sub():
-    global cache
-    print("adding 3 more images")
-    # Added 3 more token incremented
-    try:
-        if session['token'] is not None:
-            message_dict = {}
-            # Increase the counter
-            session["results_counter"] += 1
-            # Request for 3 more
-            message_dict, cache = get_query_firebase(3*session["results_counter"])
-            message_dict = process_message_dict(message_dict, time_stamp_key="timestamp")
-            return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict,  sample_urls=cache, test_login=True)
-        else:
-            session["results_counter"] += 1
-            message_dict, cache = get_query_firebase(3*session["results_counter"])
-            message_dict = process_message_dict(message_dict, time_stamp_key="timestamp")
-            return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict,  sample_urls=cache, test_login=False)
-    except Exception as e:
-        app.logger.debug(e)
-        # add three function for not logged in users.
-        message_dict, cache = get_query_firebase(3*session["results_counter"])
-        message_dict = process_message_dict(message_dict, time_stamp_key="timestamp")
-        return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict, sample_urls=cache, test_login=False)
+# @app.route('/result')
+# def hits_form():
+#     global cache
+#     session["results_counter"] = 1
+#     try:
+#         # Check if the user is logged in
+#         if session['token'] is not None:
+#             # Query the last 3 results
+#             message_dict, cache = get_query_firebase(3)
+#             # Make plots for the queried results
+#             message_dict = process_message_dict(message_dict, time_stamp_key="timestamp")
+#             # Push them to front end
+#             return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict, sample_urls=cache, test_login=True)
+#         else:
+#             message_dict, cache = get_query_firebase(3)
+#             message_dict = process_message_dict(message_dict, time_stamp_key="timestamp")
+#             return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict, sample_urls=cache, test_login=False)
+#     except Exception as e:
+#         # If user isn't logged in we show a different UI
+#         app.logger.debug(e)
+#         message_dict, cache = get_query_firebase(3)
+#         message_dict = process_message_dict(message_dict, time_stamp_key="timestamp")
+#         return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict,  sample_urls=cache, test_login=False)
+#
+#
+# # Request to add 3 more
+# @app.route('/result', methods=['GET', 'POST'])
+# def zmq_sub():
+#     global cache
+#     print("adding 3 more images")
+#     # Added 3 more token incremented
+#     try:
+#         if session['token'] is not None:
+#             message_dict = {}
+#             # Increase the counter
+#             session["results_counter"] += 1
+#             # Request for 3 more
+#             message_dict, cache = get_query_firebase(3*session["results_counter"])
+#             message_dict = process_message_dict(message_dict, time_stamp_key="timestamp")
+#             return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict,  sample_urls=cache, test_login=True)
+#         else:
+#             session["results_counter"] += 1
+#             message_dict, cache = get_query_firebase(3*session["results_counter"])
+#             message_dict = process_message_dict(message_dict, time_stamp_key="timestamp")
+#             return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict,  sample_urls=cache, test_login=False)
+#     except Exception as e:
+#         app.logger.debug(e)
+#         # add three function for not logged in users.
+#         message_dict, cache = get_query_firebase(3*session["results_counter"])
+#         message_dict = process_message_dict(message_dict, time_stamp_key="timestamp")
+#         return render_template("zmq_sub.html", title="Main Page", message_sub=message_dict, sample_urls=cache, test_login=False)
 
 @app.route('/poll')
 def poll():
 
-    client_state = ast.literal_eval(request.args.get("state"))
+    # client_state = ast.literal_eval(request.args.get("state"))
+    last_state = session.get("trigger_state", {})
 
     #poll the database
     while True:
@@ -400,17 +418,19 @@ def poll():
                 message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("observation_status").child(
                     "Energy-Detection").order_by_child("start_timestamp").limit_to_last(3).get().val()
                 # we want the order of the most recent triggers to be from most recent to least recent
-                message_dict = dict(reversed(list(message_dict.items())))
+                message_dict = collections.OrderedDict(reversed(list(message_dict.items())))
                 # Gets the results and forms the time
-                message_dict = process_message_dict(message_dict)
-                if message_dict != client_state:
-                    print("client_state", type(client_state))
+                message_dict = utils.process_message_dict(message_dict)
+                if message_dict != last_state:
+                    print("client_state", type(last_state))
+                    session["trigger_state"] = message_dict
                     return "change"
                 else:
                     return "Same"
             else:
                 raise RuntimeError("Need to login")
-        except:
+        except Exception as e:
+            app.logger.info(f"Exception encountered: {e}")
             raise RuntimeError("Need to login")
 
 @app.route('/toggle-server')
@@ -424,53 +444,54 @@ def toggleServer():
 
 
 
-@app.route('/trigger')
-def my_form():
-    try:
-        if session['token'] is not None:
-            print("get querry, trigger")
-            # Gets the most recent triggers from the observation status variables
-            message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("observation_status").child(
-                "Energy-Detection").order_by_child("start_timestamp").limit_to_last(3).get().val()
-            print("Convert time")
-            # we want the order of the most recent triggers to be from most recent to least recent
-            message_dict = dict(reversed(list(message_dict.items())))
-            # Gets the results and forms the time
-            message_dict = process_message_dict(message_dict)
-            return render_template('zmq_push.html', message_sub=message_dict)
-        else:
-            return redirect('../login')
-    except Exception as e:
-        app.logger.debug(e)
-        print("returning to login")
-        return redirect('../login')
-
-
-@app.route('/trigger', methods=['GET', 'POST'])
-def zmq_push():
-    try:
-        if session['token'] is not None:
-            compute_request = {}
-            for key in request.form:
-                compute_request[key] = request.form[key]
-            app.logger.debug(compute_request)
-            context = zmq.Context()
-            socket = context.socket(zmq.PUSH)
-            socket.connect(session["server"])
-            socket.send_pyobj(compute_request)
-            # keys are "alg_package", "alg_name", and "input_file_url"
-            message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("observation_status").child(
-                "Energy-Detection").order_by_child("start_timestamp").limit_to_last(3).get().val()
-            # we want the order of the most recent triggers to be from most recent to least recent
-            message_dict = dict(reversed(list(message_dict.items())))
-            message_dict = process_message_dict(message_dict)
-            return render_template('zmq_push.html',  message_sub=message_dict)
-        else:
-            return redirect('../login')
-    except Exception as e:
-        app.logger.debug(e)
-        print("returning to login")
-        return redirect('../login')
+# @app.route('/trigger')
+# def my_form():
+#     try:
+#         if session['token'] is not None:
+#             print("get querry, trigger")
+#             # Gets the most recent triggers from the observation status variables
+#             message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("observation_status").child(
+#                 "Energy-Detection").order_by_child("start_timestamp").limit_to_last(3).get().val()
+#             print("Convert time")
+#             # we want the order of the most recent triggers to be from most recent to least recent
+#             message_dict = collections.OrderedDict(reversed(list(message_dict.items())))
+#             # Gets the results and forms the time
+#             message_dict = process_message_dict(message_dict)
+#             return render_template('zmq_push.html', message_sub=message_dict)
+#         else:
+#             print("no session token")
+#             return redirect('../login')
+#     except Exception as e:
+#         app.logger.debug(e)
+#         print("returning to login")
+#         return redirect('../login')
+#
+#
+# @app.route('/trigger', methods=['GET', 'POST'])
+# def zmq_push():
+#     try:
+#         if session['token'] is not None:
+#             compute_request = {}
+#             for key in request.form:
+#                 compute_request[key] = request.form[key]
+#             app.logger.debug(compute_request)
+#             context = zmq.Context()
+#             socket = context.socket(zmq.PUSH)
+#             socket.connect(session["server"])
+#             socket.send_pyobj(compute_request)
+#             # keys are "alg_package", "alg_name", and "input_file_url"
+#             message_dict = db.child("breakthrough-listen-sandbox").child("flask_vars").child("observation_status").child(
+#                 "Energy-Detection").order_by_child("start_timestamp").limit_to_last(3).get().val()
+#             # we want the order of the most recent triggers to be from most recent to least recent
+#             message_dict = collections.OrderedDict(reversed(list(message_dict.items())))
+#             message_dict = process_message_dict(message_dict)
+#             return render_template('zmq_push.html',  message_sub=message_dict)
+#         else:
+#             return redirect('../login')
+#     except Exception as e:
+#         app.logger.debug(e)
+#         print("returning to login")
+#         return redirect('../login')
 
 
 listener = threading.Thread(target=socket_listener, args=())
@@ -602,9 +623,12 @@ def filter_images(df, n):
 
 
 def get_processed_hist_and_img(single_uri):
-    data = pd.read_pickle(single_uri)
-    observ = get_observation(single_uri)
-    return [get_base64_hist(data), get_base64_images(observ)]
+    try:
+        data = pd.read_pickle(single_uri)
+        observ = get_observation(single_uri)
+        return [get_base64_hist(data), get_base64_images(observ)]
+    except:
+        print("could not find file "+ single_uri)
 
 # Dashboard page and displays the cards
 
@@ -632,8 +656,9 @@ def counter():
     return str(session["counter"])
 
 
-app.register_blueprint(monitor.bp)
-
-if __name__ == '__main__':
-    app = config_app()
-    app.run()
+# app.register_blueprint(monitor.bp)
+# #app.register_blueprint(results.bp)
+#
+# if __name__ == '__main__':
+#     app = config_app()
+#     app.run()

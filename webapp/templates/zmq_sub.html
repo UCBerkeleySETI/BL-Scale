@@ -196,13 +196,13 @@
 							</li>
 							<li>
 
-								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="./trigger">Trigger</a>
+								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="../trigger">Trigger</a>
 
 
 							</li>
 							<li>
 
-								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="./result">Results</a>
+								<a class="text-gray-extra-light text-extra-small uk-visible@l" href="../result">Results</a>
 
 
 							</li>
@@ -516,7 +516,7 @@
 				<div class="row">
 					{% for sample in sample_urls[key][1] %}
 						<div class="col-sm-3">
-							
+
 							<!-- <img id="myImg" src='{{ sample }}' alt="This zooms-in really well and smooth">
 							The Modal -->
 							<img  id='{{ sample }}' src="{{ sample_urls[key][1][sample] }}" onclick="newTabImage('{{ sample }}')"/>
@@ -525,17 +525,17 @@
 									console.log("#"+sample);
 									tag = "#"+sample
 									var image = new Image();
-									image.src = $("#"+sample).attr('src');							
+									image.src = $("#"+sample).attr('src');
 									var w = window.open("",'_blank');
 									w.document.write('<body style="background-color:black;">');
 									w.document.write('<img src="'+ image.src+'" style="width:100%">');
-									w.document.close(); 
+									w.document.close();
 								}
 							</script>
 
 
-						
-							
+
+
 					</div>
 					{%endfor%}
 				</div>
