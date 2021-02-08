@@ -21,6 +21,8 @@ RUN pip3.8 install --upgrade pip
 RUN pip3.8 install zmq kubernetes tqdm
 
 # hack to remove carrige return
-RUN sed $'s/\r$//' /code/BL-Scale/scripts/start_scheduler_pod.sh > /code/BL-Scale/scripts/start_scheduler_pod.sh
+# RUN sed $'s/\r$//' /code/BL-Scale/scripts/start_scheduler_pod.sh > /code/BL-Scale/scripts/start_scheduler_pod.sh
+
+RUN cat /code/BL-Scale/scripts/start_scheduler_pod.sh
 
 CMD sh /code/BL-Scale/scripts/start_scheduler_pod.sh
