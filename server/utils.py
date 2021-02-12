@@ -22,6 +22,7 @@ class Scheduler:
         if self.idle_workers:
             worker = self.idle_workers.pop()
             worker.schedule(serialized)
+            return worker
         else:
             self.requests.append(serialized)
 
