@@ -13,6 +13,7 @@ import pyrebase
 from firebase_admin import auth
 import firebase_admin
 import pprint
+from collections import OrderedDict
 from datetime import datetime
 from flask import (
     Blueprint, render_template, current_app
@@ -31,5 +32,12 @@ def base():
     # Pulls from the firebase stored values for the monitor
     front_end_data = db.child("breakthrough-listen-sandbox").child("flask_vars").child("monitor").get().val()
     current_app.logger.debug(front_end_data)
+    front_end_data = clean_metrics(front_end_data)
     # Passes in the time to show when the page was last updated.
     return render_template("monitor.html", title="Monitor", encoded=front_end_data, time=str(datetime.now()))
+
+
+def clean_metrics(metrics):
+    return OrderedDict([(pod, pod_metrics) for pod, pod_metrics in metrics.items()
+                        if ("CPU" in pod_metrics and "RAM" in pod_metrics and "STATUS" in pod_metrics
+                            and "message" in pod_metrics])
