@@ -39,5 +39,4 @@ def base():
 
 def clean_metrics(metrics):
     return OrderedDict([(pod, pod_metrics) for pod, pod_metrics in metrics.items()
-                        if ("CPU" in pod_metrics and "RAM" in pod_metrics and "STATUS" in pod_metrics
-                            and "message" in pod_metrics)])
+                        if ("CPU" in pod_metrics and "RAM" in pod_metrics and "STATUS" in pod_metrics)])

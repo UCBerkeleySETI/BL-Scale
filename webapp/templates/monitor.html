@@ -275,7 +275,7 @@
 						<h4 class="text-weight-800 Raleway text-white">{{ key }}</h4>
 						<p class="text-white text-weight-400 no-margin-bottom"><b>STATUS</b></p>
 							<p class="text-white text-weight-400 no-margin-bottom">
-								{{encoded[key]["message"]}}
+								{{ encoded[key]["message"] if "message" in encoded[key] else "" }}
 							</p>
 							<img class='img-responsive' src='{{ encoded[key]["encode"] }}' height="100%" width="100%" style="margin:15px" class="center">
 
