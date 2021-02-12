@@ -245,6 +245,7 @@ def socket_listener():
     poller = zmq.Poller()
     poller.register(sub_socket, zmq.POLLIN)
     while True:
+        app.logger.debug("Listener Alive")
         socks = dict(poller.poll(2))
         if int(time.time()) % 60 == 0:
             app.logger.debug("Polling")
@@ -492,7 +493,6 @@ def toggleServer():
 #         app.logger.debug(e)
 #         print("returning to login")
 #         return redirect('../login')
-
 
 listener = threading.Thread(target=socket_listener, args=())
 
