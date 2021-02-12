@@ -56,3 +56,4 @@ numpydoc
 pyzmq
 gcsfs
 firebase-admin
+PyJWT

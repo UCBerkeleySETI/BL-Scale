@@ -275,14 +275,14 @@
 						<h4 class="text-weight-800 Raleway text-white">{{ key }}</h4>
 						<p class="text-white text-weight-400 no-margin-bottom"><b>STATUS</b></p>
 							<p class="text-white text-weight-400 no-margin-bottom">
-								{{encoded[key]["message"]}}
+								{{ encoded[key]["message"] if "message" in encoded[key] else "" }}
 							</p>
 							<img class='img-responsive' src='{{ encoded[key]["encode"] }}' height="100%" width="100%" style="margin:15px" class="center">
 
-							<h6 class="text-weight-800 Raleway text-white">CPU {{ encoded[key]["CPU"][19] }}%</h6>
-							<meter min="0" max="100" low="50" high="75" optimum="100" value="{{ encoded[key]["CPU"][19] }}" ></meter>
+							<h6 class="text-weight-800 Raleway text-white">CPU {{ encoded[key]["CPU"][-1] }}%</h6>
+							<meter min="0" max="100" low="50" high="75" optimum="100" value="{{ encoded[key]["CPU"][-1] }}" ></meter>
 							<h6 class="text-weight-800 Raleway text-white">RAM {{ encoded[key]["RAM"][19] }}%</h6>
-							<meter min="0" max="100" low="50" high="75" optimum="100" value="{{ encoded[key]["RAM"][19] }}"></meter>
+							<meter min="0" max="100" low="50" high="75" optimum="100" value="{{ encoded[key]["RAM"][-1] }}"></meter>
 							<h6 class="text-weight-800 Raleway text-white">STATUS {{ encoded[key]["STATUS"] }}</h6>
 							<meter min="0" max="100" low="50" high="75" optimum="100" value="{{ encoded[key]["STATUS"] }}"></meter>
 						<p>&nbsp;</p>
