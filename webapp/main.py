@@ -188,7 +188,7 @@ def update_monitor_data(update, TIME=20):
 
             total_CPU = update[key]["CPU_REQUESTED"]
             total_RAM = update[key]["RAM_REQUESTED"]
-            if key not in data:
+            if key not in data or "CPU" not in data[key] or "RAM" not in data[key]:
                 data[key] = collections.defaultdict(dict)
                 data[key]["CPU"] = []
                 data[key]["RAM"] = []
