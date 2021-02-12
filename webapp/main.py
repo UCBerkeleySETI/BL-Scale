@@ -185,7 +185,6 @@ def update_monitor_data(update, TIME=20):
         if key.startswith("bl-scale-algo"):
             temp_dict = {}
             # app.logger.debug('appending values')
-
             total_CPU = update[key]["CPU_REQUESTED"]
             total_RAM = update[key]["RAM_REQUESTED"]
             if key not in data or "CPU" not in data[key] or "RAM" not in data[key]:
@@ -212,7 +211,7 @@ def update_monitor_data(update, TIME=20):
             temp_dict["CPU"] = data[key]["CPU"]
             temp_dict["RAM"] = data[key]["RAM"]
             if 'STATUS' in data[key]:
-                temp_dict[key]['STATUS'] = data[key]['STATUS']
+                temp_dict['STATUS'] = data[key]['STATUS']
             temp_dict["encode"] = image_encode
             front_end_data[key] = temp_dict
     for key in data:
@@ -245,7 +244,6 @@ def socket_listener():
     poller = zmq.Poller()
     poller.register(sub_socket, zmq.POLLIN)
     while True:
-        app.logger.debug("Listener Alive")
         socks = dict(poller.poll(2))
         if int(time.time()) % 60 == 0:
             app.logger.debug("Polling")
