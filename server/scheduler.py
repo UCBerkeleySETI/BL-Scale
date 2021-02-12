@@ -92,5 +92,5 @@ while True:
 
     if int(time.time()) % 60 == 0 and int(time.time()) != last_info_time:
         logging.info("scheduler running normally")
-        logging.info(f"Idle workers: {scheduler.idle_workers}")
+        logging.info(f"Idle workers: {[str(worker) for worker in scheduler.idle_workers]}")
         last_info_time = int(time.time())
