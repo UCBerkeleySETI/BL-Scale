@@ -31,7 +31,7 @@ bp = Blueprint('monitor', __name__, url_prefix='/monitor')
 def base():
     # Pulls from the firebase stored values for the monitor
     front_end_data = db.child("breakthrough-listen-sandbox").child("flask_vars").child("monitor").get().val()
-    current_app.logger.debug(front_end_data)
+    current_app.logger.debug(front_end_data.keys())
     front_end_data = clean_metrics(front_end_data)
     # Passes in the time to show when the page was last updated.
     return render_template("monitor.html", title="Monitor", encoded=front_end_data, time=str(datetime.now()))

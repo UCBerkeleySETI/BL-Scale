@@ -185,10 +185,9 @@ def update_monitor_data(update, TIME=20):
         if key.startswith("bl-scale-algo"):
             temp_dict = {}
             # app.logger.debug('appending values')
-
             total_CPU = update[key]["CPU_REQUESTED"]
             total_RAM = update[key]["RAM_REQUESTED"]
-            if key not in data:
+            if key not in data or "CPU" not in data[key] or "RAM" not in data[key]:
                 data[key] = collections.defaultdict(dict)
                 data[key]["CPU"] = []
                 data[key]["RAM"] = []
@@ -212,7 +211,7 @@ def update_monitor_data(update, TIME=20):
             temp_dict["CPU"] = data[key]["CPU"]
             temp_dict["RAM"] = data[key]["RAM"]
             if 'STATUS' in data[key]:
-                temp_dict[key]['STATUS'] = data[key]['STATUS']
+                temp_dict['STATUS'] = data[key]['STATUS']
             temp_dict["encode"] = image_encode
             front_end_data[key] = temp_dict
     for key in data:
@@ -249,7 +248,6 @@ def socket_listener():
         if int(time.time()) % 60 == 0:
             app.logger.debug("Polling")
             app.logger.debug(pprint.pformat(socks))
-            time.sleep(1)
         if sub_socket in socks and socks[sub_socket] == zmq.POLLIN:
             topic, serialized = sub_socket.recv_multipart()
             if topic == b"MESSAGE":
@@ -287,6 +285,7 @@ def socket_listener():
                 status_dict = pickle.loads(status_serialized)
                 app.logger.debug(f"status serialized: {status_dict}")
                 update_status_messages(status_dict)
+        time.sleep(1)
 
 
 def get_query_firebase(num):
@@ -492,7 +491,6 @@ def toggleServer():
 #         app.logger.debug(e)
 #         print("returning to login")
 #         return redirect('../login')
-
 
 listener = threading.Thread(target=socket_listener, args=())
 

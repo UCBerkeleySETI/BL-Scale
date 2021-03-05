@@ -79,7 +79,10 @@ while True:
 
     if request_recv_socket in sockets and sockets[request_recv_socket] == zmq.POLLIN:
         serialized = request_recv_socket.recv()
-        scheduler.schedule_request(serialized)
+        logging.info(f"Received request {serialized}")
+        worker = scheduler.schedule_request(serialized)
+        if worker:
+            logging.info(f"Request scheduled to {str(worker)}")
 
     if broadcast_sub_socket in sockets and sockets[broadcast_sub_socket] == zmq.POLLIN:
         serialized_status = broadcast_sub_socket.recv_multipart()[1]
@@ -88,9 +91,11 @@ while True:
         scheduler.update_worker(status)
 
         if scheduler.requests:
-            scheduler.schedule_request(scheduler.requests.pop(0))
+            worker = scheduler.schedule_request(scheduler.requests.pop(0))
+            if worker:
+                logging.info(f"Request scheduled to {str(worker)}")
 
     if int(time.time()) % 60 == 0 and int(time.time()) != last_info_time:
         logging.info("scheduler running normally")
-        logging.info(f"Idle workers: {scheduler.idle_workers}")
+        logging.info(f"Idle workers: {[str(worker) for worker in scheduler.idle_workers]}")
         last_info_time = int(time.time())
