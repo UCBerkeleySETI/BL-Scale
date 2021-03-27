@@ -15,6 +15,7 @@ WORKDIR /code
 COPY . /code/BL-Scale
 WORKDIR /code/BL-Scale/
 RUN pip3 install --upgrade pip
+RUN pip3 install -r webapp/requirements.txt
 RUN pip3 install zmq kubernetes tqdm numpy pandas matplotlib Pyrebase
 
 # hack to remove carrige return
