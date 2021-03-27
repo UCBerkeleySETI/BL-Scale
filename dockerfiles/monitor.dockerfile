@@ -15,7 +15,7 @@ WORKDIR /code
 COPY . /code/BL-Scale
 WORKDIR /code/BL-Scale/
 RUN pip3 install --upgrade pip
-RUN pip3 install zmq kubernetes tqdm
+RUN pip3 install zmq kubernetes tqdm numpy
 
 # hack to remove carrige return
 # RUN sed $'s/\r$//' /code/BL-Scale/scripts/start_monitor_pod.sh > /code/BL-Scale/scripts/start_monitor_pod.sh
