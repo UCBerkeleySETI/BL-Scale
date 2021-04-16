@@ -6,7 +6,7 @@ request_send_socket.connect("tcp://34.122.126.21:5555")
 
 request = dict()
 
-request["alg_package"] = ""
+request["alg_package"] = "energy_detection"
 request["alg_name"] = ""
 request["input_file_url"] = ""
 

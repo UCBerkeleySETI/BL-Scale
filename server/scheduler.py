@@ -79,8 +79,14 @@ while True:
 
     if request_recv_socket in sockets and sockets[request_recv_socket] == zmq.POLLIN:
         serialized = request_recv_socket.recv()
+        try:
+            request = pickle.loads(serialized)
+            logging.info(f"Received request: {request}")
+        except (pickle.UnpicklingError, KeyError) as e:
+            logging.info(f"Exception of type {type(e).__name__} occurred with request: {serialized}")
+            continue
         logging.info(f"Received request {serialized}")
-        worker = scheduler.schedule_request(serialized)
+        worker = scheduler.schedule_request(request)
         if worker:
             logging.info(f"Request scheduled to {str(worker)}")
 
@@ -90,8 +96,8 @@ while True:
         logging.info(f"Received status update: {status}")
         scheduler.update_worker(status)
 
-        if scheduler.requests:
-            worker = scheduler.schedule_request(scheduler.requests.pop(0))
+        if scheduler.has_pending_requests():
+            worker = scheduler.schedule_request()
             if worker:
                 logging.info(f"Request scheduled to {str(worker)}")
 
