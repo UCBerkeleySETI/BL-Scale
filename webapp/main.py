@@ -267,12 +267,24 @@ def socket_listener():
                     # Updates the completed observation status and metrics
                     db.child("breakthrough-listen-sandbox").child("flask_vars").child(
                         'processed_observations').child(algo_type).child(target_name).set(message_dict)
+                    
+                    # Removes completed observation from in_progress_observations
+                    db.child("breakthrough-listen-sandbox").child("flask_vars").child(
+                        'in_progress_observations').child(algo_type).child(target_name).remove()
                 else:
                     algo_type = message_dict["algo_type"]
                     url = message_dict["url"]
-                    # Updates the observation status
+                    # (OLD) Updates the observation status - eventually remove and replace with in_progress_observations
                     db.child("breakthrough-listen-sandbox").child("flask_vars").child(
                         'observation_status').child(algo_type).child(url).set(message_dict)
+
+                    # Create a new tree - in_progress_observations - to replace observation_status eventually
+                    # in_progress_observations will be compatible with processed_observations so that observations
+                    # can be removed when they are finished.
+                    target_name = message_dict['target']
+                    db.child("breakthrough-listen-sandbox").child("flask_vars").child(
+                        'in_progress_observations').child(algo_type).child(target_name).set(message_dict)
+
                 app.logger.debug(f'Updated database with {message_dict}')
             if topic == b"METRICS":
                 monitoring_serialized = serialized
