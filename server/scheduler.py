@@ -1,4 +1,5 @@
 from kubernetes import client, config
+from flask import Flask
 import zmq
 import time
 import logging
@@ -60,6 +61,18 @@ logging.info(json.dumps(metrics, indent=2))
 # set up scheduler abstraction
 ########################################
 scheduler = Scheduler(context)
+
+########################################
+# run autoscaler metric server
+########################################
+
+app = Flask(__name__)
+
+@app.route('/')
+def worker_metric():
+    return len(scheduler.idle_workers) / len(scheduler.workers)
+
+app.run(port=6443)
 
 ########################################
 # Run event loop

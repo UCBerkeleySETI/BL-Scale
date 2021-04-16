@@ -33,6 +33,8 @@ spec:
               name: bl-scale-sched
               terminationMessagePath: /dev/termination-log
               terminationMessagePolicy: File
+              ports:
+              - containerPort: 6443
             volumes:
               - name: "cred-key"
                 secret:

@@ -10,9 +10,10 @@ spec:
   minReplicas: 1
   maxReplicas: 20
   metrics:
-  - type: Resource
-    resource:
-      name: memory
+  - type: Object
+    object:
       target:
-        type: Utilization
-        averageUtilization: 50
+        kind: Service
+        name: metric-exporter
+      metricName: idleworkers
+      targetValue: 0.2
