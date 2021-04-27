@@ -5,7 +5,7 @@ import logging
 import sys
 import pickle
 import json
-from utils import get_pod_data, extract_metrics, Scheduler, Worker, create_pod, delete_pod
+from utils import get_pod_data, extract_metrics, Scheduler, Worker
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 logging.info("Running")
@@ -44,15 +44,15 @@ config.load_kube_config()
 
 # start up check
 logging.info("Listing pods with their IPs:")
-v1 = client.CoreV1Api()
-ret = v1.list_pod_for_all_namespaces(watch=False)
+api_client = client.ApiClient()
+
+core_api = client.CoreV1Api(api_client)
+apps_api = client.AppsV1Api(api_client)
+ret = core_api.list_pod_for_all_namespaces(watch=False)
 for i in ret.items:
     logging.info("%s\t%s\t%s" % (i.status.pod_ip, i.metadata.namespace, i.metadata.name))
 
-api_client = client.ApiClient()
-
-
-pod_data, pod_specs = get_pod_data(api_client, v1)
+pod_data, pod_specs = get_pod_data(api_client, core_api)
 metrics = extract_metrics(pod_data, pod_specs)
 logging.info(json.dumps(metrics, indent=2))
 
@@ -68,44 +68,46 @@ scheduler = Scheduler(context)
 last_info_time = int(time.time())
 prev_idle_workers = scheduler.idle_workers
 
-while True:
-    sockets = dict(poller.poll(2))
+if __name__ == "__main__":
+    while True:
+        sockets = dict(poller.poll(2))
 
-    if connect_recv_socket in sockets and sockets[connect_recv_socket] == zmq.POLLIN:
-        connect = connect_recv_socket.recv_pyobj()
-        if connect["pod_id"] not in scheduler.workers:
-            new_worker = Worker(connect["pod_id"], connect["pod_ip"], context)
-            scheduler.connect_worker(new_worker)
-            logging.info(f"Connected worker {connect['pod_id']} at {connect['pod_ip']}")
+        if connect_recv_socket in sockets and sockets[connect_recv_socket] == zmq.POLLIN:
+            connect = connect_recv_socket.recv_pyobj()
+            if connect["pod_id"] not in scheduler.workers:
+                new_worker = Worker(connect["pod_id"], connect["pod_ip"], context)
+                scheduler.connect_worker(new_worker)
+                logging.info(f"Connected worker {connect['pod_id']} at {connect['pod_ip']}")
 
-    if request_recv_socket in sockets and sockets[request_recv_socket] == zmq.POLLIN:
-        serialized = request_recv_socket.recv()
-        logging.info(f"Received request {serialized}")
-        worker = scheduler.schedule_request(serialized)
-        if worker:
-            logging.info(f"Request scheduled to {str(worker)}")
-
-    if broadcast_sub_socket in sockets and sockets[broadcast_sub_socket] == zmq.POLLIN:
-        serialized_status = broadcast_sub_socket.recv_multipart()[1]
-        status = pickle.loads(serialized_status)
-        logging.info(f"Received status update: {status}")
-        scheduler.update_worker(status)
-
-        if scheduler.requests:
-            worker = scheduler.schedule_request(scheduler.requests.pop(0))
+        if request_recv_socket in sockets and sockets[request_recv_socket] == zmq.POLLIN:
+            serialized = request_recv_socket.recv()
+            logging.info(f"Received request {serialized}")
+            worker = scheduler.schedule_request(serialized)
             if worker:
                 logging.info(f"Request scheduled to {str(worker)}")
 
-    if prev_idle_workers != len(scheduler.idle_workers):
-        if scheduler.idle_workers > 2:
-            worker = scheduler.idle_workers.pop()
-            delete_pod(api_client, worker.id)
-        elif scheduler.idle_workers < 2:
-            create_pod(api_client)
+        if broadcast_sub_socket in sockets and sockets[broadcast_sub_socket] == zmq.POLLIN:
+            serialized_status = broadcast_sub_socket.recv_multipart()[1]
+            status = pickle.loads(serialized_status)
+            logging.info(f"Received status update: {status}")
+            scheduler.update_worker(status)
 
-        prev_idle_workers = len(scheduler.idle_workers)
+            if scheduler.requests:
+                worker = scheduler.schedule_request(scheduler.requests.pop(0))
+                if worker:
+                    logging.info(f"Request scheduled to {str(worker)}")
 
-    if int(time.time()) % 60 == 0 and int(time.time()) != last_info_time:
-        logging.info("scheduler running normally")
-        logging.info(f"Idle workers: {[str(worker) for worker in scheduler.idle_workers]}")
-        last_info_time = int(time.time())
+        if prev_idle_workers != len(scheduler.idle_workers):
+            if  len(scheduler.idle_workers) > 2:
+                worker = scheduler.idle_workers.pop()
+                scheduler.remove_worker(core_api)
+            elif len(scheduler.idle_workers) < 2:
+                scheduler.add_worker(apps_api)
+
+            prev_idle_workers = len(scheduler.idle_workers)
+
+        if int(time.time()) % 60 == 0 and int(time.time()) != last_info_time:
+            logging.info("scheduler running normally")
+            logging.info(f"Idle workers: {[str(worker) for worker in scheduler.idle_workers]}")
+            last_info_time = int(time.time())
+        

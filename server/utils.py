@@ -11,12 +11,40 @@ class Scheduler:
         self.requests = list()
         self.stage = stage
 
+        if self.stage == 'DEV':
+            self.deployment_name = 'bl-scale-algo-dev'
+        else:
+            self.deployment_name = 'bl-scale-algo'
+
     def connect_worker(self, worker):
         self.workers[worker.id] = worker
         self.idle_workers.add(worker)
 
-    def add_worker(self):
-        pass
+    def add_worker(self, apps_api):
+        return apps_api.patch_namespaced_deployment_scale(
+            self.deployment_name,
+            'default',
+            [
+                {
+                    'op': 'replace',
+                    'path': '/spec/replicas',
+                    'value': len(self.workers) + 1
+                }
+            ])
+
+    def remove_worker(self, core_api):
+        worker = self.idle_workers.pop()
+        del self.workers[worker]
+        return apps_api.patch_namespaced_deployment_scale(
+            self.deployment_name,
+            'default',
+            [
+                {
+                    'op': 'replace',
+                    'path': '/spec/replicas',
+                    'value': len(self.workers)
+                }
+            ])
 
     def schedule_request(self, serialized):
         if self.idle_workers:
@@ -75,18 +103,6 @@ def get_pod_data(api_client, v1):
 
     ret_specs = v1.list_pod_for_all_namespaces(watch=False)
     return data, ret_specs
-
-def create_pod(api_client):
-    return api_client.call_api(
-        '/api/v1/namespaces/' + 'default' + '/pods', 'POST',
-        auth_settings=['BearerToken'], body='../yaml/static-algo-prod.yaml')
-    )
-
-def delete_pod(api_client, pod_name):
-    return api_client.call_api(
-        '/api/v1/namespaces/' + 'default' + '/pods/' + pod_name, 'DELETE',
-        auth_settings=['BearerToken'], response_type='json')
-    )
 
 def extract_metrics(pod_data, pod_specs):
     pods = pod_data["items"]
