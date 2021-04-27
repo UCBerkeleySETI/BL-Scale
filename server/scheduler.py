@@ -5,7 +5,7 @@ import logging
 import sys
 import pickle
 import json
-from utils import get_pod_data, extract_metrics, Scheduler, Worker
+from utils import get_pod_data, extract_metrics, Scheduler, Worker, create_pod, delete_pod
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 logging.info("Running")
@@ -66,6 +66,7 @@ scheduler = Scheduler(context)
 ########################################
 
 last_info_time = int(time.time())
+prev_idle_workers = scheduler.idle_workers
 
 while True:
     sockets = dict(poller.poll(2))
@@ -94,6 +95,15 @@ while True:
             worker = scheduler.schedule_request(scheduler.requests.pop(0))
             if worker:
                 logging.info(f"Request scheduled to {str(worker)}")
+
+    if prev_idle_workers != len(scheduler.idle_workers):
+        if scheduler.idle_workers > 2:
+            worker = scheduler.idle_workers.pop()
+            delete_pod(api_client, worker.id)
+        elif scheduler.idle_workers < 2:
+            create_pod(api_client)
+
+        prev_idle_workers = len(scheduler.idle_workers)
 
     if int(time.time()) % 60 == 0 and int(time.time()) != last_info_time:
         logging.info("scheduler running normally")

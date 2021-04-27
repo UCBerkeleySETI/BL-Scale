@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Pod
+metadata:
+    name: bl-scale-algo
+    labels:
+        app: bl-scale-algo
+spec:
+    containers:
+        - name: bl-scale-energy-detection
+          image: gcr.io/breakthrough-listen-sandbox/bl-scale:energy-detection-stable
+          imagePullPolicy: Always
+          securityContext:
+              privileged: true
+              capabilities:
+                  add:
+                      - SYS_ADMIN
+          lifecycle:
+              postStart:
+                  exec:
+                      command: ["gcsfuse", "bl-scale", "/buckets/bl-scale"]
+              preStop:
+                  exec:
+                      command: ["fusermount", "-u", "/buckets/bl-scale"]
+          env:
+            - name: ALG_SUB_PACKAGE
+              valueFrom:
+                configMapKeyRef:
+                  key: ALG_SUB_PACKAGE
+                  name: bl-scale-config-38mx
+            - name: ALG_NAME
+              valueFrom:
+                configMapKeyRef:
+                  key: ALG_NAME
+                  name: bl-scale-config-38mx
+            - name: GOOGLE_APPLICATION_CREDENTIALS
+              value: "/var/run/secret/cloud.google.com/bl-scale_key.json"
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+          volumeMounts:
+            - name: "cred-key"
+              mountPath: "/var/run/secret/cloud.google.com"
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          resources:
+              limits:
+                  cpu: "15000m"
+                  memory: "30G"
+              requests:
+                  cpu: "7000m"
+                  memory: "16G"
+    volumes:
+      - name: "cred-key"
+        secret:
+          secretName: "bl-scale-cred-key"
+    nodeSelector:
+        cloud.google.com/gke-nodepool: algo-pool
+    dnsPolicy: ClusterFirst
+    restartPolicy: Always
+    schedulerName: default-scheduler
+    securityContext: {}
+    terminationGracePeriodSeconds: 300

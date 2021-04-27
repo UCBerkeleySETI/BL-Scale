@@ -76,6 +76,17 @@ def get_pod_data(api_client, v1):
     ret_specs = v1.list_pod_for_all_namespaces(watch=False)
     return data, ret_specs
 
+def create_pod(api_client):
+    return api_client.call_api(
+        '/api/v1/namespaces/' + 'default' + '/pods', 'POST',
+        auth_settings=['BearerToken'], body='../yaml/static-algo-prod.yaml')
+    )
+
+def delete_pod(api_client, pod_name):
+    return api_client.call_api(
+        '/api/v1/namespaces/' + 'default' + '/pods/' + pod_name, 'DELETE',
+        auth_settings=['BearerToken'], response_type='json')
+    )
 
 def extract_metrics(pod_data, pod_specs):
     pods = pod_data["items"]
