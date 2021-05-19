@@ -34,7 +34,11 @@ class Scheduler:
 
     def remove_worker(self, core_api):
         worker = self.idle_workers.pop()
-        del self.workers[worker]
+        try:
+            del self.workers[worker]
+        except:
+            print(self.workers)
+            print(worker)
         return apps_api.patch_namespaced_deployment_scale(
             self.deployment_name,
             'default',
