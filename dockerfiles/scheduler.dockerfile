@@ -10,7 +10,7 @@ RUN curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
 RUN python3.8 get-pip.py
 RUN python3.8 -m pip install --upgrade pip setuptools wheel
 
-RUN curl -sSL https://sdk.cloud.google.com | bash
+RUN curl -sSL https://sdk.cloud.google.com | bash >/dev/null 2>&1
 ENV PATH $PATH:/root/google-cloud-sdk/bin
 
 RUN mkdir /code

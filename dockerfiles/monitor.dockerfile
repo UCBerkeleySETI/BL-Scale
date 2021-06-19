@@ -7,7 +7,7 @@ ENV LANG C.UTF-8
 RUN apt update
 RUN apt install -y git curl python3-pip
 
-RUN curl -sSL https://sdk.cloud.google.com | bash
+RUN curl -sSL https://sdk.cloud.google.com | bash >/dev/null 2>&1
 ENV PATH $PATH:/root/google-cloud-sdk/bin
 
 RUN mkdir /code
