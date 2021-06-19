@@ -31,16 +31,12 @@ pandocfilters
 pickleshare
 requests-oauthlib
 seaborn
-cachetools
 certifi
 chardet
 google
-google-api-core
 google-auth
-google-cloud-core
 google-auth-oauthlib
 google-cloud-storage
-google-resumable-media
 gunicorn
 gevent
 idna
