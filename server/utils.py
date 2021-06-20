@@ -1,6 +1,5 @@
 import zmq
 import json
-import uuid
 from collections import defaultdict
 
 
@@ -16,23 +15,16 @@ class Scheduler:
         self.workers[worker.id] = worker
         self.idle_workers.add(worker)
 
-    def has_pending_requests(self):
-        return len(self.requests) > 0
-
     def add_worker(self):
         pass
 
-    def schedule_request(self, request=None):
-        if not request:
-            request = self.requests.pop(0)
-        if "rid" not in request:
-            request["rid"] = uuid.uuid4().hex
+    def schedule_request(self, serialized):
         if self.idle_workers:
             worker = self.idle_workers.pop()
-            worker.schedule(request)
+            worker.schedule(serialized)
             return worker
         else:
-            self.requests.append(request)
+            self.requests.append(serialized)
 
     def update_worker(self, status):
         if status["pod_id"] not in self.workers:
@@ -54,11 +46,11 @@ class Worker:
         self.idle = True
         self.last_status = None
 
-    def schedule(self, request):
+    def schedule(self, serialized):
         if self.idle:
             request_send_socket = self.context.socket(zmq.PUSH)
             request_send_socket.connect(f"tcp://{self.ip}:5555")
-            request_send_socket.send_pyobj(request)
+            request_send_socket.send(serialized)
             self.idle = False
             return True
         else:
