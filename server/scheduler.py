@@ -90,8 +90,8 @@ while True:
         logging.info(f"Received status update: {status}")
         scheduler.update_worker(status)
 
-        if scheduler.has_pending_requests():
-            worker = scheduler.schedule_request()
+        if scheduler.requests:
+            worker = scheduler.schedule_request(scheduler.requests.pop(0))
             if worker:
                 logging.info(f"Request scheduled to {str(worker)}")
 
