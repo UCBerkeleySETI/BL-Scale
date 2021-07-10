@@ -233,66 +233,6 @@ def logout():
 #         db.child("breakthrough-listen-sandbox").child("flask_vars").child("monitor").child(key).child("STATUS").set("ACTIVE")
 
 
-<<<<<<< HEAD
-    # set up poller
-    poller = zmq.Poller()
-    poller.register(sub_socket, zmq.POLLIN)
-    while True:
-        socks = dict(poller.poll(2))
-        if int(time.time()) % 60 == 0:
-            app.logger.debug("Polling")
-            app.logger.debug(pprint.pformat(socks))
-        if sub_socket in socks and socks[sub_socket] == zmq.POLLIN:
-            topic, serialized = sub_socket.recv_multipart()
-            if topic == b"MESSAGE":
-                serialized_message_dict = serialized
-                app.logger.debug(serialized_message_dict)
-                # Update the string variable
-                message_dict = pickle.loads(serialized_message_dict)
-                app.logger.debug(f"Received message: {message_dict}")
-                # Adds message to the firebase variables
-                db.child("breakthrough-listen-sandbox").child("flask_vars").child("sub_message").set(message_dict)
-                if message_dict["done"]:
-                    time_stamp = time.time()*1000
-                    algo_type = message_dict["algo_type"]
-                    message_dict["timestamp"] = time_stamp
-                    target_name = message_dict["target"]
-                    # Updates the completed observation status and metrics
-                    db.child("breakthrough-listen-sandbox").child("flask_vars").child(
-                        'processed_observations').child(algo_type).child(target_name).set(message_dict)
-                    
-                    # Removes completed observation from in_progress_observations
-                    db.child("breakthrough-listen-sandbox").child("flask_vars").child(
-                        'in_progress_observations').child(algo_type).child(target_name).remove()
-                else:
-                    algo_type = message_dict["algo_type"]
-                    url = message_dict["url"]
-                    # (OLD) Updates the observation status - eventually remove and replace with in_progress_observations
-                    db.child("breakthrough-listen-sandbox").child("flask_vars").child(
-                        'observation_status').child(algo_type).child(url).set(message_dict)
-
-                    # Create a new tree - in_progress_observations - to replace observation_status eventually
-                    # in_progress_observations will be compatible with processed_observations so that observations
-                    # can be removed when they are finished.
-                    target_name = message_dict['target']
-                    db.child("breakthrough-listen-sandbox").child("flask_vars").child(
-                        'in_progress_observations').child(algo_type).child(target_name).set(message_dict)
-
-                app.logger.debug(f'Updated database with {message_dict}')
-            if topic == b"METRICS":
-                monitoring_serialized = serialized
-                monitoring_dict = pickle.loads(monitoring_serialized)
-                app.logger.debug(monitoring_dict)
-                # Runs the update monitor function which then pushes updates to the firebase.
-                # This is then pulled by the monitor script once its called.
-                update_monitor_data(monitoring_dict)
-            if topic == b"STATUS":
-                status_serialized = serialized
-                status_dict = pickle.loads(status_serialized)
-                app.logger.debug(f"status serialized: {status_dict}")
-                update_status_messages(status_dict)
-        time.sleep(1)
-=======
 # def socket_listener():
 #     context = zmq.Context()
 #     # First socket listens to proxy publisher
@@ -346,7 +286,6 @@ def logout():
 #                 app.logger.debug(f"status serialized: {status_dict}")
 #                 update_status_messages(status_dict)
 #         time.sleep(1)
->>>>>>> 5fa40a36d1fca1dff2abd444227aae55402ffd80
 
 
 def get_query_firebase(num):
