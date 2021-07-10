@@ -248,7 +248,6 @@ def socket_listener():
         if int(time.time()) % 60 == 0:
             app.logger.debug("Polling")
             app.logger.debug(pprint.pformat(socks))
-            time.sleep(1)
         if sub_socket in socks and socks[sub_socket] == zmq.POLLIN:
             topic, serialized = sub_socket.recv_multipart()
             if topic == b"MESSAGE":
@@ -298,6 +297,7 @@ def socket_listener():
                 status_dict = pickle.loads(status_serialized)
                 app.logger.debug(f"status serialized: {status_dict}")
                 update_status_messages(status_dict)
+        time.sleep(1)
 
 
 def get_query_firebase(num):
