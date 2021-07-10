@@ -48,14 +48,20 @@ def update_monitor_data(update, TIME=20):
                 data[key]["CPU"].pop(0)
             while len(data[key]["RAM"]) > TIME:
                 data[key]["RAM"].pop(0)
-            image_encode = sutils.get_base64_hist_monitor(
-                list_cpu=data[key]["CPU"], list_ram=data[key]["RAM"], threshold=TIME)
+
+            # commented out
+            #image_encode = sutils.get_base64_hist_monitor(
+                #list_cpu=data[key]["CPU"], list_ram=data[key]["RAM"], threshold=TIME)
+
             # app.logger.debug('BASE64 DONE')
             temp_dict["CPU"] = data[key]["CPU"]
             temp_dict["RAM"] = data[key]["RAM"]
             if 'STATUS' in data[key]:
                 temp_dict['STATUS'] = data[key]['STATUS']
-            temp_dict["encode"] = image_encode
+
+            # Commented out to avoid storing images in Firebase
+            #temp_dict["encode"] = image_encode
+
             front_end_data[key] = temp_dict
     for key in data:
         if key not in front_end_data:
