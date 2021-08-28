@@ -1,8 +1,11 @@
 import zmq
 import json
 import uuid
+import logging
+import sys
 from collections import defaultdict
 
+logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
 class Scheduler:
     def __init__(self, context, stage="DEV"):
@@ -15,6 +18,8 @@ class Scheduler:
     def connect_worker(self, worker):
         self.workers[worker.id] = worker
         self.idle_workers.add(worker)
+
+        logging.debug(f"Worker {worker.id} connected to scheduler.")
 
     def has_pending_requests(self):
         return len(self.requests) > 0
@@ -30,8 +35,13 @@ class Scheduler:
         if self.idle_workers:
             worker = self.idle_workers.pop()
             worker.schedule(request)
+
+            logging.debug(f"Worker {worker.id} working on request.")
+
             return worker
         else:
+            logging.debug("Request added to queue.")
+
             self.requests.append(request)
 
     def update_worker(self, status):
@@ -42,8 +52,12 @@ class Scheduler:
                 self.workers[status["pod_id"]] = worker
         else:
             worker = self.workers[status["pod_id"]]
+            
         if worker.update(status):
             self.idle_workers.add(worker)
+            logging.debug(f"Worker {worker.id} now active.")
+        else:
+            logging.debug(f"Worker {worker.id} now idle.")
 
 
 class Worker:
