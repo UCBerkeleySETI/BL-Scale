@@ -68,7 +68,7 @@ pandocfilters==1.4.3
 pickleshare==0.7.5
 Pillow==8.2.0
 proto-plus==1.18.1
-protobuf==3.15.8
+protobuf==3.18.3
 psutil==5.8.0
 pyasn1==0.4.8
 pyasn1-modules==0.2.8
